@@ -36,7 +36,7 @@ export default defineConfig({
   // Fuera del sitemap los paneles privados y la demo del comparador (llevan
   // noindex): evita la contradicción sitemap↔robots que penaliza Google.
   integrations: [sitemap({
-    filter: (page) => !/\/(admin|clientes|analiticas|comparador)(\.html)?$/.test(page),
+    filter: (page) => !/\/(admin|clientes|analiticas|cambios|comparador)(\.html)?$/.test(page),
     serialize,
   })],
 });

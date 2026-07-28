@@ -71,6 +71,33 @@
     toastTimer = setTimeout(function () { t.classList.remove("show"); }, 3200);
   }
 
+  // ---------- Registro de auditoría (best-effort) ----------
+  // Inserta una fila en change_log con quién hizo qué. Si algo de esto falla
+  // (tabla no migrada, sin red, sesión rara) NUNCA debe romper la operación
+  // principal: todo va envuelto y sin esperar su resultado.
+  function currentEmail() {
+    if (!LIVE) return Promise.resolve("");
+    return sb.auth.getUser().then(function (r) {
+      return (r && r.data && r.data.user && r.data.user.email) || "";
+    }).catch(function () { return ""; });
+  }
+  function logChange(entry) {
+    if (!LIVE) return;
+    try {
+      currentEmail().then(function (email) {
+        entry.user_email = email;
+        return sb.from("change_log").insert([entry]);
+      }).catch(function () { /* best-effort: no interrumpe la operación principal */ });
+    } catch (e) { /* best-effort: no interrumpe la operación principal */ }
+  }
+  function snapshotRow(p) {
+    return {
+      slug: p.slug, name: p.name, brand: p.brand, category: p.category, price: p.price,
+      specs: (p.specs || []).slice(), features: (p.features || []).slice(), description: p.description,
+      ideal_for: p.ideal_for, efficiency: p.efficiency, img: p.img, pop: p.pop, best: p.best, visible: p.visible
+    };
+  }
+
   // ---------- Sesión compartida entre paneles ----------
   // Si ya iniciaste sesión en el otro panel, entras directamente sin
   // volver a escribir la contraseña (la sesión se guarda en el navegador).
@@ -350,6 +377,7 @@
       var ok = window.confirm('¿Eliminar definitivamente "' + (p.name || "este producto") + '"?\n\nSi solo quieres que no se vea en la web, usa el interruptor de visibilidad.');
       if (!ok) return;
       var slug = p.slug;
+      var beforeDelete = snapshotRow(p);
       deleteRow(slug, function (saved) {
         // Solo mutamos el estado local si el DELETE se confirmó; si falla,
         // la ficha permanece en la lista (sin borrado optimista que mienta).
@@ -357,6 +385,11 @@
           STATE[cat].splice(idx, 1);
           renderList(cat);
           toast("Producto eliminado.");
+          logChange({
+            action: "borrar", entity: "producto", entity_id: slug,
+            label: 'Eliminó el producto "' + (beforeDelete.name || slug) + '".',
+            before_data: beforeDelete, after_data: null
+          });
         }
       });
       return;
@@ -371,6 +404,11 @@
       var price = Number(val("f-price-" + uid));
       if (name.length < 2) { toast("El nombre es obligatorio.", true); return; }
       if (!isValidPrice(price)) { toast("El precio debe ser un número entre 1 y 99.999.", true); return; }
+
+      // Para el registro de auditoría: la ficha ANTES de aplicar los cambios
+      // del formulario (null si el producto es nuevo, no hay "antes").
+      var wasNew = !!p._isNew;
+      var beforeSave = wasNew ? null : snapshotRow(p);
 
       p.name = name;
       p.brand = val("f-brand-" + uid);
@@ -401,7 +439,21 @@
         ideal_for: p.ideal_for, efficiency: p.efficiency, img: p.img, pop: p.pop, best: p.best, visible: p.visible
       };
       saveRow(row, function (saved) {
-        if (saved) { renderList(cat); toast("Ficha guardada" + (LIVE ? " y publicada." : " (modo demo).")); }
+        if (saved) {
+          renderList(cat);
+          toast("Ficha guardada" + (LIVE ? " y publicada." : " (modo demo)."));
+          logChange(wasNew
+            ? {
+                action: "crear", entity: "producto", entity_id: row.slug,
+                label: 'Creó el producto "' + row.name + '".',
+                before_data: null, after_data: row
+              }
+            : {
+                action: "editar", entity: "producto", entity_id: row.slug,
+                label: 'Editó el producto "' + row.name + '".',
+                before_data: beforeSave, after_data: row
+              });
+        }
       });
       return;
     }
@@ -449,9 +501,17 @@
     var p = STATE[cat][idx];
     if (p._isNew) { toast("Guarda primero la ficha del producto nuevo.", true); sw.checked = true; return; }
     var prevVisible = p.visible;
+    var beforeVis = snapshotRow(p);
     p.visible = sw.checked;
     prod.classList.toggle("hidden-prod", !p.visible);
     var row = { slug: p.slug, visible: p.visible };
+    var logVisibility = function () {
+      logChange({
+        action: p.visible ? "mostrar" : "ocultar", entity: "producto", entity_id: p.slug,
+        label: (p.visible ? 'Mostró el producto "' : 'Ocultó el producto "') + (p.name || p.slug) + '".',
+        before_data: beforeVis, after_data: snapshotRow(p)
+      });
+    };
     if (LIVE) {
       sb.from("products").update({ visible: p.visible }).eq("slug", p.slug).then(function (res) {
         if (res.error) {
@@ -464,6 +524,7 @@
         }
         renderList(cat);
         toast(p.visible ? "Producto visible en la web." : "Producto oculto de la web.");
+        logVisibility();
       });
     } else {
       persistDemo();

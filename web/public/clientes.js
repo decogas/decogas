@@ -40,6 +40,24 @@
     toastTimer = setTimeout(function () { t.classList.remove("show"); }, 3200);
   }
 
+  // ---------- Registro de auditoría (best-effort) ----------
+  // Igual que en admin.js: nunca debe romper la operación principal si falla.
+  function currentEmail() {
+    if (!LIVE) return Promise.resolve("");
+    return sb.auth.getUser().then(function (r) {
+      return (r && r.data && r.data.user && r.data.user.email) || "";
+    }).catch(function () { return ""; });
+  }
+  function logChange(entry) {
+    if (!LIVE) return;
+    try {
+      currentEmail().then(function (email) {
+        entry.user_email = email;
+        return sb.from("change_log").insert([entry]);
+      }).catch(function () { /* best-effort: no interrumpe la operación principal */ });
+    } catch (e) { /* best-effort: no interrumpe la operación principal */ }
+  }
+
   // ---------- Sesión compartida entre paneles ----------
   if (LIVE) {
     sb.auth.getSession().then(function (res) {
@@ -321,6 +339,12 @@
       lead.estado = nuevo;
       render();
       toast("Estado actualizado: " + ESTADO_LABEL[nuevo] + ".");
+      logChange({
+        action: "cambiar-estado", entity: "lead", entity_id: String(lead.id),
+        label: "Cambió el estado de " + (lead.name || "un cliente") + " a " + ESTADO_LABEL[nuevo] + ".",
+        before_data: { id: lead.id, estado: anterior },
+        after_data: { id: lead.id, estado: nuevo }
+      });
     };
     if (LIVE) {
       sb.from("leads").update({ estado: nuevo }).eq("id", id).then(function (res) {
@@ -358,12 +382,27 @@
     if (!del) return;
     if (!window.confirm("¿Eliminar este cliente de la lista? Esta acción no se puede deshacer.")) return;
     var id = del.dataset.id;
+    var lead = null;
+    for (var i = 0; i < LEADS.length; i++) {
+      if (String(LEADS[i].id) === String(id)) { lead = LEADS[i]; break; }
+    }
     if (LIVE) {
       sb.from("leads").delete().eq("id", id).then(function (res) {
         if (res.error) { toast("Error: " + res.error.message, true); return; }
         LEADS = LEADS.filter(function (l) { return String(l.id) !== String(id); });
         render();
         toast("Cliente eliminado.");
+        if (lead) {
+          logChange({
+            action: "borrar", entity: "lead", entity_id: String(id),
+            label: 'Eliminó al cliente "' + (lead.name || "sin nombre") + '".',
+            before_data: {
+              id: lead.id, name: lead.name, phone: lead.phone, email: lead.email,
+              interest: lead.interest, message: lead.message, estado: lead.estado, created_at: lead.created_at
+            },
+            after_data: null
+          });
+        }
       });
     }
   });
