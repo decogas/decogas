@@ -24,12 +24,12 @@
   };
 
   // ---------- Estado ----------
-  var STATE = { calderas: [], aires: [], termos: [] };
+  var STATE = { calderas: [], aires: [], termos: [], aerotermia: [] };
 
   var DATASETS = window.DECOGAS_DATASETS || {};
-  var CATS = ["calderas", "aires", "termos"];
-  var LIST_IDS = { calderas: "listCalderas", aires: "listAires", termos: "listTermos" };
-  var COUNT_IDS = { calderas: "countCalderas", aires: "countAires", termos: "countTermos" };
+  var CATS = ["calderas", "aires", "termos", "aerotermia"];
+  var LIST_IDS = { calderas: "listCalderas", aires: "listAires", termos: "listTermos", aerotermia: "listAerotermia" };
+  var COUNT_IDS = { calderas: "countCalderas", aires: "countAires", termos: "countTermos", aerotermia: "countAerotermia" };
   function defaults(category) {
     var d = DATASETS[category];
     return (d ? d.products : []).map(function (p) {
@@ -320,7 +320,9 @@
       var nuevo = {
         slug: "", name: "", brand: "", category: cat, price: 0,
         specs: [], features: [], description: "", ideal_for: "", efficiency: "", img: "",
-        pop: STATE[cat].length + 1, best: false, visible: true, _isNew: true
+        // La categoría aerotermia es nueva (sin catálogo publicado todavía): sus
+        // productos nacen OCULTOS por defecto, a diferencia del resto de categorías.
+        pop: STATE[cat].length + 1, best: false, visible: cat !== "aerotermia", _isNew: true
       };
       STATE[cat].push(nuevo);
       renderList(cat);

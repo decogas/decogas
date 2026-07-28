@@ -45,7 +45,7 @@
   }
 
   // ---------- En el catálogo: pintar la tira ----------
-  if (page !== "calderas" && page !== "aires" && page !== "termos") return;
+  if (page !== "calderas" && page !== "aires" && page !== "termos" && page !== "aerotermia") return;
   var root = document.getElementById("catalogRoot");
   if (!root || !root.parentNode || typeof root.parentNode.insertBefore !== "function") return;
   var vistos = leer().filter(function (x) { return x && x.slug && x.name; });

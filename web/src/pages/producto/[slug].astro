@@ -44,6 +44,7 @@ const CAT = {
   calderas: { page: 'calderas.html', name: 'Calderas' },
   aires: { page: 'aires.html', name: 'Aire acondicionado' },
   termos: { page: 'termos.html', name: 'Termos y calentadores' },
+  aerotermia: { page: 'aerotermia.html', name: 'Aerotermia' },
 }[p.category] || { page: 'index.html', name: 'Catálogo' };
 
 const price = Number(p.price);
@@ -87,7 +88,7 @@ const breadcrumbLd = JSON.stringify({
 });
 
 const waText = encodeURIComponent(`Hola, me interesa: ${p.name} (${fmt(price)} €). ¿Me podéis informar?`);
-const scripts = ['utils.js', 'config.js', 'prices.js', 'data-calderas.js', 'data-aires.js', 'data-termos.js', 'search.js', 'recientes.js', 'presupuesto.js', 'app.js'];
+const scripts = ['utils.js', 'config.js', 'prices.js', 'data-calderas.js', 'data-aires.js', 'data-termos.js', 'data-aerotermia.js', 'search.js', 'recientes.js', 'presupuesto.js', 'app.js'];
 ---
 <Base title={`${p.name} · Decogas Madrid`} description={metaDesc} dataPage="producto" scripts={scripts}>
   <Fragment slot="head">

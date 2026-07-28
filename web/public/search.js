@@ -32,8 +32,8 @@
         return (remote && remote.length ? remote : local(cat));
       }).catch(function () { return local(cat); });
     };
-    indexPromise = Promise.all([one("calderas"), one("aires"), one("termos")]).then(function (lists) {
-      return lists[0].concat(lists[1]).concat(lists[2]).filter(function (p) { return p.visible !== false; });
+    indexPromise = Promise.all([one("calderas"), one("aires"), one("termos"), one("aerotermia")]).then(function (lists) {
+      return lists[0].concat(lists[1]).concat(lists[2]).concat(lists[3]).filter(function (p) { return p.visible !== false; });
     });
     return indexPromise;
   }
@@ -63,7 +63,8 @@
   var ICONS = {
     calderas: '<svg width="18" height="18" viewBox="0 0 24 24"><rect x="7" y="2" width="10" height="20" rx="2"/><circle cx="10.5" cy="7" r="1.3"/><circle cx="13.5" cy="7" r="1.3"/><path d="M9.5 16c.8-1.2 1.7-1.2 2.5 0s1.7 1.2 2.5 0"/></svg>',
     termos: '<svg width="18" height="18" viewBox="0 0 24 24"><rect x="8" y="2" width="8" height="17" rx="4"/><path d="M10 22h4M12 19v3"/><circle cx="12" cy="9" r="2.2"/></svg>',
-    aires: '<svg width="18" height="18" viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="9" rx="2.5"/><path d="M5 17c1-1.4 2-1.4 3 0M10.5 18c1-1.4 2-1.4 3 0M16 17c1-1.4 2-1.4 3 0"/></svg>'
+    aires: '<svg width="18" height="18" viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="9" rx="2.5"/><path d="M5 17c1-1.4 2-1.4 3 0M10.5 18c1-1.4 2-1.4 3 0M16 17c1-1.4 2-1.4 3 0"/></svg>',
+    aerotermia: '<svg width="18" height="18" viewBox="0 0 24 24"><path d="M14.7 6.3a4.5 4.5 0 0 0-6.4 6.4l7 7a2 2 0 0 0 2.8-2.8z"/><path d="m5 21 4-4"/></svg>'
   };
   var PAGE = document.body.getAttribute("data-page");
 
@@ -104,13 +105,15 @@
       resultsBox.innerHTML = '<div class="search-empty">Sin resultados para "' + esc(q) + '". Prueba con la marca o el modelo.</div>';
       return;
     }
+    var CAT_PAGE = { calderas: "calderas.html", termos: "termos.html", aires: "aires.html", aerotermia: "aerotermia.html" };
+    var CAT_LABEL = { calderas: "Caldera", termos: "Termo / Calentador", aires: "Aire acondicionado", aerotermia: "Aerotermia" };
     var prodHtml = matches.map(function (p) {
-      var page = p.category === "calderas" ? "calderas.html" : p.category === "termos" ? "termos.html" : "aires.html";
+      var page = CAT_PAGE[p.category] || "aires.html";
       return '<a class="search-result" href="' + page + '#p=' + esc(p.slug) + '">' +
         '<span class="sr-icon">' + ICONS[p.category] + "</span>" +
         '<span class="sr-info">' +
           '<span class="sr-name">' + esc(p.name) + "</span>" +
-          '<span class="sr-meta">' + esc(p.brand) + " · " + (p.category === "calderas" ? "Caldera" : p.category === "termos" ? "Termo / Calentador" : "Aire acondicionado") + "</span>" +
+          '<span class="sr-meta">' + esc(p.brand) + " · " + (CAT_LABEL[p.category] || "Equipo") + "</span>" +
         "</span>" +
         '<span class="sr-price">' + Number(p.price).toLocaleString("es-ES") + " €</span>" +
       "</a>";
@@ -134,7 +137,8 @@
     if (!a) return;
     var samePage = (PAGE === "calderas" && a.href.indexOf("calderas.html") !== -1) ||
                    (PAGE === "termos" && a.href.indexOf("termos.html") !== -1) ||
-                   (PAGE === "aires" && a.href.indexOf("aires.html") !== -1);
+                   (PAGE === "aires" && a.href.indexOf("aires.html") !== -1) ||
+                   (PAGE === "aerotermia" && a.href.indexOf("aerotermia.html") !== -1);
     if (samePage) close();
   });
 })();

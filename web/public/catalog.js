@@ -26,7 +26,7 @@
   var formatPrice = function (n) { return Number(n).toLocaleString("es-ES"); };
 
   var waLink = function (p) {
-    var msg = "Hola, me interesa " + (DATA.type === "ac" ? "el aire acondicionado " : DATA.type === "termo" ? "el equipo " : "la caldera ") +
+    var msg = "Hola, me interesa " + (DATA.type === "ac" ? "el aire acondicionado " : DATA.type === "termo" ? "el equipo " : DATA.type === "aerotermia" ? "el equipo de aerotermia " : "la caldera ") +
       p.name + " por " + formatPrice(p.price) + "\u20AC que he visto en vuestra web. \u00BFMe pod\u00E9is informar?";
     return "https://wa.me/34651368631?text=" + encodeURIComponent(msg);
   };
@@ -53,6 +53,18 @@
         '<path d="M110 54v6l4 3" stroke="' + b + '" stroke-width="2.4" stroke-linecap="round"/>' +
         '<path d="M96 124v10M124 124v10" stroke="' + a + '" stroke-width="4" stroke-linecap="round"/>' +
         '<path class="breeze-line" d="M100 92 Q110 99 120 92" stroke="' + a + '" stroke-width="3" stroke-linecap="round"/>' +
+        '</svg>';
+    }
+    if (DATA.type === "aerotermia") {
+      // Unidad exterior de bomba de calor: carcasa con ventilador (aspas) y rejillas.
+      return '<svg viewBox="0 0 220 150" fill="none">' +
+        '<rect x="34" y="46" width="152" height="66" rx="12" fill="#0E2238"/>' +
+        '<circle cx="72" cy="79" r="21" fill="none" stroke="' + a + '" stroke-width="3"/>' +
+        '<path d="M72 62v34M55 79h34M60 67l24 24M84 67 60 91" stroke="' + b + '" stroke-width="2.4" stroke-linecap="round"/>' +
+        '<rect x="110" y="60" width="62" height="8" rx="4" fill="' + a + '" opacity=".8"/>' +
+        '<rect x="110" y="74" width="62" height="8" rx="4" fill="' + b + '" opacity=".8"/>' +
+        '<rect x="110" y="88" width="62" height="8" rx="4" fill="' + a + '" opacity=".55"/>' +
+        '<path class="breeze-line" d="M96 120 Q108 128 120 120" stroke="' + a + '" stroke-width="3" stroke-linecap="round"/>' +
         '</svg>';
     }
     return '<svg viewBox="0 0 220 150" fill="none">' +
@@ -164,6 +176,9 @@
     }
     if (DATA.type === "termo") {
       return /calentador/i.test(txt) ? "calentador" : "termo";
+    }
+    if (DATA.type === "aerotermia") {
+      return /bibloc/i.test(txt) ? "bibloc" : /monobloc/i.test(txt) ? "monobloc" : null;
     }
     var m = String(p.idealFor || "").match(/(\d)\s*bañ/i);
     return m ? String(Math.min(Number(m[1]), 2)) : null; // sin dato: no se filtra

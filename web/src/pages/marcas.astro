@@ -7,8 +7,8 @@ const marcas = agruparPorMarca(await fetchProductosVisibles());
 const SB = new URL(import.meta.env.BASE_URL.endsWith('/') ? import.meta.env.BASE_URL : import.meta.env.BASE_URL + '/', Astro.site).href;
 const title = 'Marcas que instalamos · Decogas Madrid';
 const description = `Instalamos y damos servicio a ${marcas.length} fabricantes: ${marcas.slice(0, 6).map((m) => m.brand).join(', ')} y más. Catálogo con IVA e instalación incluidos.`;
-const scripts = ['utils.js', 'config.js', 'prices.js', 'data-calderas.js', 'data-aires.js', 'search.js', 'app.js'];
-const CAT_NOMBRE = { calderas: 'calderas', aires: 'aires', termos: 'termos' };
+const scripts = ['utils.js', 'config.js', 'prices.js', 'data-calderas.js', 'data-aires.js', 'data-termos.js', 'data-aerotermia.js', 'search.js', 'app.js'];
+const CAT_NOMBRE = { calderas: 'calderas', aires: 'aires', termos: 'termos', aerotermia: 'aerotermia' };
 const base = import.meta.env.BASE_URL.endsWith('/') ? import.meta.env.BASE_URL : import.meta.env.BASE_URL + '/';
 // Logos de marca (self-hosted en public/marcas/). Clave = slug de la marca.
 const LOGO = {

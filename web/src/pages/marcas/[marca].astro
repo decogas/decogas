@@ -20,11 +20,11 @@ const LOGO = {
 };
 const fmt = (n) => Number(n).toLocaleString('es-ES');
 const cuota36 = (n) => fmt(Math.ceil((Number(n) / 36) * 100) / 100);
-const CAT_NOMBRE = { calderas: 'Calderas', aires: 'Aire acondicionado', termos: 'Termos y calentadores' };
+const CAT_NOMBRE = { calderas: 'Calderas', aires: 'Aire acondicionado', termos: 'Termos y calentadores', aerotermia: 'Aerotermia' };
 const cats = [...new Set(m.productos.map((p) => p.category))];
 const title = `${m.brand}: catálogo con instalación · Decogas Madrid`;
 const description = `${m.productos.length} equipos ${m.brand} con instalación incluida en Madrid: ${cats.map((c) => (CAT_NOMBRE[c] || c).toLowerCase()).join(', ')}. Precios con IVA y financiación sin intereses.`;
-const scripts = ['utils.js', 'config.js', 'prices.js', 'data-calderas.js', 'data-aires.js', 'data-termos.js', 'search.js', 'recientes.js', 'app.js'];
+const scripts = ['utils.js', 'config.js', 'prices.js', 'data-calderas.js', 'data-aires.js', 'data-termos.js', 'data-aerotermia.js', 'search.js', 'recientes.js', 'app.js'];
 
 const ld = JSON.stringify({
   '@context': 'https://schema.org',

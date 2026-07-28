@@ -97,7 +97,7 @@
       return fetchRows(cfg, "select=slug,price,name,visible,img").then(toMap);
     }
     var demo = readDemoStorage();
-    return Promise.resolve(toMap(demo ? [].concat(demo.calderas || [], demo.aires || [], demo.termos || []) : []));
+    return Promise.resolve(toMap(demo ? [].concat(demo.calderas || [], demo.aires || [], demo.termos || [], demo.aerotermia || []) : []));
   }
 
   function applyToDom(overrides) {
