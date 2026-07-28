@@ -1193,6 +1193,7 @@ nav.main-nav a[aria-current="page"]::after{ right:0; }
 [data-theme="dark"] .article-prose p,
 [data-theme="dark"] .article-prose li,
 [data-theme="dark"] .article-prose td{ color:#C3D0DC; }
+[data-theme="dark"] .article-prose a{ color:#FF8A5B; }
 [data-theme="dark"] .article-prose blockquote{ background:#152230; color:#C3D0DC; }
 [data-theme="dark"] .article-prose h2,
 [data-theme="dark"] .article-prose h3,
@@ -1423,7 +1424,7 @@ nav.main-nav a[aria-current="page"]::after{ right:0; }
 [data-theme="dark"] .sub-chip.active{ background:#1C3B58; border-color:#1C3B58; color:#fff; }
 /* v52: badges de clase energética coherentes en oscuro (antes verde clarito chillón) */
 [data-theme="dark"] .p-specs .p-eff,
-[data-theme="dark"] .prod-eff{ background:#12301F; color:#5FD98A; border-color:#265F42; }
+[data-theme="dark"] .prod-eff{ background:#12301F !important; color:#5FD98A !important; border-color:#265F42 !important; }
 
 /* Modales: comparador de productos y presupuesto de la calculadora */
 [data-theme="dark"] .compare-sheet,

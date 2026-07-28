@@ -8,3 +8,7 @@ web/.astro/
 
 # Copias de seguridad de la BD (contienen datos de clientes)
 backups/
+
+# artefactos de build
+decogas-es-web.zip
+*.zip

@@ -1,6 +1,10 @@
-# Despliegue automático a GitHub Pages en cada push a main.
-# Desde la migración a Astro: construye web/ y publica web/dist.
-name: Desplegar en GitHub Pages
+# Despliegue automático a Nicalia (hosting cPanel) por FTP en cada push a main.
+# Construye web/ (Astro) y sincroniza web/dist a la carpeta decogas.es del hosting.
+# Requiere 3 secrets en el repo (Settings -> Secrets and variables -> Actions):
+#   FTP_SERVER    -> 92.60.33.97
+#   FTP_USERNAME  -> decogas@decogas.es
+#   FTP_PASSWORD  -> (la contraseña del FTP)
+name: Desplegar en Nicalia (FTP)
 
 on:
   push:
@@ -11,21 +15,13 @@ on:
     # generadas desde Supabase no se queden desfasadas sin pushes.
     - cron: '30 5 * * 1'
 
-permissions:
-  contents: read
-  pages: write
-  id-token: write
-
 concurrency:
-  group: pages
+  group: deploy-nicalia
   cancel-in-progress: true
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -42,9 +38,15 @@ jobs:
         env:
           SITE: https://decogas.es
           BASE: /
-      - uses: actions/configure-pages@v5
-      - uses: actions/upload-pages-artifact@v3
+      - name: Desplegar por FTP a Nicalia
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
-          path: web/dist
-      - id: deployment
-        uses: actions/deploy-pages@v4
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          local-dir: ./web/dist/
+          server-dir: /decogas.es/
+          exclude: |
+            **/.git*
+            **/.git*/**
+            **/.ftp-deploy-sync-state.json
