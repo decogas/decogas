@@ -1171,6 +1171,7 @@ nav.main-nav a[aria-current="page"]::after{ right:0; }
   --line:#25384C;
   --navy:#DCE7F1;       /* antes texto azul oscuro → ahora claro */
   --navy-soft:#B9CBDC;
+  --aero-card-bg:#141F2C; /* tarjetas de aerotermia con fondo fijo en claro */
   --shadow:0 14px 40px rgba(0,0,0,.5);
 }
 
