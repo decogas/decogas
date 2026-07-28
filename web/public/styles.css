@@ -965,7 +965,7 @@
 .article-prose h3{ font-size:19px; margin:28px 0 10px; }
 .article-prose h4{ font-family:'Inter'; font-weight:700; font-size:16px; margin:22px 0 8px; }
 .article-prose p{ font-size:16px; color:#3D4C5C; line-height:1.85; margin-bottom:16px; }
-.article-prose a{ color:var(--flame-deep); font-weight:600; }
+.article-prose a{ color:#C2410C; font-weight:600; }
 .article-prose ul, .article-prose ol{ margin:14px 0 18px 24px; }
 .article-prose li{ font-size:15.5px; color:#3D4C5C; line-height:1.8; margin-bottom:7px; }
 .article-prose img{
