@@ -28,8 +28,8 @@
   var FILTER = { name: "", from: null, to: null, interest: "", estado: "" };
 
   // Estados del mini-CRM (v7): deben coincidir con el CHECK de la BD
-  var ESTADOS = ["pendiente", "llamado", "presupuestado", "cerrado"];
-  var ESTADO_LABEL = { pendiente: "Pendiente", llamado: "Llamado", presupuestado: "Presupuestado", cerrado: "Cerrado" };
+  var ESTADOS = ["pendiente", "llamado", "presupuestado", "aprobado", "denegado"];
+  var ESTADO_LABEL = { pendiente: "Pendiente", llamado: "Llamado", presupuestado: "Presupuestado", aprobado: "Aprobado", denegado: "Denegado" };
 
   var toastTimer;
   function toast(text, isErr) {
@@ -92,7 +92,7 @@
       email: String(r.email || ""), interest: String(r.interest || ""),
       message: String(r.message || ""),
       // Autocontenida (sin variables externas): el harness de tests la extrae aislada
-      estado: ["pendiente", "llamado", "presupuestado", "cerrado"].indexOf(r.estado) !== -1 ? r.estado : "pendiente"
+      estado: ["pendiente", "llamado", "presupuestado", "aprobado", "denegado"].indexOf(r.estado) !== -1 ? r.estado : "pendiente"
     };
   }
   function loadLeads() {

@@ -67,17 +67,44 @@
   };
   var PAGE = document.body.getAttribute("data-page");
 
+  // Marcas con página propia (marcas/<slug>.html)
+  var MARCA_SLUGS = { bosch:1, daikin:1, demirdokum:1, fujitsu:1, hermann:1, hisense:1, "mitsubishi-electric":1, "saunier-duval":1, vaillant:1 };
+  var MARCA_ICON = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.6 13.4 13.4 20.6a2 2 0 0 1-2.8 0l-7.2-7.2a2 2 0 0 1-.6-1.4V4a1 1 0 0 1 1-1h7.9a2 2 0 0 1 1.4.6l7.5 7.5a2 2 0 0 1 0 2.8z"/><circle cx="7.5" cy="7.5" r="1.3"/></svg>';
+  function marcaSlug(brand) { return norm(String(brand || "")).trim().replace(/\s+/g, "-"); }
+
   function render(list, q) {
     if (!q) { resultsBox.innerHTML = ""; return; }
+
+    // --- Marcas que coinciden con la búsqueda y tienen página propia ---
+    var seen = {}, marcaHits = [];
+    list.forEach(function (p) {
+      var s = marcaSlug(p.brand);
+      if (seen[s] || !MARCA_SLUGS[s]) return;
+      if (norm(p.brand).indexOf(q) === -1) return;
+      seen[s] = 1;
+      marcaHits.push({ brand: p.brand, slug: s });
+    });
+    var marcaHtml = marcaHits.slice(0, 3).map(function (m) {
+      return '<a class="search-result search-result-marca" href="/marcas/' + esc(m.slug) + '.html">' +
+        '<span class="sr-icon">' + MARCA_ICON + "</span>" +
+        '<span class="sr-info">' +
+          '<span class="sr-name">Ver todos los ' + esc(m.brand) + "</span>" +
+          '<span class="sr-meta">Marca &middot; todos sus equipos</span>' +
+        "</span>" +
+        '<span class="sr-price">Ver &rarr;</span>' +
+      "</a>";
+    }).join("");
+
+    // --- Productos ---
     var matches = list.filter(function (p) {
       return norm(p.name + " " + p.brand).indexOf(q) !== -1;
     }).slice(0, 7);
 
-    if (!matches.length) {
+    if (!marcaHtml && !matches.length) {
       resultsBox.innerHTML = '<div class="search-empty">Sin resultados para "' + esc(q) + '". Prueba con la marca o el modelo.</div>';
       return;
     }
-    resultsBox.innerHTML = matches.map(function (p) {
+    var prodHtml = matches.map(function (p) {
       var page = p.category === "calderas" ? "calderas.html" : p.category === "termos" ? "termos.html" : "aires.html";
       return '<a class="search-result" href="' + page + '#p=' + esc(p.slug) + '">' +
         '<span class="sr-icon">' + ICONS[p.category] + "</span>" +
@@ -88,6 +115,7 @@
         '<span class="sr-price">' + Number(p.price).toLocaleString("es-ES") + " €</span>" +
       "</a>";
     }).join("");
+    resultsBox.innerHTML = marcaHtml + prodHtml;
   }
 
   var debounce;
