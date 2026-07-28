@@ -91,9 +91,9 @@
     var cards = '<div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(115px,1fr)); gap:12px; margin-bottom:22px;">' +
       card("Visitas", fmt(views)) +
       card("Visitantes", fmt(visitantes)) +
-      card("📞 Llamadas", fmt(calls), "var(--flame)") +
-      card("💬 WhatsApp", fmt(wa), "#1E9E5A") +
-      card("✉️ Formularios", fmt(formularios), "var(--ice)") +
+      card("Llamadas", fmt(calls), "var(--flame)") +
+      card("WhatsApp", fmt(wa), "#1E9E5A") +
+      card("Formularios", fmt(formularios), "var(--ice)") +
       card("Contactos totales", fmt(contactos), "var(--navy)", "llamadas + WhatsApp + formularios") +
       "</div>";
 
@@ -142,8 +142,8 @@
     var deviceBar = '<div style="margin-top:22px;">' +
       '<div style="font-size:12.5px; font-weight:600; color:var(--muted); margin-bottom:8px;">Dispositivo</div>' +
       '<div style="display:flex; height:26px; border-radius:8px; overflow:hidden; font-size:11.5px; font-weight:600; color:#fff;">' +
-      '<div style="width:' + movilPct + '%; background:var(--flame); display:flex; align-items:center; justify-content:center; min-width:44px;">📱 ' + movilPct + "%</div>" +
-      '<div style="width:' + (100 - movilPct) + '%; background:var(--navy); display:flex; align-items:center; justify-content:center; min-width:44px;">💻 ' + (100 - movilPct) + "%</div>" +
+      '<div style="width:' + movilPct + '%; background:var(--flame); display:flex; align-items:center; justify-content:center; min-width:44px;">Móvil ' + movilPct + "%</div>" +
+      '<div style="width:' + (100 - movilPct) + '%; background:var(--navy); display:flex; align-items:center; justify-content:center; min-width:44px;">Escritorio ' + (100 - movilPct) + "%</div>" +
       "</div></div>";
 
     var note = views === 0
