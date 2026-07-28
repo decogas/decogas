@@ -139,12 +139,18 @@
     // ---- Móvil vs escritorio ----
     var devTotal = dev.movil + dev.escritorio || 1;
     var movilPct = Math.round((dev.movil / devTotal) * 100);
+    var escPct = 100 - movilPct;
     var deviceBar = '<div style="margin-top:22px;">' +
       '<div style="font-size:12.5px; font-weight:600; color:var(--muted); margin-bottom:8px;">Dispositivo</div>' +
-      '<div style="display:flex; height:26px; border-radius:8px; overflow:hidden; font-size:11.5px; font-weight:600; color:#fff;">' +
-      '<div style="width:' + movilPct + '%; background:var(--flame); display:flex; align-items:center; justify-content:center; min-width:44px;">Móvil ' + movilPct + "%</div>" +
-      '<div style="width:' + (100 - movilPct) + '%; background:var(--navy); display:flex; align-items:center; justify-content:center; min-width:44px;">Escritorio ' + (100 - movilPct) + "%</div>" +
-      "</div></div>";
+      '<div style="display:flex; height:12px; border-radius:999px; overflow:hidden; background:var(--line);">' +
+        '<div style="width:' + movilPct + '%; background:var(--flame);"></div>' +
+        '<div style="width:' + escPct + '%; background:#3E5C76;"></div>' +
+      '</div>' +
+      '<div style="display:flex; justify-content:space-between; gap:12px; margin-top:9px; font-size:12.5px; font-weight:600; color:var(--text);">' +
+        '<span style="display:inline-flex; align-items:center; gap:6px;"><span style="width:9px; height:9px; border-radius:2px; background:var(--flame); flex:none;"></span>Móvil ' + movilPct + '%</span>' +
+        '<span style="display:inline-flex; align-items:center; gap:6px;"><span style="width:9px; height:9px; border-radius:2px; background:#3E5C76; flex:none;"></span>Escritorio ' + escPct + '%</span>' +
+      '</div>' +
+    '</div>';
 
     var note = views === 0
       ? '<div style="background:var(--cloud); border:1px dashed var(--line); border-radius:11px; padding:14px; font-size:13px; color:var(--muted); margin-top:18px;">Aún no hay visitas registradas. En cuanto la web reciba tráfico, aquí verás todo en tiempo casi real.</div>'
