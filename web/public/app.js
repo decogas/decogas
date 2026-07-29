@@ -396,6 +396,9 @@
         var anyOk = results.some(function (r) { return r.status === "fulfilled"; });
         if (anyOk) {
           try { localStorage.setItem("decogas_last_send", String(Date.now())); } catch (err) {}
+          if (window.gtag && cfg.googleAdsConversions && cfg.googleAdsConversions.formulario) {
+            window.gtag("event", "conversion", { send_to: cfg.googleAdsConversions.formulario });
+          }
           if (successOverlay) {
             successOverlay.classList.add("show");
             burstSparkles(successOverlay);

@@ -66,7 +66,20 @@
     var a = e.target && e.target.closest ? e.target.closest("a[href]") : null;
     if (!a) return;
     var href = a.getAttribute("href") || "";
-    if (href.indexOf("tel:") === 0) send("call");
-    else if (/wa\.me|api\.whatsapp\.com|whatsapp:/i.test(href)) send("whatsapp");
+    if (href.indexOf("tel:") === 0) {
+      send("call");
+      fireAdsConversion("llamada");
+    } else if (/wa\.me|api\.whatsapp\.com|whatsapp:/i.test(href)) {
+      send("whatsapp");
+      fireAdsConversion("whatsapp");
+    }
   }, true);
+
+  // ---- Conversión de Google Ads (llamada/whatsapp) ----
+  function fireAdsConversion(key) {
+    try {
+      var label = cfg.googleAdsConversions && cfg.googleAdsConversions[key];
+      if (window.gtag && label) window.gtag("event", "conversion", { send_to: label });
+    } catch (e) {}
+  }
 })();

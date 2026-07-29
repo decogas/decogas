@@ -3,8 +3,9 @@
 // Se escribe UNA vez y lo comparten todas las páginas raíz de marketing.
 const rawBase = import.meta.env.BASE_URL; // '/decogas' (sin barra final)
 const base = rawBase.endsWith('/') ? rawBase : rawBase + '/'; // → '/decogas/'
-const ASSET_V = 42; // + categoría aerotermia (catálogo/búsqueda/nav)
+const ASSET_V = 43; // + seguimiento de conversiones de Google Ads
 const STYLES_V = 58; // hero interior compacto + limpieza cabecera
+const GOOGLE_ADS_ID = 'AW-18358011669';
 // Página actual (formato 'file': /decogas/calderas.html) para marcar el menú activo
 const currentFile = Astro.url.pathname.split('/').pop() || 'index.html';
 const active = (file: string) => (currentFile === file ? 'page' : undefined);
@@ -72,6 +73,8 @@ const localBizLd = JSON.stringify({
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>{title}</title>
 {description && <meta name="description" content={description}>}
+<script async src={`https://www.googletagmanager.com/gtag/js?id=${GOOGLE_ADS_ID}`}></script>
+<script is:inline set:html={`window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}window.gtag=gtag;gtag('js',new Date());gtag('config','${GOOGLE_ADS_ID}');`}></script>
 <script src={`${base}theme.js?v=1`} is:inline></script>
 <script is:inline set:html={`window.DECOGAS_BASE=${JSON.stringify(base)}`}></script>
 <script type="application/ld+json" set:html={siteLd} is:inline></script>
