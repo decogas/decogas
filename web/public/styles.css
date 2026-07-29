@@ -152,6 +152,9 @@
   .hero .wrap{ display:grid; grid-template-columns:1.2fr .8fr; gap:64px; align-items:center; width:100%; }
   @media(max-width:960px){ .hero .wrap{ grid-template-columns:1fr; } .hero{ padding-top:140px; min-height:560px; } }
   @media(max-width:600px){ .hero{ min-height:480px; } }
+  /* Heros de páginas interiores (breadcrumb+título): sin el hueco grande de la home */
+  .hero:has(.page-hero){ min-height:0; padding:118px 0 58px; align-items:flex-start; }
+  @media(max-width:960px){ .hero:has(.page-hero){ padding-top:104px; } }
   .hero h1{ color:#fff; font-size:clamp(42px,6.4vw,84px); line-height:1.02; letter-spacing:-.025em; font-weight:600; margin-bottom:24px; text-wrap:balance; }
   .hero h1 .accent{ color:var(--flame); font-style:italic; }
   .hero p.lead{ color:rgba(255,255,255,.82); font-size:19px; line-height:1.7; max-width:544px; margin-bottom:40px; }
