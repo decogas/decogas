@@ -59,7 +59,7 @@
     var el = box(); if (!el) return;
 
     var views = 0, calls = 0, wa = 0;
-    var sessions = {}, byDay = {}, byPage = {}, bySource = {}, dev = { movil: 0, escritorio: 0 };
+    var sessions = {}, byDay = {}, byDayC = {}, byDayW = {}, byPage = {}, bySource = {}, dev = { movil: 0, escritorio: 0 };
     for (var i = 0; i < events.length; i++) {
       var e = events[i];
       if (e.session) sessions[e.session] = 1;
@@ -73,8 +73,8 @@
         if (src === "interno") src = "directo";
         bySource[src] = (bySource[src] || 0) + 1;
         if (e.device === "movil") dev.movil++; else if (e.device === "escritorio") dev.escritorio++;
-      } else if (e.type === "call") calls++;
-      else if (e.type === "whatsapp") wa++;
+      } else if (e.type === "call") { calls++; var dc = (e.created_at || "").slice(0, 10); byDayC[dc] = (byDayC[dc] || 0) + 1; }
+      else if (e.type === "whatsapp") { wa++; var dw = (e.created_at || "").slice(0, 10); byDayW[dw] = (byDayW[dw] || 0) + 1; }
     }
     var visitantes = Object.keys(sessions).length;
     var formularios = leads.length;
@@ -105,18 +105,26 @@
     }
     var maxDay = 1;
     days.forEach(function (dd) { if ((byDay[dd] || 0) > maxDay) maxDay = byDay[dd]; });
+    function dayDetailHTML(dd) {
+      var v = byDay[dd] || 0, c = byDayC[dd] || 0, w = byDayW[dd] || 0;
+      var human = dd.slice(8, 10) + "/" + dd.slice(5, 7) + "/" + dd.slice(0, 4);
+      return '<b>' + human + '</b> — ' + fmt(v) + ' visitas · ' + fmt(c) + ' llamadas · ' + fmt(w) + ' WhatsApp';
+    }
     var bars = days.map(function (dd) {
       var v = byDay[dd] || 0;
       var h = Math.round((v / maxDay) * 100);
       var lbl = dd.slice(8, 10) + "/" + dd.slice(5, 7);
-      return '<div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:4px;" title="' + lbl + ": " + v + ' visitas">' +
-        '<div style="width:100%; height:80px; display:flex; align-items:flex-end;">' +
+      return '<div class="aday" data-day="' + dd + '" style="flex:1; display:flex; flex-direction:column; align-items:center; gap:3px; cursor:pointer;" title="' + lbl + ": " + v + ' visitas">' +
+        '<div style="font-size:9.5px; font-weight:700; color:var(--navy); font-family:\'IBM Plex Mono\'; min-height:12px;">' + (v || "") + "</div>" +
+        '<div style="width:100%; height:70px; display:flex; align-items:flex-end;">' +
         '<div style="width:100%; background:linear-gradient(180deg,#FF7A45,#E2501C); height:' + Math.max(h, 2) + '%; border-radius:4px 4px 0 0;"></div></div>' +
         '<div style="font-size:9px; color:var(--muted); font-family:\'IBM Plex Mono\';">' + dd.slice(8, 10) + "</div></div>";
     }).join("");
     var chart = '<div style="margin-bottom:22px;">' +
-      '<div style="font-size:12.5px; font-weight:600; color:var(--muted); margin-bottom:10px;">Visitas por día (últimos 14)</div>' +
-      '<div style="display:flex; align-items:flex-end; gap:5px;">' + bars + "</div></div>";
+      '<div style="font-size:12.5px; font-weight:600; color:var(--muted); margin-bottom:10px;">Visitas por día (últimos 14) · pulsa un día para ver su detalle</div>' +
+      '<div id="dayChart" style="display:flex; align-items:flex-end; gap:5px;">' + bars + "</div>" +
+      '<div id="dayDetail" style="margin-top:10px; font-size:13px; color:var(--text); background:var(--cloud); border:1px solid var(--line); border-radius:9px; padding:9px 12px;">' + dayDetailHTML(days[days.length - 1]) + "</div>" +
+      "</div>";
 
     // ---- Listas (páginas top + fuentes) ----
     function rankList(title, obj, total) {
@@ -157,6 +165,18 @@
       : "";
 
     el.innerHTML = cards + chart + lists + deviceBar + note;
+    var dayChartEl = el.querySelector("#dayChart");
+    if (dayChartEl) {
+      dayChartEl.addEventListener("click", function (ev) {
+        var b = ev.target && ev.target.closest ? ev.target.closest(".aday") : null;
+        if (!b) return;
+        var det = el.querySelector("#dayDetail");
+        if (det) det.innerHTML = dayDetailHTML(b.getAttribute("data-day"));
+        var all = el.querySelectorAll(".aday");
+        for (var z = 0; z < all.length; z++) all[z].style.opacity = ".5";
+        b.style.opacity = "1";
+      });
+    }
   }
 
   // Cargar cuando haya sesión de admin (sesión directa o login nuevo)
