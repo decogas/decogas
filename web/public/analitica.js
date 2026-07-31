@@ -13,6 +13,35 @@
   var box = function () { return document.getElementById("analiticaBox"); };
   var busy = false, done = false;
 
+  // ---------- Rango de fechas seleccionado ----------
+  function ymd(d) { return d.toISOString().slice(0, 10); }
+  function startOfDay(d) { var x = new Date(d); x.setHours(0, 0, 0, 0); return x; }
+  function endOfDay(d) { var x = new Date(d); x.setHours(23, 59, 59, 999); return x; }
+  var RANGE = { since: startOfDay(new Date(Date.now() - 29 * 24 * 3600 * 1000)), until: endOfDay(new Date()), label: "Últimos 30 días" };
+
+  function computeRange() {
+    var sel = document.getElementById("analiticaRango");
+    var val = sel ? sel.value : "30";
+    var now = new Date();
+    if (val === "7" || val === "30") {
+      var n = val === "7" ? 6 : 29;
+      RANGE = { since: startOfDay(new Date(Date.now() - n * 24 * 3600 * 1000)), until: endOfDay(now), label: "Últimos " + val + " días" };
+    } else if (val === "mesActual") {
+      var f = new Date(now.getFullYear(), now.getMonth(), 1);
+      RANGE = { since: startOfDay(f), until: endOfDay(now), label: "Este mes" };
+    } else if (val === "mesAnterior") {
+      var fa = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+      var ua = new Date(now.getFullYear(), now.getMonth(), 0);
+      RANGE = { since: startOfDay(fa), until: endOfDay(ua), label: "Mes anterior" };
+    } else if (val === "custom") {
+      var di = document.getElementById("analiticaDesde"), hi = document.getElementById("analiticaHasta");
+      var d = di && di.value ? new Date(di.value + "T00:00:00") : RANGE.since;
+      var h = hi && hi.value ? new Date(hi.value + "T23:59:59") : RANGE.until;
+      RANGE = { since: d, until: h, label: "Del " + ymd(d).split("-").reverse().join("/") + " al " + ymd(h).split("-").reverse().join("/") };
+    }
+    return RANGE;
+  }
+
   function fmt(n) { return Number(n || 0).toLocaleString("es-ES"); }
   // Reutiliza el esc() compartido (escapa también la comilla simple); si no
   // estuviera cargado, usa un fallback local igual de estricto.
@@ -31,10 +60,10 @@
     var el = box(); if (!el) return;
     busy = true;
     el.innerHTML = '<p style="color:var(--muted); font-size:14px; padding:6px 0;">Cargando datos…</p>';
-    var since = new Date(Date.now() - 30 * 24 * 3600 * 1000).toISOString();
+    var since = RANGE.since.toISOString(), until = RANGE.until.toISOString();
     Promise.all([
-      sb.from("web_events").select("type,path,source,session,device,created_at").gte("created_at", since).limit(50000),
-      sb.from("leads").select("created_at").gte("created_at", since).limit(5000)
+      sb.from("web_events").select("type,path,source,session,device,created_at").gte("created_at", since).lte("created_at", until).limit(50000),
+      sb.from("leads").select("created_at").gte("created_at", since).lte("created_at", until).limit(5000)
     ]).then(function (res) {
       busy = false;
       if (res[0].error) {
@@ -97,12 +126,16 @@
       card("Contactos totales", fmt(contactos), "var(--navy)", "llamadas + WhatsApp + formularios") +
       "</div>";
 
-    // ---- Gráfico por día (últimos 14) ----
+    // ---- Gráfico por día (según el rango elegido, máx. 31 barras) ----
+    var totalDias = Math.round((RANGE.until - RANGE.since) / (24 * 3600 * 1000)) + 1;
+    var CAP = 31;
     var days = [];
-    for (var k = 13; k >= 0; k--) {
-      var dt = new Date(Date.now() - k * 24 * 3600 * 1000);
+    var nDias = Math.min(totalDias, CAP);
+    for (var k = nDias - 1; k >= 0; k--) {
+      var dt = new Date(RANGE.until.getTime() - k * 24 * 3600 * 1000);
       days.push(dt.toISOString().slice(0, 10));
     }
+    var chartNote = totalDias > CAP ? " (mostrando los últimos " + CAP + " días del rango)" : "";
     var maxDay = 1;
     days.forEach(function (dd) { if ((byDay[dd] || 0) > maxDay) maxDay = byDay[dd]; });
     function dayDetailHTML(dd) {
@@ -121,7 +154,7 @@
         '<div style="font-size:9px; color:var(--muted); font-family:\'IBM Plex Mono\';">' + dd.slice(8, 10) + "</div></div>";
     }).join("");
     var chart = '<div style="margin-bottom:22px;">' +
-      '<div style="font-size:12.5px; font-weight:600; color:var(--muted); margin-bottom:10px;">Visitas por día (últimos 14) · pulsa un día para ver su detalle</div>' +
+      '<div style="font-size:12.5px; font-weight:600; color:var(--muted); margin-bottom:10px;">Visitas por día' + esc(chartNote) + ' · pulsa un día para ver su detalle</div>' +
       '<div id="dayChart" style="display:flex; align-items:flex-end; gap:5px;">' + bars + "</div>" +
       '<div id="dayDetail" style="margin-top:10px; font-size:13px; color:var(--text); background:var(--cloud); border:1px solid var(--line); border-radius:9px; padding:9px 12px;">' + dayDetailHTML(days[days.length - 1]) + "</div>" +
       "</div>";
@@ -186,6 +219,19 @@
   }
   // Botón de refresco (si existe)
   document.addEventListener("click", function (e) {
-    if (e.target && e.target.id === "analiticaRefresh") { done = false; load(true); }
+    if (e.target && e.target.id === "analiticaRefresh") { computeRange(); done = false; load(true); }
+  });
+
+  // Selector de rango: los presets recargan al momento; "personalizado" solo
+  // muestra los campos de fecha y espera al botón Actualizar.
+  document.addEventListener("change", function (e) {
+    if (e.target && e.target.id === "analiticaRango") {
+      var isCustom = e.target.value === "custom";
+      var di = document.getElementById("analiticaDesde"), hi = document.getElementById("analiticaHasta"), g = document.getElementById("analiticaGuion");
+      if (di) di.style.display = isCustom ? "inline-block" : "none";
+      if (hi) hi.style.display = isCustom ? "inline-block" : "none";
+      if (g) g.style.display = isCustom ? "inline" : "none";
+      if (!isCustom) { computeRange(); done = false; load(true); }
+    }
   });
 })();
