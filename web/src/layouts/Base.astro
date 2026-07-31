@@ -4,7 +4,7 @@
 const rawBase = import.meta.env.BASE_URL; // '/decogas' (sin barra final)
 const base = rawBase.endsWith('/') ? rawBase : rawBase + '/'; // → '/decogas/'
 const ASSET_V = 43; // + seguimiento de conversiones de Google Ads
-const STYLES_V = 60; // renombra .official-notice (colisión real con .trust-strip resuelta)
+const STYLES_V = 61; // banner de confianza movido dentro del hero, encima de Llamar/WhatsApp
 const GOOGLE_ADS_ID = 'AW-18358011669';
 // Página actual (formato 'file': /decogas/calderas.html) para marcar el menú activo
 const currentFile = Astro.url.pathname.split('/').pop() || 'index.html';
