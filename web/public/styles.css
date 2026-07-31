@@ -157,8 +157,8 @@
   @media(max-width:960px){ .hero:has(.page-hero){ padding-top:104px; } }
   /* Franjas sueltas antes del hero (p.ej. banner de confianza): el header es
      fixed y flota encima, así que necesitan el mismo despeje que .page-hero. */
-  .trust-strip{ padding:118px 0 0; }
-  @media(max-width:960px){ .trust-strip{ padding-top:104px; } }
+  .official-notice{ padding:118px 0 0; }
+  @media(max-width:960px){ .official-notice{ padding-top:104px; } }
   .hero h1{ color:#fff; font-size:clamp(42px,6.4vw,84px); line-height:1.02; letter-spacing:-.025em; font-weight:600; margin-bottom:24px; text-wrap:balance; }
   .hero h1 .accent{ color:var(--flame); font-style:italic; }
   .hero p.lead{ color:rgba(255,255,255,.82); font-size:19px; line-height:1.7; max-width:544px; margin-bottom:40px; }
