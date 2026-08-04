@@ -21,7 +21,7 @@
 
   function computeRange() {
     var sel = document.getElementById("analiticaRango");
-    var val = sel ? sel.value : "30";
+    var val = sel ? sel.dataset.value : "30";
     var now = new Date();
     if (val === "7" || val === "30") {
       var n = val === "7" ? 6 : 29;
@@ -222,16 +222,55 @@
     if (e.target && e.target.id === "analiticaRefresh") { computeRange(); done = false; load(true); }
   });
 
-  // Selector de rango: los presets recargan al momento; "personalizado" solo
-  // muestra los campos de fecha y espera al botón Actualizar.
-  document.addEventListener("change", function (e) {
-    if (e.target && e.target.id === "analiticaRango") {
-      var isCustom = e.target.value === "custom";
-      var di = document.getElementById("analiticaDesde"), hi = document.getElementById("analiticaHasta"), g = document.getElementById("analiticaGuion");
-      if (di) di.style.display = isCustom ? "inline-block" : "none";
-      if (hi) hi.style.display = isCustom ? "inline-block" : "none";
-      if (g) g.style.display = isCustom ? "inline" : "none";
-      if (!isCustom) { computeRange(); done = false; load(true); }
+  // Selector de rango (desplegable propio, no <select> nativo): los presets
+  // recargan al momento; "personalizado" solo muestra los campos de fecha y
+  // espera al botón Actualizar.
+  function selectRange(value, label) {
+    var trigger = document.getElementById("analiticaRango");
+    if (!trigger) return;
+    trigger.dataset.value = value;
+    var labelEl = document.getElementById("analiticaRangoLabel");
+    if (labelEl) labelEl.textContent = label;
+
+    var isCustom = value === "custom";
+    var di = document.getElementById("analiticaDesde"), hi = document.getElementById("analiticaHasta"), g = document.getElementById("analiticaGuion");
+    if (di) di.style.display = isCustom ? "inline-block" : "none";
+    if (hi) hi.style.display = isCustom ? "inline-block" : "none";
+    if (g) g.style.display = isCustom ? "inline" : "none";
+    if (!isCustom) { computeRange(); done = false; load(true); }
+  }
+  document.addEventListener("click", function (e) {
+    var trigger = e.target.closest && e.target.closest("#analiticaRango");
+    var menu = document.querySelector(".range-menu");
+    if (trigger) {
+      var open = menu.classList.toggle("open");
+      trigger.setAttribute("aria-expanded", String(open));
+      return;
+    }
+    var opt = e.target.closest && e.target.closest(".range-opt");
+    if (opt && menu && menu.contains(opt)) {
+      menu.querySelectorAll(".range-opt").forEach(function (o) { o.classList.remove("active"); o.removeAttribute("aria-selected"); });
+      opt.classList.add("active");
+      opt.setAttribute("aria-selected", "true");
+      menu.classList.remove("open");
+      var t = document.getElementById("analiticaRango");
+      if (t) t.setAttribute("aria-expanded", "false");
+      selectRange(opt.dataset.value, opt.textContent);
+      return;
+    }
+    if (menu && menu.classList.contains("open") && !menu.contains(e.target)) {
+      menu.classList.remove("open");
+      var trg = document.getElementById("analiticaRango");
+      if (trg) trg.setAttribute("aria-expanded", "false");
+    }
+  });
+  document.addEventListener("keydown", function (e) {
+    if (e.key !== "Escape") return;
+    var menu = document.querySelector(".range-menu.open");
+    if (menu) {
+      menu.classList.remove("open");
+      var trg = document.getElementById("analiticaRango");
+      if (trg) trg.setAttribute("aria-expanded", "false");
     }
   });
 })();
