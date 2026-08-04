@@ -469,6 +469,8 @@
     if (remote && remote.length) {
       PRODUCTS = remote.filter(function (p) { return p.visible !== false; });
     }
+    var countEl = document.getElementById("filterAllCount");
+    if (countEl) countEl.textContent = "(" + PRODUCTS.length + ")";
     renderCatalog("all");
     highlightFromHash();
   };

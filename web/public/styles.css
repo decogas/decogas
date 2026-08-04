@@ -603,6 +603,7 @@
   .filter-btn svg{ width:15px; height:15px; stroke:currentColor; }
   .filter-btn:hover{ border-color:var(--navy); color:var(--navy); }
   .filter-btn.active{ background:var(--navy); border-color:var(--navy); color:#fff; }
+  .filter-count{ opacity:.7; font-family:'IBM Plex Mono'; font-size:12px; font-weight:500; }
 
   /* ---------- catalog root + brand groups ---------- */
   #catalogRoot{ transition:opacity .22s ease, transform .22s ease; }
