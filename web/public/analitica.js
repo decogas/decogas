@@ -166,7 +166,7 @@
       var rows = arr.map(function (r) {
         var pct = total ? Math.round((r[1] / total) * 100) : 0;
         return '<div style="margin-bottom:9px;">' +
-          '<div style="display:flex; justify-content:space-between; font-size:13px; margin-bottom:3px;"><span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:72%;">' + esc(r[0]) + '</span><span style="font-family:\'IBM Plex Mono\'; color:var(--muted);">' + fmt(r[1]) + "</span></div>" +
+          '<div style="display:flex; justify-content:space-between; gap:8px; font-size:13px; margin-bottom:3px;"><span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; min-width:0; flex:1 1 auto;">' + esc(r[0]) + '</span><span style="font-family:\'IBM Plex Mono\'; color:var(--muted); flex:none;">' + fmt(r[1]) + "</span></div>" +
           '<div style="height:6px; background:var(--line); border-radius:99px; overflow:hidden;"><div style="height:100%; width:' + pct + '%; background:var(--navy); border-radius:99px;"></div></div>' +
           "</div>";
       }).join("");
