@@ -30,6 +30,8 @@
   // Estados del mini-CRM (v7): deben coincidir con el CHECK de la BD
   var ESTADOS = ["pendiente", "llamado", "presupuestado", "aprobado", "denegado"];
   var ESTADO_LABEL = { pendiente: "Pendiente", llamado: "Llamado", presupuestado: "Presupuestado", aprobado: "Aprobado", denegado: "Denegado" };
+  // Flechita del desplegable de estado (se repite en el botón al abrir/cerrar/revertir)
+  var ESTADO_CARET = '<svg class="lead-estado-caret" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>';
 
   var toastTimer;
   function toast(text, isErr) {
@@ -259,11 +261,16 @@
           badgeHTML(l.interest) +
           '<span class="lead-date">' + fmtDate(l.created_at) + "</span>" +
           (l.id
-            ? '<select class="lead-estado est-' + esc(l.estado) + '" data-id="' + esc(l.id) + '" aria-label="Estado de la solicitud">' +
-                ESTADOS.map(function (s) {
-                  return '<option value="' + s + '"' + (s === l.estado ? " selected" : "") + ">" + ESTADO_LABEL[s] + "</option>";
-                }).join("") +
-              "</select>"
+            ? '<div class="lead-estado-wrap">' +
+                '<button type="button" class="lead-estado est-' + esc(l.estado) + '" data-id="' + esc(l.id) + '" aria-haspopup="listbox" aria-expanded="false" aria-label="Estado de la solicitud">' +
+                  esc(ESTADO_LABEL[l.estado]) + ESTADO_CARET +
+                '</button>' +
+                '<div class="lead-estado-menu" role="listbox">' +
+                  ESTADOS.map(function (s) {
+                    return '<button type="button" class="lead-estado-opt est-' + s + (s === l.estado ? " active" : "") + '" data-value="' + s + '" role="option"' + (s === l.estado ? ' aria-selected="true"' : "") + ">" + ESTADO_LABEL[s] + "</button>";
+                  }).join("") +
+                "</div>" +
+              "</div>"
             : "") +
           (l.id ? '<button class="lead-del" data-id="' + esc(l.id) + '" type="button">Eliminar</button>' : "") +
         "</div>" +
@@ -323,18 +330,54 @@
     });
   }
 
+  // Desplegable de estado (propio, no <select> nativo: así se puede dar
+  // estilo al menú abierto — bordes redondeados y sombra como el resto del panel).
+  function closeEstadoMenu(menu) {
+    menu.classList.remove("open");
+    menu.previousElementSibling.setAttribute("aria-expanded", "false");
+  }
+  document.addEventListener("click", function (e) {
+    var openMenu = document.querySelector(".lead-estado-menu.open");
+    var trigger = e.target.closest(".lead-estado");
+    if (trigger) {
+      var menu = trigger.nextElementSibling;
+      var wasOpen = menu.classList.contains("open");
+      if (openMenu && openMenu !== menu) closeEstadoMenu(openMenu);
+      menu.classList.toggle("open", !wasOpen);
+      trigger.setAttribute("aria-expanded", String(!wasOpen));
+      return;
+    }
+    var opt = e.target.closest(".lead-estado-opt");
+    if (opt) {
+      var optMenu = opt.closest(".lead-estado-menu");
+      closeEstadoMenu(optMenu);
+      cambiarEstado(optMenu.previousElementSibling, opt.dataset.value);
+      return;
+    }
+    if (openMenu) closeEstadoMenu(openMenu);
+  });
+  document.addEventListener("keydown", function (e) {
+    if (e.key !== "Escape") return;
+    var openMenu = document.querySelector(".lead-estado-menu.open");
+    if (openMenu) closeEstadoMenu(openMenu);
+  });
+
   // Cambio de estado de una solicitud (v7): guarda y revierte si falla
-  document.addEventListener("change", function (e) {
-    var sel = e.target.closest(".lead-estado");
-    if (!sel) return;
-    var id = sel.dataset.id;
-    var nuevo = sel.value;
+  function cambiarEstado(trigger, nuevo) {
+    var id = trigger.dataset.id;
     var lead = null;
     for (var i = 0; i < LEADS.length; i++) {
       if (String(LEADS[i].id) === String(id)) { lead = LEADS[i]; break; }
     }
-    if (!lead) return;
+    if (!lead || nuevo === lead.estado) return;
     var anterior = lead.estado;
+    // Optimista: refleja el cambio en el botón ya mismo, igual que hacía el <select> nativo.
+    trigger.className = "lead-estado est-" + nuevo;
+    trigger.innerHTML = esc(ESTADO_LABEL[nuevo]) + ESTADO_CARET;
+    var revertir = function () {
+      trigger.className = "lead-estado est-" + anterior;
+      trigger.innerHTML = esc(ESTADO_LABEL[anterior]) + ESTADO_CARET;
+    };
     var aplicar = function () {
       lead.estado = nuevo;
       render();
@@ -349,7 +392,7 @@
     if (LIVE) {
       sb.from("leads").update({ estado: nuevo }).eq("id", id).then(function (res) {
         if (res.error) {
-          sel.value = anterior;
+          revertir();
           var msg = String(res.error.message || "");
           toast(msg.indexOf("estado") !== -1
             ? "Falta la columna de estados: ejecuta supabase/setup-supabase-v7-estados.sql en Supabase."
@@ -366,7 +409,7 @@
       } catch (err) { /* demo sin almacenamiento: solo en memoria */ }
       aplicar();
     }
-  });
+  }
 
   // Guardar nota interna al salir del campo
   document.addEventListener("change", function (e) {
