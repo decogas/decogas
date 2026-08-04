@@ -257,6 +257,17 @@
         "</div>" +
         '<div class="prod-price">' + Number(p.price).toLocaleString("es-ES") + " €</div>" +
         '<div class="prod-actions">' +
+          '<div class="transfer-wrap">' +
+            '<button class="btn ghost small transfer-btn" type="button" aria-haspopup="listbox" aria-expanded="false">' +
+              '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h4M16 17l5-5-5-5M21 12H9"/></svg>' +
+              "Transferir a" +
+            "</button>" +
+            '<div class="transfer-menu" role="listbox">' +
+              CATS.filter(function (c) { return c !== category; }).map(function (c) {
+                return '<button type="button" class="transfer-opt" data-cat="' + c + '" role="option">' + CAT_LABEL[c] + "</button>";
+              }).join("") +
+            "</div>" +
+          "</div>" +
           '<button class="icon-btn edit-btn" type="button" title="Editar ficha">' +
             '<svg viewBox="0 0 24 24"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>' +
           "</button>" +
@@ -270,9 +281,6 @@
           fieldHTML("Nombre del producto", "f-name-" + uid, p.name) +
           fieldHTML("Marca", "f-brand-" + uid, p.brand) +
           fieldHTML("Precio (€, IVA incluido)", "f-price-" + uid, p.price, null, "number") +
-          '<div class="field"><label>Categoría</label><select id="f-cat-' + uid + '">' +
-            CATS.map(function (c) { return '<option value="' + c + '"' + (c === category ? " selected" : "") + ">" + CAT_LABEL[c] + "</option>"; }).join("") +
-          "</select><p class=\"form-hint\">Cámbiala para mover el producto a otra categoría (útil para “No encontrados” / “Repetidos”).</p></div>" +
           fieldHTML("Orden de popularidad", "f-pop-" + uid, p.pop, "1 = el más vendido. Ordena el filtro \u201cMás vendido\u201d.", "number") +
           '<div class="full">' + fieldHTML("Etiquetas cortas (una por línea, se muestran bajo el nombre)", "f-specs-" + uid, p.specs.join("\n"), null, "textarea") + "</div>" +
           '<div class="full">' + fieldHTML("Descripción", "f-desc-" + uid, p.description, null, "textarea") + "</div>" +
@@ -415,13 +423,9 @@
       var wasNew = !!p._isNew;
       var beforeSave = wasNew ? null : snapshotRow(p);
 
-      var newCat = val("f-cat-" + uid) || cat;
-      var movedCat = newCat !== cat;
-
       p.name = name;
       p.brand = val("f-brand-" + uid);
       p.price = price;
-      p.category = newCat;
       p.pop = Number(val("f-pop-" + uid)) || 999;
       p.specs = lines("f-specs-" + uid);
       p.description = val("f-desc-" + uid);
@@ -449,36 +453,81 @@
       };
       saveRow(row, function (saved) {
         if (saved) {
-          if (movedCat) {
-            STATE[cat].splice(idx, 1);
-            STATE[newCat].push(p);
-            renderList(cat);
-            renderList(newCat);
-            toast('Movido a "' + CAT_LABEL[newCat] + '".');
-            logChange({
-              action: "mover", entity: "producto", entity_id: row.slug,
-              label: 'Movió "' + row.name + '" de ' + CAT_LABEL[cat] + ' a ' + CAT_LABEL[newCat] + '.',
-              before_data: beforeSave, after_data: row
-            });
-          } else {
-            renderList(cat);
-            toast("Ficha guardada" + (LIVE ? " y publicada." : " (modo demo)."));
-            logChange(wasNew
-              ? {
-                  action: "crear", entity: "producto", entity_id: row.slug,
-                  label: 'Creó el producto "' + row.name + '".',
-                  before_data: null, after_data: row
-                }
-              : {
-                  action: "editar", entity: "producto", entity_id: row.slug,
-                  label: 'Editó el producto "' + row.name + '".',
-                  before_data: beforeSave, after_data: row
-                });
-          }
+          renderList(cat);
+          toast("Ficha guardada" + (LIVE ? " y publicada." : " (modo demo)."));
+          logChange(wasNew
+            ? {
+                action: "crear", entity: "producto", entity_id: row.slug,
+                label: 'Creó el producto "' + row.name + '".',
+                before_data: null, after_data: row
+              }
+            : {
+                action: "editar", entity: "producto", entity_id: row.slug,
+                label: 'Editó el producto "' + row.name + '".',
+                before_data: beforeSave, after_data: row
+              });
         }
       });
       return;
     }
+  });
+
+  // ---------- Transferir producto a otra categoría (fuera del formulario) ----------
+  function closeTransferMenu(menu) {
+    menu.classList.remove("open");
+    menu.previousElementSibling.setAttribute("aria-expanded", "false");
+  }
+  document.addEventListener("click", function (e) {
+    var openMenu = document.querySelector(".transfer-menu.open");
+    var trigger = e.target.closest(".transfer-btn");
+    if (trigger) {
+      var menu = trigger.nextElementSibling;
+      var wasOpen = menu.classList.contains("open");
+      if (openMenu && openMenu !== menu) closeTransferMenu(openMenu);
+      menu.classList.toggle("open", !wasOpen);
+      trigger.setAttribute("aria-expanded", String(!wasOpen));
+      return;
+    }
+    var opt = e.target.closest(".transfer-opt");
+    if (opt) {
+      var optMenu = opt.closest(".transfer-menu");
+      closeTransferMenu(optMenu);
+      var prod = opt.closest(".prod");
+      var cat = prod.dataset.cat, idx = Number(prod.dataset.idx);
+      var p = STATE[cat][idx];
+      var newCat = opt.dataset.cat;
+      if (p._isNew) { toast("Guarda primero la ficha del producto nuevo.", true); return; }
+      var beforeMove = snapshotRow(p);
+      p.category = newCat;
+      var row = {
+        slug: p.slug, name: p.name, brand: p.brand, category: p.category, price: p.price,
+        specs: p.specs, features: p.features, description: p.description,
+        ideal_for: p.ideal_for, efficiency: p.efficiency, img: p.img, pop: p.pop, best: p.best, visible: p.visible
+      };
+      saveRow(row, function (saved) {
+        if (saved) {
+          STATE[cat].splice(idx, 1);
+          STATE[newCat].push(p);
+          renderList(cat);
+          renderList(newCat);
+          toast('Movido a "' + CAT_LABEL[newCat] + '".');
+          logChange({
+            action: "mover", entity: "producto", entity_id: p.slug,
+            label: 'Movió "' + p.name + '" de ' + CAT_LABEL[cat] + ' a ' + CAT_LABEL[newCat] + '.',
+            before_data: beforeMove, after_data: row
+          });
+        } else {
+          p.category = cat; // revierte si falló el guardado
+        }
+      });
+      return;
+    }
+    if (openMenu && !openMenu.contains(e.target)) closeTransferMenu(openMenu);
+  });
+  document.addEventListener("keydown", function (e) {
+    if (e.key !== "Escape") return;
+    var openMenu = document.querySelector(".transfer-menu.open");
+    if (openMenu) closeTransferMenu(openMenu);
   });
 
   // ---------- Subida de fotos a Supabase Storage ----------
