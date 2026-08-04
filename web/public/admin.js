@@ -534,13 +534,25 @@
   });
 
   // ---------- Formularios expandibles ----------
+  // Tras abrir, al terminar la transición se quita el max-height fijo (pasa a "none")
+  // para que si el contenido crece después (textarea, cambio de orientación) no quede
+  // cortado con los botones de Cancelar/Guardar inalcanzables.
   function openForm(prod) {
     var form = prod.querySelector(".prod-form");
     form.style.maxHeight = form.scrollHeight + "px";
     prod.dataset.open = "1";
+    form.addEventListener("transitionend", function onEnd(e) {
+      if (e.propertyName !== "max-height") return;
+      form.removeEventListener("transitionend", onEnd);
+      if (prod.dataset.open) form.style.maxHeight = "none";
+    });
   }
   function closeForm(prod) {
     var form = prod.querySelector(".prod-form");
+    if (form.style.maxHeight === "none" || !form.style.maxHeight) {
+      form.style.maxHeight = form.scrollHeight + "px";
+      void form.offsetHeight; // fuerza reflow para que la transición arranque desde ahí
+    }
     form.style.maxHeight = "0";
     delete prod.dataset.open;
   }

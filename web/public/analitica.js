@@ -147,7 +147,7 @@
       var v = byDay[dd] || 0;
       var h = Math.round((v / maxDay) * 100);
       var lbl = dd.slice(8, 10) + "/" + dd.slice(5, 7);
-      return '<div class="aday" data-day="' + dd + '" style="flex:1; display:flex; flex-direction:column; align-items:center; gap:3px; cursor:pointer;" title="' + lbl + ": " + v + ' visitas">' +
+      return '<div class="aday" data-day="' + dd + '" title="' + lbl + ": " + v + ' visitas">' +
         '<div style="font-size:9.5px; font-weight:700; color:var(--navy); font-family:\'IBM Plex Mono\'; min-height:12px;">' + (v || "") + "</div>" +
         '<div style="width:100%; height:70px; display:flex; align-items:flex-end;">' +
         '<div style="width:100%; background:linear-gradient(180deg,#FF7A45,#E2501C); height:' + Math.max(h, 2) + '%; border-radius:4px 4px 0 0;"></div></div>' +
@@ -155,7 +155,7 @@
     }).join("");
     var chart = '<div style="margin-bottom:22px;">' +
       '<div style="font-size:12.5px; font-weight:600; color:var(--muted); margin-bottom:10px;">Visitas por día' + esc(chartNote) + ' · pulsa un día para ver su detalle</div>' +
-      '<div id="dayChart" style="display:flex; align-items:flex-end; gap:5px;">' + bars + "</div>" +
+      '<div id="dayChart" class="day-chart">' + bars + "</div>" +
       '<div id="dayDetail" style="margin-top:10px; font-size:13px; color:var(--text); background:var(--cloud); border:1px solid var(--line); border-radius:9px; padding:9px 12px;">' + dayDetailHTML(days[days.length - 1]) + "</div>" +
       "</div>";
 
@@ -172,7 +172,7 @@
       }).join("");
       return '<div><div style="font-size:12.5px; font-weight:600; color:var(--muted); margin-bottom:10px;">' + title + "</div>" + rows + "</div>";
     }
-    var lists = '<div style="display:grid; grid-template-columns:1fr 1fr; gap:24px;">' +
+    var lists = '<div class="analitica-lists">' +
       rankList("Páginas más vistas", byPage, views) +
       rankList("De dónde vienen", bySource, views) +
       "</div>";
