@@ -257,17 +257,10 @@
         "</div>" +
         '<div class="prod-price">' + Number(p.price).toLocaleString("es-ES") + " €</div>" +
         '<div class="prod-actions">' +
-          '<div class="transfer-wrap">' +
-            '<button class="btn ghost small transfer-btn" type="button" aria-haspopup="listbox" aria-expanded="false">' +
-              '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h4M16 17l5-5-5-5M21 12H9"/></svg>' +
-              "Transferir a" +
-            "</button>" +
-            '<div class="transfer-menu" role="listbox">' +
-              CATS.filter(function (c) { return c !== category; }).map(function (c) {
-                return '<button type="button" class="transfer-opt" data-cat="' + c + '" role="option">' + CAT_LABEL[c] + "</button>";
-              }).join("") +
-            "</div>" +
-          "</div>" +
+          '<button class="btn ghost small transfer-btn" type="button" aria-haspopup="listbox" aria-expanded="false">' +
+            '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h4M16 17l5-5-5-5M21 12H9"/></svg>' +
+            "Transferir a" +
+          "</button>" +
           '<button class="icon-btn edit-btn" type="button" title="Editar ficha">' +
             '<svg viewBox="0 0 24 24"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>' +
           "</button>" +
@@ -473,28 +466,61 @@
   });
 
   // ---------- Transferir producto a otra categoría (fuera del formulario) ----------
-  function closeTransferMenu(menu) {
-    menu.classList.remove("open");
-    menu.previousElementSibling.setAttribute("aria-expanded", "false");
+  // Menú flotante único, añadido a <body> y posicionado con position:fixed:
+  // así escapa del overflow:hidden de .prod (necesario para las esquinas
+  // redondeadas del acordeón), que si no recortaba el menú y lo dejaba invisible.
+  var transferMenuEl = null;
+  var transferTarget = null;
+  function getTransferMenu() {
+    if (!transferMenuEl) {
+      transferMenuEl = document.createElement("div");
+      transferMenuEl.className = "transfer-menu";
+      transferMenuEl.setAttribute("role", "listbox");
+      document.body.appendChild(transferMenuEl);
+    }
+    return transferMenuEl;
+  }
+  function closeTransferMenu() {
+    if (!transferMenuEl) return;
+    transferMenuEl.classList.remove("open");
+    if (transferTarget && transferTarget.trigger) transferTarget.trigger.setAttribute("aria-expanded", "false");
+    transferTarget = null;
+  }
+  function openTransferMenu(trigger, cat, idx) {
+    var menu = getTransferMenu();
+    menu.innerHTML = CATS.filter(function (c) { return c !== cat; }).map(function (c) {
+      return '<button type="button" class="transfer-opt" data-cat="' + c + '" role="option">' + CAT_LABEL[c] + "</button>";
+    }).join("");
+    var r = trigger.getBoundingClientRect();
+    var fitsBelow = r.bottom + 220 <= window.innerHeight;
+    menu.style.left = Math.min(r.left, window.innerWidth - 200) + "px";
+    if (fitsBelow) {
+      menu.style.top = (r.bottom + 6) + "px";
+      menu.style.bottom = "auto";
+    } else {
+      menu.style.bottom = (window.innerHeight - r.top + 6) + "px";
+      menu.style.top = "auto";
+    }
+    menu.classList.add("open");
+    trigger.setAttribute("aria-expanded", "true");
+    transferTarget = { cat: cat, idx: idx, trigger: trigger };
   }
   document.addEventListener("click", function (e) {
-    var openMenu = document.querySelector(".transfer-menu.open");
     var trigger = e.target.closest(".transfer-btn");
     if (trigger) {
-      var menu = trigger.nextElementSibling;
-      var wasOpen = menu.classList.contains("open");
-      if (openMenu && openMenu !== menu) closeTransferMenu(openMenu);
-      menu.classList.toggle("open", !wasOpen);
-      trigger.setAttribute("aria-expanded", String(!wasOpen));
+      var prod = trigger.closest(".prod");
+      var cat = prod.dataset.cat, idx = Number(prod.dataset.idx);
+      var wasOpenForThis = !!(transferMenuEl && transferMenuEl.classList.contains("open") && transferTarget && transferTarget.trigger === trigger);
+      closeTransferMenu();
+      if (!wasOpenForThis) openTransferMenu(trigger, cat, idx);
       return;
     }
     var opt = e.target.closest(".transfer-opt");
-    if (opt) {
-      var optMenu = opt.closest(".transfer-menu");
-      closeTransferMenu(optMenu);
-      var prod = opt.closest(".prod");
-      var cat = prod.dataset.cat, idx = Number(prod.dataset.idx);
-      var p = STATE[cat][idx];
+    if (opt && transferMenuEl && transferMenuEl.contains(opt)) {
+      var target = transferTarget;
+      closeTransferMenu();
+      if (!target) return;
+      var p = STATE[target.cat][target.idx];
       var newCat = opt.dataset.cat;
       if (p._isNew) { toast("Guarda primero la ficha del producto nuevo.", true); return; }
       var beforeMove = snapshotRow(p);
@@ -506,29 +532,28 @@
       };
       saveRow(row, function (saved) {
         if (saved) {
-          STATE[cat].splice(idx, 1);
+          STATE[target.cat].splice(target.idx, 1);
           STATE[newCat].push(p);
-          renderList(cat);
+          renderList(target.cat);
           renderList(newCat);
           toast('Movido a "' + CAT_LABEL[newCat] + '".');
           logChange({
             action: "mover", entity: "producto", entity_id: p.slug,
-            label: 'Movió "' + p.name + '" de ' + CAT_LABEL[cat] + ' a ' + CAT_LABEL[newCat] + '.',
+            label: 'Movió "' + p.name + '" de ' + CAT_LABEL[target.cat] + ' a ' + CAT_LABEL[newCat] + '.',
             before_data: beforeMove, after_data: row
           });
         } else {
-          p.category = cat; // revierte si falló el guardado
+          p.category = target.cat; // revierte si falló el guardado
         }
       });
       return;
     }
-    if (openMenu && !openMenu.contains(e.target)) closeTransferMenu(openMenu);
+    if (transferMenuEl && transferMenuEl.classList.contains("open") && !transferMenuEl.contains(e.target)) closeTransferMenu();
   });
   document.addEventListener("keydown", function (e) {
-    if (e.key !== "Escape") return;
-    var openMenu = document.querySelector(".transfer-menu.open");
-    if (openMenu) closeTransferMenu(openMenu);
+    if (e.key === "Escape") closeTransferMenu();
   });
+  window.addEventListener("scroll", closeTransferMenu, true);
 
   // ---------- Subida de fotos a Supabase Storage ----------
   document.addEventListener("change", function (e) {
