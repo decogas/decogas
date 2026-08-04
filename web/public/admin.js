@@ -380,23 +380,28 @@
     }
 
     if (e.target.closest(".del-btn")) {
-      var ok = window.confirm('¿Eliminar definitivamente "' + (p.name || "este producto") + '"?\n\nSi solo quieres que no se vea en la web, usa el interruptor de visibilidad.');
-      if (!ok) return;
-      var slug = p.slug;
-      var beforeDelete = snapshotRow(p);
-      deleteRow(slug, function (saved) {
-        // Solo mutamos el estado local si el DELETE se confirmó; si falla,
-        // la ficha permanece en la lista (sin borrado optimista que mienta).
-        if (saved) {
-          STATE[cat].splice(idx, 1);
-          renderList(cat);
-          toast("Producto eliminado.");
-          logChange({
-            action: "borrar", entity: "producto", entity_id: slug,
-            label: 'Eliminó el producto "' + (beforeDelete.name || slug) + '".',
-            before_data: beforeDelete, after_data: null
-          });
-        }
+      window.DecogasConfirm.ask({
+        title: "Eliminar producto",
+        message: '¿Eliminar definitivamente "' + (p.name || "este producto") + '"?\n\nSi solo quieres que no se vea en la web, usa el interruptor de visibilidad.',
+        confirmText: "Eliminar", key: "del-producto"
+      }).then(function (ok) {
+        if (!ok) return;
+        var slug = p.slug;
+        var beforeDelete = snapshotRow(p);
+        deleteRow(slug, function (saved) {
+          // Solo mutamos el estado local si el DELETE se confirmó; si falla,
+          // la ficha permanece en la lista (sin borrado optimista que mienta).
+          if (saved) {
+            STATE[cat].splice(idx, 1);
+            renderList(cat);
+            toast("Producto eliminado.");
+            logChange({
+              action: "borrar", entity: "producto", entity_id: slug,
+              label: 'Eliminó el producto "' + (beforeDelete.name || slug) + '".',
+              before_data: beforeDelete, after_data: null
+            });
+          }
+        });
       });
       return;
     }

@@ -198,16 +198,22 @@
       var delId = delBtn.dataset.id;
       var delRow = findChange(delId);
       if (!delRow) return;
-      if (!window.confirm("¿Eliminar esta entrada del registro? Esto NO revierte el cambio, solo lo quita de esta lista.")) return;
-      delBtn.disabled = true;
-      sb.from("change_log").delete().eq("id", delId).then(function (res) {
-        if (res.error) throw new Error(res.error.message);
-        CHANGES = CHANGES.filter(function (r) { return String(r.id) !== String(delId); });
-        render();
-        toast("Entrada eliminada del registro.");
-      }).catch(function (err) {
-        delBtn.disabled = false;
-        toast("Error al eliminar: " + (err && err.message ? err.message : "desconocido"), true);
+      window.DecogasConfirm.ask({
+        title: "Eliminar entrada",
+        message: "¿Eliminar esta entrada del registro? Esto NO revierte el cambio, solo lo quita de esta lista.",
+        confirmText: "Eliminar", key: "del-log"
+      }).then(function (ok) {
+        if (!ok) return;
+        delBtn.disabled = true;
+        sb.from("change_log").delete().eq("id", delId).then(function (res) {
+          if (res.error) throw new Error(res.error.message);
+          CHANGES = CHANGES.filter(function (r) { return String(r.id) !== String(delId); });
+          render();
+          toast("Entrada eliminada del registro.");
+        }).catch(function (err) {
+          delBtn.disabled = false;
+          toast("Error al eliminar: " + (err && err.message ? err.message : "desconocido"), true);
+        });
       });
       return;
     }
@@ -216,23 +222,29 @@
     var id = btn.dataset.id;
     var row = findChange(id);
     if (!row) return;
-    if (!window.confirm("¿Revertir este cambio? Se restaurará el estado anterior.")) return;
-    btn.disabled = true;
-    var original = btn.textContent;
-    btn.textContent = "Revirtiendo…";
-    doRevert(row).then(function (res) {
-      if (res && res.error) throw new Error(res.error.message);
-      return sb.from("change_log").update({ reverted: true }).eq("id", row.id);
-    }).then(function (res2) {
-      if (res2 && res2.error) throw new Error(res2.error.message);
-      row.reverted = true;
-      render();
-      toast("Cambio revertido.");
-      logRevertEvent(row);
-    }).catch(function (err) {
-      btn.disabled = false;
-      btn.textContent = original;
-      toast("Error al revertir: " + (err && err.message ? err.message : "desconocido"), true);
+    window.DecogasConfirm.ask({
+      title: "Revertir cambio",
+      message: "¿Revertir este cambio? Se restaurará el estado anterior.",
+      confirmText: "Revertir", key: "revertir-cambio"
+    }).then(function (ok) {
+      if (!ok) return;
+      btn.disabled = true;
+      var original = btn.textContent;
+      btn.textContent = "Revirtiendo…";
+      doRevert(row).then(function (res) {
+        if (res && res.error) throw new Error(res.error.message);
+        return sb.from("change_log").update({ reverted: true }).eq("id", row.id);
+      }).then(function (res2) {
+        if (res2 && res2.error) throw new Error(res2.error.message);
+        row.reverted = true;
+        render();
+        toast("Cambio revertido.");
+        logRevertEvent(row);
+      }).catch(function (err) {
+        btn.disabled = false;
+        btn.textContent = original;
+        toast("Error al revertir: " + (err && err.message ? err.message : "desconocido"), true);
+      });
     });
   });
 })();

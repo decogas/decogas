@@ -423,30 +423,36 @@
   document.addEventListener("click", function (e) {
     var del = e.target.closest(".lead-del");
     if (!del) return;
-    if (!window.confirm("¿Eliminar este cliente de la lista? Esta acción no se puede deshacer.")) return;
-    var id = del.dataset.id;
-    var lead = null;
-    for (var i = 0; i < LEADS.length; i++) {
-      if (String(LEADS[i].id) === String(id)) { lead = LEADS[i]; break; }
-    }
-    if (LIVE) {
-      sb.from("leads").delete().eq("id", id).then(function (res) {
-        if (res.error) { toast("Error: " + res.error.message, true); return; }
-        LEADS = LEADS.filter(function (l) { return String(l.id) !== String(id); });
-        render();
-        toast("Cliente eliminado.");
-        if (lead) {
-          logChange({
-            action: "borrar", entity: "lead", entity_id: String(id),
-            label: 'Eliminó al cliente "' + (lead.name || "sin nombre") + '".',
-            before_data: {
-              id: lead.id, name: lead.name, phone: lead.phone, email: lead.email,
-              interest: lead.interest, message: lead.message, estado: lead.estado, created_at: lead.created_at
-            },
-            after_data: null
-          });
-        }
-      });
-    }
+    window.DecogasConfirm.ask({
+      title: "Eliminar cliente",
+      message: "¿Eliminar este cliente de la lista? Esta acción no se puede deshacer.",
+      confirmText: "Eliminar", key: "del-cliente"
+    }).then(function (ok) {
+      if (!ok) return;
+      var id = del.dataset.id;
+      var lead = null;
+      for (var i = 0; i < LEADS.length; i++) {
+        if (String(LEADS[i].id) === String(id)) { lead = LEADS[i]; break; }
+      }
+      if (LIVE) {
+        sb.from("leads").delete().eq("id", id).then(function (res) {
+          if (res.error) { toast("Error: " + res.error.message, true); return; }
+          LEADS = LEADS.filter(function (l) { return String(l.id) !== String(id); });
+          render();
+          toast("Cliente eliminado.");
+          if (lead) {
+            logChange({
+              action: "borrar", entity: "lead", entity_id: String(id),
+              label: 'Eliminó al cliente "' + (lead.name || "sin nombre") + '".',
+              before_data: {
+                id: lead.id, name: lead.name, phone: lead.phone, email: lead.email,
+                interest: lead.interest, message: lead.message, estado: lead.estado, created_at: lead.created_at
+              },
+              after_data: null
+            });
+          }
+        });
+      }
+    });
   });
 })();

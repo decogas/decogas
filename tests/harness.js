@@ -172,6 +172,7 @@ function makeContext(opts) {
   // stubs dentro del objeto window) y sólo rellenamos lo que falte.
   win.alert = opts.alert || win.alert || function () {};
   win.confirm = opts.confirm || win.confirm || function () { return true; };
+  win.DecogasConfirm = opts.DecogasConfirm || win.DecogasConfirm || { ask: function () { return Promise.resolve(true); } };
   win.print = opts.print || win.print || function () {};
   win.getComputedStyle = function () { return {}; };
 
