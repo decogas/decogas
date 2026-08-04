@@ -24,12 +24,13 @@
   };
 
   // ---------- Estado ----------
-  var STATE = { calderas: [], aires: [], termos: [], aerotermia: [] };
+  var STATE = { calderas: [], aires: [], termos: [], aerotermia: [], noencontrados: [], repetidos: [] };
 
   var DATASETS = window.DECOGAS_DATASETS || {};
-  var CATS = ["calderas", "aires", "termos", "aerotermia"];
-  var LIST_IDS = { calderas: "listCalderas", aires: "listAires", termos: "listTermos", aerotermia: "listAerotermia" };
-  var COUNT_IDS = { calderas: "countCalderas", aires: "countAires", termos: "countTermos", aerotermia: "countAerotermia" };
+  var CATS = ["calderas", "aires", "termos", "aerotermia", "noencontrados", "repetidos"];
+  var LIST_IDS = { calderas: "listCalderas", aires: "listAires", termos: "listTermos", aerotermia: "listAerotermia", noencontrados: "listNoencontrados", repetidos: "listRepetidos" };
+  var COUNT_IDS = { calderas: "countCalderas", aires: "countAires", termos: "countTermos", aerotermia: "countAerotermia", noencontrados: "countNoencontrados", repetidos: "countRepetidos" };
+  var CAT_LABEL = { calderas: "Calderas", aires: "Aire acondicionado", termos: "Termos y calentadores", aerotermia: "Aerotermia", noencontrados: "No encontrados", repetidos: "Repetidos" };
   function defaults(category) {
     var d = DATASETS[category];
     return (d ? d.products : []).map(function (p) {
@@ -269,6 +270,9 @@
           fieldHTML("Nombre del producto", "f-name-" + uid, p.name) +
           fieldHTML("Marca", "f-brand-" + uid, p.brand) +
           fieldHTML("Precio (€, IVA incluido)", "f-price-" + uid, p.price, null, "number") +
+          '<div class="field"><label>Categoría</label><select id="f-cat-' + uid + '">' +
+            CATS.map(function (c) { return '<option value="' + c + '"' + (c === category ? " selected" : "") + ">" + CAT_LABEL[c] + "</option>"; }).join("") +
+          "</select><p class=\"form-hint\">Cámbiala para mover el producto a otra categoría (útil para “No encontrados” / “Repetidos”).</p></div>" +
           fieldHTML("Orden de popularidad", "f-pop-" + uid, p.pop, "1 = el más vendido. Ordena el filtro \u201cMás vendido\u201d.", "number") +
           '<div class="full">' + fieldHTML("Etiquetas cortas (una por línea, se muestran bajo el nombre)", "f-specs-" + uid, p.specs.join("\n"), null, "textarea") + "</div>" +
           '<div class="full">' + fieldHTML("Descripción", "f-desc-" + uid, p.description, null, "textarea") + "</div>" +
@@ -347,9 +351,10 @@
       var nuevo = {
         slug: "", name: "", brand: "", category: cat, price: 0,
         specs: [], features: [], description: "", ideal_for: "", efficiency: "", img: "",
-        // La categoría aerotermia es nueva (sin catálogo publicado todavía): sus
-        // productos nacen OCULTOS por defecto, a diferencia del resto de categorías.
-        pop: STATE[cat].length + 1, best: false, visible: cat !== "aerotermia", _isNew: true
+        // Aerotermia (sin catálogo publicado todavía) y las dos categorías internas
+        // (no encontrados / repetidos, que no tienen página pública) nacen OCULTAS
+        // por defecto, a diferencia del resto de categorías.
+        pop: STATE[cat].length + 1, best: false, visible: (cat !== "aerotermia" && cat !== "noencontrados" && cat !== "repetidos"), _isNew: true
       };
       STATE[cat].push(nuevo);
       renderList(cat);
@@ -410,9 +415,13 @@
       var wasNew = !!p._isNew;
       var beforeSave = wasNew ? null : snapshotRow(p);
 
+      var newCat = val("f-cat-" + uid) || cat;
+      var movedCat = newCat !== cat;
+
       p.name = name;
       p.brand = val("f-brand-" + uid);
       p.price = price;
+      p.category = newCat;
       p.pop = Number(val("f-pop-" + uid)) || 999;
       p.specs = lines("f-specs-" + uid);
       p.description = val("f-desc-" + uid);
@@ -440,19 +449,32 @@
       };
       saveRow(row, function (saved) {
         if (saved) {
-          renderList(cat);
-          toast("Ficha guardada" + (LIVE ? " y publicada." : " (modo demo)."));
-          logChange(wasNew
-            ? {
-                action: "crear", entity: "producto", entity_id: row.slug,
-                label: 'Creó el producto "' + row.name + '".',
-                before_data: null, after_data: row
-              }
-            : {
-                action: "editar", entity: "producto", entity_id: row.slug,
-                label: 'Editó el producto "' + row.name + '".',
-                before_data: beforeSave, after_data: row
-              });
+          if (movedCat) {
+            STATE[cat].splice(idx, 1);
+            STATE[newCat].push(p);
+            renderList(cat);
+            renderList(newCat);
+            toast('Movido a "' + CAT_LABEL[newCat] + '".');
+            logChange({
+              action: "mover", entity: "producto", entity_id: row.slug,
+              label: 'Movió "' + row.name + '" de ' + CAT_LABEL[cat] + ' a ' + CAT_LABEL[newCat] + '.',
+              before_data: beforeSave, after_data: row
+            });
+          } else {
+            renderList(cat);
+            toast("Ficha guardada" + (LIVE ? " y publicada." : " (modo demo)."));
+            logChange(wasNew
+              ? {
+                  action: "crear", entity: "producto", entity_id: row.slug,
+                  label: 'Creó el producto "' + row.name + '".',
+                  before_data: null, after_data: row
+                }
+              : {
+                  action: "editar", entity: "producto", entity_id: row.slug,
+                  label: 'Editó el producto "' + row.name + '".',
+                  before_data: beforeSave, after_data: row
+                });
+          }
         }
       });
       return;
