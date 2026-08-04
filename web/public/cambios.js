@@ -130,9 +130,10 @@
             '<div class="change-meta">' + esc(fmtDateTime(row.created_at)) + " · " + esc(row.user_email || "—") + "</div>" +
           "</div>" +
           '<div class="change-actions">' +
-            (reverted
-              ? '<span class="change-badge">Revertido</span>'
-              : '<button class="revert-btn" data-id="' + esc(row.id) + '" type="button">Revertir</button>') +
+            (reverted ? '<span class="change-badge">Revertido</span>' : '<button class="revert-btn" data-id="' + esc(row.id) + '" type="button">Revertir</button>') +
+            '<button class="del-log-btn" data-id="' + esc(row.id) + '" type="button" title="Eliminar del registro">' +
+              '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/></svg>' +
+            "</button>" +
           "</div>" +
         "</div>" +
       "</div>";
@@ -192,6 +193,24 @@
   }
 
   document.addEventListener("click", function (e) {
+    var delBtn = e.target.closest(".del-log-btn");
+    if (delBtn) {
+      var delId = delBtn.dataset.id;
+      var delRow = findChange(delId);
+      if (!delRow) return;
+      if (!window.confirm("¿Eliminar esta entrada del registro? Esto NO revierte el cambio, solo lo quita de esta lista.")) return;
+      delBtn.disabled = true;
+      sb.from("change_log").delete().eq("id", delId).then(function (res) {
+        if (res.error) throw new Error(res.error.message);
+        CHANGES = CHANGES.filter(function (r) { return String(r.id) !== String(delId); });
+        render();
+        toast("Entrada eliminada del registro.");
+      }).catch(function (err) {
+        delBtn.disabled = false;
+        toast("Error al eliminar: " + (err && err.message ? err.message : "desconocido"), true);
+      });
+      return;
+    }
     var btn = e.target.closest(".revert-btn");
     if (!btn) return;
     var id = btn.dataset.id;
