@@ -24,13 +24,13 @@
   };
 
   // ---------- Estado ----------
-  var STATE = { calderas: [], aires: [], termos: [], aerotermia: [], noencontrados: [], repetidos: [] };
+  var STATE = { calderas: [], aires: [], termos: [], aerotermia: [], noencontrados: [], repetidos: [], pendientes: [] };
 
   var DATASETS = window.DECOGAS_DATASETS || {};
-  var CATS = ["calderas", "aires", "termos", "aerotermia", "noencontrados", "repetidos"];
-  var LIST_IDS = { calderas: "listCalderas", aires: "listAires", termos: "listTermos", aerotermia: "listAerotermia", noencontrados: "listNoencontrados", repetidos: "listRepetidos" };
-  var COUNT_IDS = { calderas: "countCalderas", aires: "countAires", termos: "countTermos", aerotermia: "countAerotermia", noencontrados: "countNoencontrados", repetidos: "countRepetidos" };
-  var CAT_LABEL = { calderas: "Calderas", aires: "Aire acondicionado", termos: "Termos y calentadores", aerotermia: "Aerotermia", noencontrados: "No encontrados", repetidos: "Repetidos" };
+  var CATS = ["calderas", "aires", "termos", "aerotermia", "noencontrados", "repetidos", "pendientes"];
+  var LIST_IDS = { calderas: "listCalderas", aires: "listAires", termos: "listTermos", aerotermia: "listAerotermia", noencontrados: "listNoencontrados", repetidos: "listRepetidos", pendientes: "listPendientes" };
+  var COUNT_IDS = { calderas: "countCalderas", aires: "countAires", termos: "countTermos", aerotermia: "countAerotermia", noencontrados: "countNoencontrados", repetidos: "countRepetidos", pendientes: "countPendientes" };
+  var CAT_LABEL = { calderas: "Calderas", aires: "Aire acondicionado", termos: "Termos y calentadores", aerotermia: "Aerotermia", noencontrados: "No encontrados", repetidos: "Repetidos", pendientes: "Pendientes" };
   function defaults(category) {
     var d = DATASETS[category];
     return (d ? d.products : []).map(function (p) {
@@ -354,7 +354,7 @@
         // Aerotermia (sin catálogo publicado todavía) y las dos categorías internas
         // (no encontrados / repetidos, que no tienen página pública) nacen OCULTAS
         // por defecto, a diferencia del resto de categorías.
-        pop: STATE[cat].length + 1, best: false, visible: (cat !== "aerotermia" && cat !== "noencontrados" && cat !== "repetidos"), _isNew: true
+        pop: STATE[cat].length + 1, best: false, visible: (cat !== "aerotermia" && cat !== "noencontrados" && cat !== "repetidos" && cat !== "pendientes"), _isNew: true
       };
       STATE[cat].push(nuevo);
       renderList(cat);
