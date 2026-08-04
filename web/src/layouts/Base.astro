@@ -4,7 +4,7 @@
 const rawBase = import.meta.env.BASE_URL; // '/decogas' (sin barra final)
 const base = rawBase.endsWith('/') ? rawBase : rawBase + '/'; // → '/decogas/'
 const ASSET_V = 45; // analítica: sesión persiste durante la visita (visitantes 1:1, no por página)
-const STYLES_V = 61; // banner de confianza movido dentro del hero, encima de Llamar/WhatsApp
+const STYLES_V = 62; // añade "Calculadora" al menú de escritorio (antes solo estaba en móvil/pie)
 const GOOGLE_ADS_ID = 'AW-18358011669';
 // Página actual (formato 'file': /decogas/calderas.html) para marcar el menú activo
 const currentFile = Astro.url.pathname.split('/').pop() || 'index.html';
@@ -99,6 +99,7 @@ const localBizLd = JSON.stringify({
       <a href={`${base}termos.html`} aria-current={active('termos.html')}>Termos</a>
       <a href={`${base}aerotermia.html`} aria-current={active('aerotermia.html')}>Aerotermia</a>
       <a href={`${base}marcas.html`} aria-current={active('marcas.html')}>Marcas</a>
+      <a href={`${base}calcula.html`} aria-current={active('calcula.html')}>Calculadora</a>
       <a href={`${base}guias.html`} aria-current={active('guias.html')}>Guías</a>
       <a href={`${base}index.html#contacto`}>Contacto</a>
     </nav>

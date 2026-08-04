@@ -115,8 +115,8 @@
   .logo img{ height:44px; width:auto; display:block; }
   header.scrolled .logo{ height:28px; transition:height .3s var(--ease); }
   header.scrolled .logo img{ height:40px; transition:height .3s var(--ease); }
-  nav.main-nav{ display:flex; gap:17px; }
-  nav.main-nav a{ color:rgba(255,255,255,.82); font-size:14px; font-weight:500; transition:color .15s; position:relative; white-space:nowrap; }
+  nav.main-nav{ display:flex; gap:14px; }
+  nav.main-nav a{ color:rgba(255,255,255,.82); font-size:13.5px; font-weight:500; transition:color .15s; position:relative; white-space:nowrap; }
   nav.main-nav a:hover{ color:#fff; }
   .header-actions{ display:flex; align-items:center; gap:16px; }
   .phone-pill{ display:flex; align-items:center; gap:7px; color:#fff; font-family:'IBM Plex Mono'; font-size:13.5px; font-weight:600; }
