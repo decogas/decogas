@@ -46,7 +46,20 @@
     var m = String(p.name).match(/\b(2[0-9]|3[0-9])\b/);
     return m ? Number(m[1]) : null;
   };
-  var is2x1 = function (p) { return /2\s*x\s*1/i.test(p.name); };
+  // Nº de estancias que cubre el equipo (1 = split simple, 2 = 2x1, 3 = 3x1...)
+  var estanciasOf = function (p) {
+    var m = String(p.name).match(/(\d)\s*x\s*1/i);
+    return m ? Number(m[1]) : 1;
+  };
+  // Potencia total (kW) de las unidades interiores de un multisplit, sumando los
+  // códigos tipo CF25/CF35/HR25/HR35 (el número ÷10 = kW de esa unidad interior).
+  var kitKW = function (p) {
+    var matches = String(p.name).match(/(?:CF|HR)(\d{2})/gi);
+    if (!matches || !matches.length) return null;
+    var sum = 0;
+    matches.forEach(function (m) { sum += Number(m.slice(-2)) / 10; });
+    return sum;
+  };
 
   // ---------- Tabs ----------
   document.querySelectorAll(".calc-tab").forEach(function (tab) {
@@ -65,6 +78,8 @@
   }
   wireSlider("cM2", "cM2Val");
   wireSlider("aM2", "aM2Val");
+  wireSlider("aM2b", "aM2bVal");
+  wireSlider("aM2c", "aM2cVal");
 
   function wireChoices(groupId) {
     $(groupId).addEventListener("click", function (e) {
@@ -82,6 +97,16 @@
     var c = $(groupId).querySelector(".calc-choice.active");
     return c ? c.dataset.value : null;
   };
+
+  // Al elegir 2x1 o 3x1, aparecen las líneas de metros de las estancias extra
+  function syncRoomFields() {
+    var n = Number(choice("aEstancias"));
+    $("aM2bField").style.display = n >= 2 ? "" : "none";
+    $("aM2cField").style.display = n >= 3 ? "" : "none";
+    $("aM2LabelText").textContent = n === 1 ? "Superficie a climatizar" : "Superficie de la estancia 1";
+  }
+  $("aEstancias").addEventListener("click", syncRoomFields);
+  syncRoomFields();
 
   // ---------- Render de recomendación ----------
   function catalogLink(cat, slug) {
@@ -147,7 +172,11 @@
       return "Vivienda de " + $("cM2").value + " m\u00B2 con " + choice("cBanos") + (Number(choice("cBanos")) > 1 ? " ba\u00F1os" : " ba\u00F1o");
     }
     var est = Number(choice("aEstancias"));
-    return (est === 2 ? "2 estancias" : "Estancia de " + $("aM2").value + " m\u00B2") + (choice("aSol") === "si" ? " con alta exposici\u00F3n al sol" : "");
+    var m2s = [$("aM2").value];
+    if (est >= 2) m2s.push($("aM2b").value);
+    if (est >= 3) m2s.push($("aM2c").value);
+    return (est === 1 ? "Estancia de " + m2s[0] + " m\u00B2" : est + " estancias (" + m2s.join(" + ") + " m\u00B2)") +
+      (choice("aSol") === "si" ? " con alta exposici\u00F3n al sol" : "");
   }
 
   function openBudget(cat) {
@@ -269,11 +298,15 @@
 
   // ---------- AIRES ----------
   $("aCalc").addEventListener("click", function () {
-    var m2 = Number($("aM2").value);
     var estancias = Number(choice("aEstancias"));
     var sol = choice("aSol") === "si";
 
-    var frig = Math.round(m2 * 100 * (sol ? 1.2 : 1));
+    var m2list = [Number($("aM2").value)];
+    if (estancias >= 2) m2list.push(Number($("aM2b").value));
+    if (estancias >= 3) m2list.push(Number($("aM2c").value));
+    var m2 = m2list[0]; // estancia principal, usada como filtro de m² en equipos de 1 sola estancia
+
+    var frig = Math.round(m2list.reduce(function (sum, v) { return sum + v * 100 * (sol ? 1.2 : 1); }, 0));
     var kw = Math.round((frig / 860) * 10) / 10;
 
     $("aMin").innerHTML = frig.toLocaleString("es-ES") + ' <small>frig.</small>';
@@ -281,25 +314,34 @@
 
     loadList("aires").then(function (list) {
       var pool = list.filter(function (p) { return p.visible !== false; });
-      var candidates = pool.filter(function (p) { return is2x1(p) === (estancias === 2); });
+      var candidates = pool.filter(function (p) { return estanciasOf(p) === estancias; });
       var fits = candidates.filter(function (p) {
+        if (estancias >= 2) {
+          var pk = kitKW(p);
+          return pk == null || pk >= kw - 0.3;
+        }
         var pm2 = maxM2(p);
         return pm2 == null || pm2 >= m2;
       });
       fits.sort(function (a, b) {
-        var am = maxM2(a) || 999, bm = maxM2(b) || 999;
-        if (am !== bm) return am - bm;
+        if (estancias >= 2) {
+          var ak = kitKW(a) || 999, bk = kitKW(b) || 999;
+          if (ak !== bk) return ak - bk;
+        } else {
+          var am = maxM2(a) || 999, bm = maxM2(b) || 999;
+          if (am !== bm) return am - bm;
+        }
         return a.price - b.price;
       });
       var best = fits[0] || null;
       var alts = fits.slice(1, 3);
       var why;
       if (best) {
-        why = estancias === 2
-          ? "Equipo 2x1: climatiza tus dos estancias con una sola unidad exterior, cubriendo los " + frig.toLocaleString("es-ES") + " frigorías estimadas."
+        why = estancias >= 2
+          ? "Equipo " + estancias + "x1: climatiza tus " + estancias + " estancias (" + m2list.join(" + ") + " m²) con una sola unidad exterior, cubriendo los " + frig.toLocaleString("es-ES") + " frigorías estimadas."
           : "Cubre los " + m2 + " m² de tu estancia" + (sol ? " incluso con alta exposición al sol" : "") + " con un consumo ajustado, sin pagar de más por potencia sobrante.";
       } else {
-        best = candidates.sort(function (a, b) { return (maxM2(b) || 0) - (maxM2(a) || 0); })[0] || pool[0];
+        best = candidates.sort(function (a, b) { return (kitKW(b) || maxM2(b) || 0) - (kitKW(a) || maxM2(a) || 0); })[0] || pool[0];
         why = "Para esa superficie conviene un estudio a medida. Esta es la opción más potente del catálogo; llámanos y lo vemos sin compromiso.";
         alts = [];
       }
