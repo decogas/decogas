@@ -3,8 +3,8 @@
 // Se escribe UNA vez y lo comparten todas las páginas raíz de marketing.
 const rawBase = import.meta.env.BASE_URL; // '/decogas' (sin barra final)
 const base = rawBase.endsWith('/') ? rawBase : rawBase + '/'; // → '/decogas/'
-const ASSET_V = 45; // analítica: sesión persiste durante la visita (visitantes 1:1, no por página)
-const STYLES_V = 62; // añade "Calculadora" al menú de escritorio (antes solo estaba en móvil/pie)
+const ASSET_V = 46; // calculadora: aviso "no tenemos equipo tan potente" cuando no hay ficha que llegue
+const STYLES_V = 63; // badge ámbar "no-fit" en la calculadora cuando no llega ningún equipo
 const GOOGLE_ADS_ID = 'AW-18358011669';
 // Página actual (formato 'file': /decogas/calderas.html) para marcar el menú activo
 const currentFile = Astro.url.pathname.split('/').pop() || 'index.html';

@@ -732,6 +732,8 @@
   position:absolute; top:-11px; left:18px; background:var(--flame); color:#fff; font-family:'IBM Plex Mono';
   font-size:10px; font-weight:600; letter-spacing:.08em; padding:4px 12px; border-radius:999px;
 }
+.reco-card.no-fit{ border-color:var(--gold); box-shadow:0 14px 34px rgba(255,185,48,.2); }
+.reco-card.no-fit .reco-tag{ background:var(--gold); color:#3D2E00; }
 .reco-card .reco-name{ font-weight:700; font-size:16.5px; margin:6px 0 2px; }
 .reco-card .reco-brand{ font-family:'IBM Plex Mono'; font-size:11px; color:var(--muted); }
 .reco-card .reco-price{ font-family:'IBM Plex Mono'; font-weight:600; font-size:19px; margin-top:10px; }

@@ -114,20 +114,25 @@
   }
   var LAST = {}; // último equipo recomendado y contexto por categoría (para el presupuesto)
 
-  function recoHTML(cat, best, alts, why) {
-    if (best) LAST[cat] = { p: best, why: why };
+  function recoHTML(cat, best, alts, why, noFit) {
+    if (best && !noFit) LAST[cat] = { p: best, why: why };
     var html = "";
     if (best) {
-      html += '<div class="reco-card">' +
-        '<span class="reco-tag">RECOMENDADA PARA TU CASO</span>' +
+      html += '<div class="reco-card' + (noFit ? " no-fit" : "") + '">' +
+        '<span class="reco-tag">' + (noFit ? "NO TENEMOS UN EQUIPO ASÍ DE POTENTE" : "RECOMENDADA PARA TU CASO") + "</span>" +
         '<div class="reco-brand">' + esc(best.brand) + "</div>" +
         '<div class="reco-name">' + esc(best.name) + "</div>" +
         '<div class="reco-price">' + Number(best.price).toLocaleString("es-ES") + ' € <span style="font-size:11px; color:var(--muted); font-weight:500;">IVA e instalación incluidos</span></div>' +
         '<div class="reco-why">' + esc(why) + "</div>" +
-        '<div class="reco-actions">' +
-          '<button class="btn btn-flame" style="padding:11px 20px; font-size:13.5px;" type="button" data-budget="' + cat + '">Presupuesto al instante</button>' +
-          '<a class="btn btn-ghost" style="padding:11px 20px; font-size:13.5px;" href="' + catalogLink(cat, best.slug) + '">Ver en el catálogo</a>' +
-        "</div>" +
+        (noFit
+          ? '<div class="reco-actions">' +
+              '<a class="btn btn-flame" style="padding:11px 20px; font-size:13.5px;" href="tel:+34919930168">Llamar y pedir estudio gratuito</a>' +
+              '<a class="btn btn-ghost" style="padding:11px 20px; font-size:13.5px;" href="https://wa.me/34651368631" target="_blank" rel="noopener">WhatsApp</a>' +
+            "</div>"
+          : '<div class="reco-actions">' +
+              '<button class="btn btn-flame" style="padding:11px 20px; font-size:13.5px;" type="button" data-budget="' + cat + '">Presupuesto al instante</button>' +
+              '<a class="btn btn-ghost" style="padding:11px 20px; font-size:13.5px;" href="' + catalogLink(cat, best.slug) + '">Ver en el catálogo</a>' +
+            "</div>") +
       "</div>";
     }
     if (alts.length) {
@@ -282,16 +287,17 @@
       });
       var best = fits[0] || null;
       var alts = fits.slice(1, 3);
-      var why;
+      var why, noFit = false;
       if (best) {
         why = "Cubre tu superficie de " + m2 + " m² con " + banos + (banos > 1 ? " baños" : " baño") +
           " y una potencia adecuada para agua caliente y calefacción sin sobredimensionar la instalación.";
       } else {
         best = pool.sort(function (a, b) { return (maxM2(b) || 0) - (maxM2(a) || 0); })[0];
-        why = "Tu caso necesita un estudio a medida (superficie o número de baños elevados). Esta es la opción más potente del catálogo; llámanos y la visita técnica gratuita te confirmará la potencia exacta.";
+        why = "No tenemos en catálogo una caldera con tanta potencia para tu caso (" + m2 + " m² y " + banos + (banos > 1 ? " baños" : " baño") + "). Esta es nuestra opción más potente, mostrada solo como referencia. Necesitas un estudio técnico a medida — llámanos y te lo confirmamos sin compromiso.";
         alts = [];
+        noFit = true;
       }
-      $("cReco").innerHTML = recoHTML("calderas", best, alts, why);
+      $("cReco").innerHTML = recoHTML("calderas", best, alts, why, noFit);
       showResult("cResult");
     });
   });
@@ -335,17 +341,20 @@
       });
       var best = fits[0] || null;
       var alts = fits.slice(1, 3);
-      var why;
+      var why, noFit = false;
       if (best) {
         why = estancias >= 2
           ? "Equipo " + estancias + "x1: climatiza tus " + estancias + " estancias (" + m2list.join(" + ") + " m²) con una sola unidad exterior, cubriendo los " + frig.toLocaleString("es-ES") + " frigorías estimadas."
           : "Cubre los " + m2 + " m² de tu estancia" + (sol ? " incluso con alta exposición al sol" : "") + " con un consumo ajustado, sin pagar de más por potencia sobrante.";
       } else {
         best = candidates.sort(function (a, b) { return (kitKW(b) || maxM2(b) || 0) - (kitKW(a) || maxM2(a) || 0); })[0] || pool[0];
-        why = "Para esa superficie conviene un estudio a medida. Esta es la opción más potente del catálogo; llámanos y lo vemos sin compromiso.";
+        why = estancias >= 2
+          ? "No tenemos en catálogo un equipo " + estancias + "x1 con tanta potencia para tus estancias (" + m2list.join(" + ") + " m²). Este es nuestro kit " + estancias + "x1 más potente, mostrado solo como referencia. Necesitas un estudio técnico a medida — llámanos y lo vemos sin compromiso."
+          : "No tenemos en catálogo un equipo con tanta potencia para esa superficie. Esta es nuestra opción más potente, mostrada solo como referencia. Necesitas un estudio técnico a medida — llámanos y lo vemos sin compromiso.";
         alts = [];
+        noFit = true;
       }
-      $("aReco").innerHTML = recoHTML("aires", best, alts, why);
+      $("aReco").innerHTML = recoHTML("aires", best, alts, why, noFit);
       showResult("aResult");
     });
   });
