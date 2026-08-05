@@ -29,6 +29,8 @@ jobs:
           node-version: 22
           cache: npm
           cache-dependency-path: web/package-lock.json
+      - name: Ejecutar tests (node:test, sin dependencias)
+        run: npm test
       - name: Instalar dependencias
         run: npm ci
         working-directory: web
