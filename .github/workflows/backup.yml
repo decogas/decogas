@@ -1,0 +1,32 @@
+# Copia de seguridad semanal de la base de datos (products + leads) a un
+# artefacto del propio workflow (retención por defecto de GitHub: 90 días).
+# Requiere el secret SUPABASE_SERVICE_KEY en Settings -> Secrets and
+# variables -> Actions (Supabase -> Project Settings -> API -> service_role).
+# Sin ese secret, la copia solo incluye `products` (leads necesita la
+# service key porque contiene datos personales protegidos por RLS).
+name: Copia de seguridad semanal
+
+on:
+  schedule:
+    # Domingo 04:00 UTC
+    - cron: '0 4 * * 0'
+  workflow_dispatch:
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Generar copia de seguridad
+        run: node scripts/backup-supabase.mjs
+        env:
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+      - name: Subir como artefacto del workflow
+        uses: actions/upload-artifact@v4
+        with:
+          name: backup-decogas-${{ github.run_id }}
+          path: backups/
+          retention-days: 90
