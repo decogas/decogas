@@ -10,7 +10,7 @@
 window.DECOGAS_CONFIG = {
   // Correo que recibe los avisos de nuevos clientes del formulario.
   // Cambiarlo aquí cuando se pase al correo de la empresa.
-  notifyEmail: "dr4389742@gmail.com",
+  notifyEmail: "info@decogas.com",
   supabaseUrl: "https://ygailcynbblqvugunleq.supabase.co",
   supabaseAnonKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlnYWlsY3luYmJscXZ1Z3VubGVxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQxMDc2MzAsImV4cCI6MjA5OTY4MzYzMH0.nVAg5hfrZAfECDMNr30BoeMuXuyj_hy4c1LM-FnnY-Q",
   // Conversiones de Google Ads (etiqueta global en Base.astro, ASSET_V).
