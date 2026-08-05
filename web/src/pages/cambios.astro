@@ -2,9 +2,7 @@
 // Página autónoma (panel privado): head propio con estilos en línea, sin el layout de marketing.
 const rawBase = import.meta.env.BASE_URL;
 const base = rawBase.endsWith('/') ? rawBase : rawBase + '/';
-const V = 4; // fix: cabecera de sección se partía en dos líneas feas en móvil
-const css = "\r\n  :root{\r\n    --navy:#0E2238; --navy-2:#16324B; --flame:#FF6B35; --flame-deep:#E2501C; --ice:#3AA6D9;\r\n    --gold:#FFB930; --cloud:#F3F6F9; --line:#E2E8EF; --muted:#5B6B7B; --ok:#1E9E5A; --err:#D8433B;\r\n  }\r\n  *{ margin:0; padding:0; box-sizing:border-box; }\r\n  body{ font-family:'Inter',sans-serif; background:var(--cloud); color:var(--navy); min-height:100vh; overflow-x:hidden; }\r\n  \r\n  h1,h2,h3{ font-family:'Fraunces',serif; }\r\n  button{ font-family:'Inter',sans-serif; cursor:pointer; }\r\n\r\n  #loginScreen{\r\n    position:fixed; inset:0; display:flex; align-items:center; justify-content:center; padding:20px;\r\n    background:\r\n      radial-gradient(90% 120% at 85% -10%, rgba(58,166,217,.30), transparent 55%),\r\n      radial-gradient(70% 90% at 5% 110%, rgba(255,107,53,.22), transparent 55%),\r\n      linear-gradient(160deg, #0E2238 0%, #081729 100%);\r\n    overflow:hidden; z-index:50; transition:opacity .5s, visibility .5s;\r\n  }\r\n  #loginScreen.hidden{ opacity:0; visibility:hidden; }\r\n  .orb{ position:absolute; border-radius:50%; filter:blur(60px); opacity:.5; animation:float 9s ease-in-out infinite; }\r\n  .orb.o1{ width:340px; height:340px; background:var(--ice); top:-90px; right:-60px; }\r\n  .orb.o2{ width:280px; height:280px; background:var(--flame); bottom:-70px; left:-50px; animation-delay:-3s; }\r\n  @keyframes float{ 0%,100%{ transform:translateY(0) scale(1); } 50%{ transform:translateY(-26px) scale(1.05); } }\r\n  .login-card{\r\n    position:relative; z-index:1; width:100%; max-width:420px; background:rgba(255,255,255,.98);\r\n    border-radius:20px; padding:40px 36px 34px; box-shadow:0 30px 80px rgba(0,0,0,.35);\r\n    animation:cardIn .7s cubic-bezier(.22,1,.36,1) both;\r\n  }\r\n  @keyframes cardIn{ from{ opacity:0; transform:translateY(26px) scale(.97); } to{ opacity:1; transform:none; } }\r\n  .login-logo{ display:flex; align-items:center; gap:12px; margin-bottom:8px; }\r\n  .login-logo .mark{\r\n    width:44px; height:44px; border-radius:12px; background:var(--navy); color:#fff; display:flex;\r\n    align-items:center; justify-content:center; font-family:'Fraunces'; font-weight:700; font-size:22px; position:relative; overflow:hidden;\r\n  }\r\n  .login-logo .mark::after{ content:\"\"; position:absolute; inset:0;\r\n    background:radial-gradient(60% 60% at 70% 30%, rgba(58,166,217,.55), transparent 70%),\r\n               radial-gradient(60% 60% at 25% 80%, rgba(255,107,53,.55), transparent 70%); }\r\n  .login-logo .mark span{ position:relative; z-index:1; }\r\n  .login-logo h1{ font-size:24px; }\r\n  .login-sub{ font-size:13.5px; color:var(--muted); margin-bottom:26px; }\r\n  .field{ margin-bottom:16px; }\r\n  .field label{ display:block; font-size:12.5px; font-weight:600; margin-bottom:6px; }\r\n  .field input{ width:100%; padding:12px 14px; border:1.5px solid var(--line); border-radius:10px; font-size:14.5px; font-family:'Inter'; }\r\n  .field input:focus{ outline:none; border-color:var(--ice); box-shadow:0 0 0 3px rgba(58,166,217,.15); }\r\n  .btn{ display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:13px 24px;\r\n    border-radius:11px; border:none; background:var(--flame); color:#fff; font-weight:600; font-size:14.5px;\r\n    transition:transform .2s, background .2s; box-shadow:0 6px 18px rgba(255,107,53,.35); text-decoration:none; }\r\n  .btn:hover{ background:var(--flame-deep); transform:translateY(-2px); }\r\n  .btn:active{ transform:translateY(0) scale(.97); }\r\n  .btn.ghost{ background:transparent; color:var(--muted); border:1.5px solid var(--line); box-shadow:none; }\r\n  .btn.ghost:hover{ color:var(--navy); border-color:var(--muted); background:#fff; }\r\n  .btn.small{ padding:9px 16px; font-size:13px; border-radius:9px; }\r\n  .btn.block{ width:100%; }\r\n  .msg{ font-size:13.5px; margin-top:12px; display:none; color:var(--err); }\r\n  .msg.show{ display:block; }\r\n\r\n  #panel{ display:none; }\r\n  .admin-header{ background:linear-gradient(160deg, #0E2238 0%, #12293F 100%); color:#fff; padding:26px 0 74px; position:relative; overflow:hidden; }\r\n  .admin-header .orb{ opacity:.35; }\r\n  .wrap{ max-width:960px; margin:0 auto; padding:0 20px; position:relative; z-index:1; }\r\n  .admin-topbar{ display:flex; align-items:center; justify-content:space-between; gap:14px; flex-wrap:wrap; }\r\n  .admin-topbar h1{ font-size:24px; }\r\n  .admin-topbar .right{ display:flex; align-items:center; gap:10px; }.hdr-link{ color:rgba(255,255,255,.8); border-color:rgba(255,255,255,.3); }.hdr-link:hover{ color:var(--navy); background:#fff; }\r\n  .admin-sub{ margin-top:10px; font-size:14px; color:rgba(255,255,255,.75); max-width:560px; line-height:1.55; }\r\n  .panel-body{ margin-top:-44px; padding-bottom:90px; }\r\n\r\n  .section-card{\r\n    background:#fff; border:1px solid var(--line); border-radius:16px; padding:24px; margin-bottom:26px;\r\n    box-shadow:0 10px 30px rgba(14,34,56,.06); animation:cardIn .5s ease both;\r\n  }\r\n  .section-head{ display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:16px; }\r\n  .section-head h2{ font-size:20px; display:flex; align-items:center; gap:10px; }\r\n  .section-head .count{ font-family:'IBM Plex Mono'; font-size:11px; color:var(--muted); background:var(--cloud); padding:4px 10px; border-radius:999px; }\r\n\r\n  #toast{ position:fixed; bottom:26px; left:50%; transform:translate(-50%, 80px); background:var(--navy); color:#fff; max-width:90vw; text-align:center; line-height:1.45;\r\n    padding:13px 22px; border-radius:12px; font-size:14px; box-shadow:0 14px 34px rgba(0,0,0,.3);\r\n    transition:transform .4s cubic-bezier(.22,1,.36,1); z-index:100; }\r\n  #toast.show{ transform:translate(-50%, 0); }\r\n  #toast.err{ background:var(--err); } [data-theme=\"dark\"]{ --cloud:#0F1A25; --navy:#E6EEF6; --navy-2:#B9CBDC; --line:#26384B; --muted:#93A5B6; }[data-theme=\"dark\"] body{ background:#0B131C; }[data-theme=\"dark\"] .login-card{ background:#141F2C; }[data-theme=\"dark\"] input, [data-theme=\"dark\"] textarea, [data-theme=\"dark\"] select{ background:#0F1A25; color:#E6EEF6; }[data-theme=\"dark\"] input::placeholder, [data-theme=\"dark\"] textarea::placeholder{ color:#5F7488; }[data-theme=\"dark\"] .btn.ghost:hover{ background:#1B2A3A; }[data-theme=\"dark\"] .section-card, [data-theme=\"dark\"] .filters-card, [data-theme=\"dark\"] .stats-pro, [data-theme=\"dark\"] .prod, [data-theme=\"dark\"] .lead, [data-theme=\"dark\"] .stat-card{ background:#141F2C; }[data-theme=\"dark\"] .prod:hover, [data-theme=\"dark\"] .lead:hover{ border-color:#3A4C60; box-shadow:none; }[data-theme=\"dark\"] .prod.hidden-prod{ background:#0F1A25; }[data-theme=\"dark\"] .icon-btn, [data-theme=\"dark\"] .photo-thumb{ background:#1B2A3A; }[data-theme=\"dark\"] .chip{ background:#1B2A3A; border-color:#26384B; }[data-theme=\"dark\"] .chip.active{ background:#173A5C; color:#fff; border-color:#173A5C; }[data-theme=\"dark\"] .login-logo .mark{ background:#173A5C; }[data-theme=\"dark\"] #toast{ background:#1B2A3A; }[data-theme=\"dark\"] .switch .track{ background:#3A4C60; }[data-theme=\"dark\"] .prod-form{ background:#0F1A25; }[data-theme=\"dark\"] .prod-form-inner{ border-top-color:#26384B; }[data-theme=\"dark\"] .mode-pill.demo{ background:#3A2A18; border-color:#5A3D28; }[data-theme=\"dark\"] .mode-pill.live{ background:#12301F; border-color:#265F42; }[data-theme=\"dark\"] .add-btn{ border-color:#3A4C60; }[data-theme=\"dark\"] .add-btn:hover{ background:#2A2018; }[data-theme=\"dark\"] .empty-state{ background:#141F2C; }[data-theme=\"dark\"] .lead-msg, [data-theme=\"dark\"] .prod-form-inner{ border-color:#26384B; }[data-theme=\"dark\"] .theme-toggle-btn{ color:rgba(255,255,255,.85); }\r\n\r\n  /* ===== Últimos cambios: lista de auditoría ===== */\r\n  .change-item{ background:#fff; border:1px solid var(--line); border-radius:13px; padding:16px 18px; margin-bottom:11px; transition:box-shadow .25s, border-color .25s; animation:cardIn .4s ease both; }\r\n  .change-item:hover{ border-color:#CBD6E0; box-shadow:0 6px 16px rgba(14,34,56,.07); }\r\n  .change-item.reverted{ opacity:.55; }\r\n  .change-top{ display:flex; align-items:flex-start; justify-content:space-between; gap:14px; flex-wrap:wrap; }\r\n  .change-main{ flex:1; min-width:min(240px, 100%); }\r\n  .change-label{ font-weight:700; font-size:14.5px; overflow-wrap:anywhere; }\r\n  .change-meta{ font-family:'IBM Plex Mono'; font-size:11px; color:var(--muted); margin-top:5px; overflow-wrap:anywhere; }\r\n  .change-actions{ display:flex; align-items:center; gap:8px; flex:none; }\r\n  .change-badge{ font-family:'IBM Plex Mono'; font-size:10.5px; font-weight:600; padding:5px 12px; border-radius:999px; background:var(--cloud); color:var(--muted); border:1px solid var(--line); white-space:nowrap; }\r\n  .revert-btn{ display:inline-flex; align-items:center; gap:6px; background:#fff; border:1.5px solid var(--line); color:var(--navy); font-size:12px; font-weight:600; padding:7px 13px; border-radius:9px; font-family:'Inter'; transition:all .2s; white-space:nowrap; }\r\n  .revert-btn:hover{ background:var(--cloud); border-color:var(--ice); color:#1E7FAE; }\r\n  .revert-btn:disabled{ opacity:.5; cursor:not-allowed; }.del-log-btn{ display:inline-flex; align-items:center; justify-content:center; width:34px; height:34px; flex:none; background:#fff; border:1.5px solid var(--line); color:var(--muted); border-radius:9px; transition:all .2s; }.del-log-btn:hover{ color:var(--err); border-color:var(--err); background:#FDF1F0; }.del-log-btn:disabled{ opacity:.5; cursor:not-allowed; }\r\n  [data-theme=\"dark\"] .change-item{ background:#141F2C; }\r\n  [data-theme=\"dark\"] .change-item:hover{ border-color:#3A4C60; box-shadow:none; }\r\n  [data-theme=\"dark\"] .revert-btn{ background:#0F1A25; border-color:#26384B; color:#E6EEF6; }.del-log-btn{ background:#0F1A25; border-color:#26384B; color:#93A5B6; }.del-log-btn:hover{ background:#3A1E1C; border-color:var(--err); color:#ff8a80; }\r\n  [data-theme=\"dark\"] .revert-btn:hover{ background:#1B2A3A; }\r\n  [data-theme=\"dark\"] .change-badge{ background:#1B2A3A; border-color:#26384B; }\r\n@media(max-width:640px){\r\n    .wrap{ padding:0 14px; }\r\n    .section-card{ padding:16px 14px; }\r\n    .admin-topbar h1{ font-size:20px; }\r\n    .admin-topbar .right{ flex-wrap:wrap; }\r\n    .section-head{ flex-wrap:nowrap; gap:8px; }\r\n    .section-head h2{ font-size:16px; display:block; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; flex:1 1 auto; }\r\n    .section-head .count{ flex:none; font-size:10px; padding:4px 8px; white-space:nowrap; }\r\n    .revert-btn{ min-height:40px; padding:10px 16px; }\r\n    .change-actions{ width:100%; }.del-log-btn{ width:40px; height:40px; }\r\n  }\r\n";
-const body = "<div id=\"loginScreen\">\r\n  <div class=\"orb o1\"></div><div class=\"orb o2\"></div>\r\n  <div class=\"login-card\">\r\n    <div class=\"login-logo\">\r\n      <div class=\"mark\"><span>D</span></div>\r\n      <h1>Últimos cambios</h1>\r\n    </div>\r\n    <p class=\"login-sub\">Registro de auditoría del panel: quién cambió qué y cuándo, con opción de revertir.</p>\r\n    <form id=\"loginForm\">\r\n      <div class=\"field\">\r\n        <label for=\"adminEmail\">Email</label>\r\n        <input type=\"email\" id=\"adminEmail\" autocomplete=\"username\" required>\r\n      </div>\r\n      <div class=\"field\">\r\n        <label for=\"adminPass\">Contraseña</label>\r\n        <input type=\"password\" id=\"adminPass\" autocomplete=\"current-password\" required>\r\n      </div>\r\n      <button type=\"submit\" class=\"btn block\" id=\"loginBtn\">Entrar</button>\r\n      <p class=\"msg\" id=\"loginMsg\"></p>\r\n    </form>\r\n  </div>\r\n</div>\r\n\r\n<div id=\"panel\">\r\n  <header class=\"admin-header\">\r\n    <div class=\"orb o1\"></div><div class=\"orb o2\"></div>\r\n    <div class=\"wrap\">\r\n      <div class=\"admin-topbar\">\r\n        <h1>Últimos cambios</h1>\r\n        <div class=\"right\">\r\n          <button class=\"btn ghost small theme-toggle-btn hdr-link\" id=\"themeToggle\" type=\"button\" title=\"Modo claro / oscuro\" aria-label=\"Cambiar tema\">◐</button>\r\n          <a class=\"btn ghost small hdr-link\" href=\"admin.html\" style=\" text-decoration:none;\">Catálogo</a>\r\n          <a class=\"btn ghost small hdr-link\" href=\"clientes.html\" style=\" text-decoration:none;\">Clientes</a>\r\n          <a class=\"btn ghost small hdr-link\" href=\"analiticas.html\" style=\" text-decoration:none;\">Analíticas</a>\r\n          <button class=\"btn ghost small hdr-link\" id=\"logoutBtn\" type=\"button\">Salir</button>\r\n        </div>\r\n      </div>\r\n      <p class=\"admin-sub\">Cada cambio que se hace en el catálogo o en clientes queda registrado aquí: quién, cuándo y qué, con opción de deshacerlo.</p>\r\n    </div>\r\n  </header>\r\n\r\n  <div class=\"panel-body\">\r\n    <div class=\"wrap\">\r\n      <div class=\"section-card\">\r\n        <div class=\"section-head\">\r\n          <h2>Cambios recientes</h2>\r\n          <span class=\"count\" id=\"changesCount\">–</span>\r\n        </div>\r\n        <div id=\"changesList\"><p style=\"color:var(--muted); font-size:14px; padding:6px 0;\">Cargando…</p></div>\r\n      </div>\r\n    </div>\r\n  </div>\r\n</div>\r\n\r\n<div id=\"toast\"></div>";
+const V = 5; // migración a sintaxis Astro normal (sin strings gigantes con \r\n)
 ---
 <!DOCTYPE html>
 <html lang="es">
@@ -16,10 +14,174 @@ const body = "<div id=\"loginScreen\">\r\n  <div class=\"orb o1\"></div><div cla
 <title>Últimos cambios — Decogas</title>
 <link rel="icon" type="image/svg+xml" href={`${base}favicon.svg`}>
 <link rel="stylesheet" href={`${base}fonts.css?v=1`}>
-<style is:inline set:html={css}></style>
+<style is:inline>
+  :root{
+    --navy:#0E2238; --navy-2:#16324B; --flame:#FF6B35; --flame-deep:#E2501C; --ice:#3AA6D9;
+    --gold:#FFB930; --cloud:#F3F6F9; --line:#E2E8EF; --muted:#5B6B7B; --ok:#1E9E5A; --err:#D8433B;
+  }
+  *{ margin:0; padding:0; box-sizing:border-box; }
+  body{ font-family:'Inter',sans-serif; background:var(--cloud); color:var(--navy); min-height:100vh; overflow-x:hidden; }
+
+  h1,h2,h3{ font-family:'Fraunces',serif; }
+  button{ font-family:'Inter',sans-serif; cursor:pointer; }
+
+  #loginScreen{
+    position:fixed; inset:0; display:flex; align-items:center; justify-content:center; padding:20px;
+    background:
+      radial-gradient(90% 120% at 85% -10%, rgba(58,166,217,.30), transparent 55%),
+      radial-gradient(70% 90% at 5% 110%, rgba(255,107,53,.22), transparent 55%),
+      linear-gradient(160deg, #0E2238 0%, #081729 100%);
+    overflow:hidden; z-index:50; transition:opacity .5s, visibility .5s;
+  }
+  #loginScreen.hidden{ opacity:0; visibility:hidden; }
+  .orb{ position:absolute; border-radius:50%; filter:blur(60px); opacity:.5; animation:float 9s ease-in-out infinite; }
+  .orb.o1{ width:340px; height:340px; background:var(--ice); top:-90px; right:-60px; }
+  .orb.o2{ width:280px; height:280px; background:var(--flame); bottom:-70px; left:-50px; animation-delay:-3s; }
+  @keyframes float{ 0%,100%{ transform:translateY(0) scale(1); } 50%{ transform:translateY(-26px) scale(1.05); } }
+  .login-card{
+    position:relative; z-index:1; width:100%; max-width:420px; background:rgba(255,255,255,.98);
+    border-radius:20px; padding:40px 36px 34px; box-shadow:0 30px 80px rgba(0,0,0,.35);
+    animation:cardIn .7s cubic-bezier(.22,1,.36,1) both;
+  }
+  @keyframes cardIn{ from{ opacity:0; transform:translateY(26px) scale(.97); } to{ opacity:1; transform:none; } }
+  .login-logo{ display:flex; align-items:center; gap:12px; margin-bottom:8px; }
+  .login-logo .mark{
+    width:44px; height:44px; border-radius:12px; background:var(--navy); color:#fff; display:flex;
+    align-items:center; justify-content:center; font-family:'Fraunces'; font-weight:700; font-size:22px; position:relative; overflow:hidden;
+  }
+  .login-logo .mark::after{ content:""; position:absolute; inset:0;
+    background:radial-gradient(60% 60% at 70% 30%, rgba(58,166,217,.55), transparent 70%),
+               radial-gradient(60% 60% at 25% 80%, rgba(255,107,53,.55), transparent 70%); }
+  .login-logo .mark span{ position:relative; z-index:1; }
+  .login-logo h1{ font-size:24px; }
+  .login-sub{ font-size:13.5px; color:var(--muted); margin-bottom:26px; }
+  .field{ margin-bottom:16px; }
+  .field label{ display:block; font-size:12.5px; font-weight:600; margin-bottom:6px; }
+  .field input{ width:100%; padding:12px 14px; border:1.5px solid var(--line); border-radius:10px; font-size:14.5px; font-family:'Inter'; }
+  .field input:focus{ outline:none; border-color:var(--ice); box-shadow:0 0 0 3px rgba(58,166,217,.15); }
+  .btn{ display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:13px 24px;
+    border-radius:11px; border:none; background:var(--flame); color:#fff; font-weight:600; font-size:14.5px;
+    transition:transform .2s, background .2s; box-shadow:0 6px 18px rgba(255,107,53,.35); text-decoration:none; }
+  .btn:hover{ background:var(--flame-deep); transform:translateY(-2px); }
+  .btn:active{ transform:translateY(0) scale(.97); }
+  .btn.ghost{ background:transparent; color:var(--muted); border:1.5px solid var(--line); box-shadow:none; }
+  .btn.ghost:hover{ color:var(--navy); border-color:var(--muted); background:#fff; }
+  .btn.small{ padding:9px 16px; font-size:13px; border-radius:9px; }
+  .btn.block{ width:100%; }
+  .msg{ font-size:13.5px; margin-top:12px; display:none; color:var(--err); }
+  .msg.show{ display:block; }
+
+  #panel{ display:none; }
+  .admin-header{ background:linear-gradient(160deg, #0E2238 0%, #12293F 100%); color:#fff; padding:26px 0 74px; position:relative; overflow:hidden; }
+  .admin-header .orb{ opacity:.35; }
+  .wrap{ max-width:960px; margin:0 auto; padding:0 20px; position:relative; z-index:1; }
+  .admin-topbar{ display:flex; align-items:center; justify-content:space-between; gap:14px; flex-wrap:wrap; }
+  .admin-topbar h1{ font-size:24px; }
+  .admin-topbar .right{ display:flex; align-items:center; gap:10px; }.hdr-link{ color:rgba(255,255,255,.8); border-color:rgba(255,255,255,.3); }.hdr-link:hover{ color:var(--navy); background:#fff; }
+  .admin-sub{ margin-top:10px; font-size:14px; color:rgba(255,255,255,.75); max-width:560px; line-height:1.55; }
+  .panel-body{ margin-top:-44px; padding-bottom:90px; }
+
+  .section-card{
+    background:#fff; border:1px solid var(--line); border-radius:16px; padding:24px; margin-bottom:26px;
+    box-shadow:0 10px 30px rgba(14,34,56,.06); animation:cardIn .5s ease both;
+  }
+  .section-head{ display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:16px; }
+  .section-head h2{ font-size:20px; display:flex; align-items:center; gap:10px; }
+  .section-head .count{ font-family:'IBM Plex Mono'; font-size:11px; color:var(--muted); background:var(--cloud); padding:4px 10px; border-radius:999px; }
+
+  #toast{ position:fixed; bottom:26px; left:50%; transform:translate(-50%, 80px); background:var(--navy); color:#fff; max-width:90vw; text-align:center; line-height:1.45;
+    padding:13px 22px; border-radius:12px; font-size:14px; box-shadow:0 14px 34px rgba(0,0,0,.3);
+    transition:transform .4s cubic-bezier(.22,1,.36,1); z-index:100; }
+  #toast.show{ transform:translate(-50%, 0); }
+  #toast.err{ background:var(--err); } [data-theme="dark"]{ --cloud:#0F1A25; --navy:#E6EEF6; --navy-2:#B9CBDC; --line:#26384B; --muted:#93A5B6; }[data-theme="dark"] body{ background:#0B131C; }[data-theme="dark"] .login-card{ background:#141F2C; }[data-theme="dark"] input, [data-theme="dark"] textarea, [data-theme="dark"] select{ background:#0F1A25; color:#E6EEF6; }[data-theme="dark"] input::placeholder, [data-theme="dark"] textarea::placeholder{ color:#5F7488; }[data-theme="dark"] .btn.ghost:hover{ background:#1B2A3A; }[data-theme="dark"] .section-card, [data-theme="dark"] .filters-card, [data-theme="dark"] .stats-pro, [data-theme="dark"] .prod, [data-theme="dark"] .lead, [data-theme="dark"] .stat-card{ background:#141F2C; }[data-theme="dark"] .prod:hover, [data-theme="dark"] .lead:hover{ border-color:#3A4C60; box-shadow:none; }[data-theme="dark"] .prod.hidden-prod{ background:#0F1A25; }[data-theme="dark"] .icon-btn, [data-theme="dark"] .photo-thumb{ background:#1B2A3A; }[data-theme="dark"] .chip{ background:#1B2A3A; border-color:#26384B; }[data-theme="dark"] .chip.active{ background:#173A5C; color:#fff; border-color:#173A5C; }[data-theme="dark"] .login-logo .mark{ background:#173A5C; }[data-theme="dark"] #toast{ background:#1B2A3A; }[data-theme="dark"] .switch .track{ background:#3A4C60; }[data-theme="dark"] .prod-form{ background:#0F1A25; }[data-theme="dark"] .prod-form-inner{ border-top-color:#26384B; }[data-theme="dark"] .mode-pill.demo{ background:#3A2A18; border-color:#5A3D28; }[data-theme="dark"] .mode-pill.live{ background:#12301F; border-color:#265F42; }[data-theme="dark"] .add-btn{ border-color:#3A4C60; }[data-theme="dark"] .add-btn:hover{ background:#2A2018; }[data-theme="dark"] .empty-state{ background:#141F2C; }[data-theme="dark"] .lead-msg, [data-theme="dark"] .prod-form-inner{ border-color:#26384B; }[data-theme="dark"] .theme-toggle-btn{ color:rgba(255,255,255,.85); }
+
+  /* ===== Últimos cambios: lista de auditoría ===== */
+  .change-item{ background:#fff; border:1px solid var(--line); border-radius:13px; padding:16px 18px; margin-bottom:11px; transition:box-shadow .25s, border-color .25s; animation:cardIn .4s ease both; }
+  .change-item:hover{ border-color:#CBD6E0; box-shadow:0 6px 16px rgba(14,34,56,.07); }
+  .change-item.reverted{ opacity:.55; }
+  .change-top{ display:flex; align-items:flex-start; justify-content:space-between; gap:14px; flex-wrap:wrap; }
+  .change-main{ flex:1; min-width:min(240px, 100%); }
+  .change-label{ font-weight:700; font-size:14.5px; overflow-wrap:anywhere; }
+  .change-meta{ font-family:'IBM Plex Mono'; font-size:11px; color:var(--muted); margin-top:5px; overflow-wrap:anywhere; }
+  .change-actions{ display:flex; align-items:center; gap:8px; flex:none; }
+  .change-badge{ font-family:'IBM Plex Mono'; font-size:10.5px; font-weight:600; padding:5px 12px; border-radius:999px; background:var(--cloud); color:var(--muted); border:1px solid var(--line); white-space:nowrap; }
+  .revert-btn{ display:inline-flex; align-items:center; gap:6px; background:#fff; border:1.5px solid var(--line); color:var(--navy); font-size:12px; font-weight:600; padding:7px 13px; border-radius:9px; font-family:'Inter'; transition:all .2s; white-space:nowrap; }
+  .revert-btn:hover{ background:var(--cloud); border-color:var(--ice); color:#1E7FAE; }
+  .revert-btn:disabled{ opacity:.5; cursor:not-allowed; }.del-log-btn{ display:inline-flex; align-items:center; justify-content:center; width:34px; height:34px; flex:none; background:#fff; border:1.5px solid var(--line); color:var(--muted); border-radius:9px; transition:all .2s; }.del-log-btn:hover{ color:var(--err); border-color:var(--err); background:#FDF1F0; }.del-log-btn:disabled{ opacity:.5; cursor:not-allowed; }
+  [data-theme="dark"] .change-item{ background:#141F2C; }
+  [data-theme="dark"] .change-item:hover{ border-color:#3A4C60; box-shadow:none; }
+  [data-theme="dark"] .revert-btn{ background:#0F1A25; border-color:#26384B; color:#E6EEF6; }.del-log-btn{ background:#0F1A25; border-color:#26384B; color:#93A5B6; }.del-log-btn:hover{ background:#3A1E1C; border-color:var(--err); color:#ff8a80; }
+  [data-theme="dark"] .revert-btn:hover{ background:#1B2A3A; }
+  [data-theme="dark"] .change-badge{ background:#1B2A3A; border-color:#26384B; }
+@media(max-width:640px){
+    .wrap{ padding:0 14px; }
+    .section-card{ padding:16px 14px; }
+    .admin-topbar h1{ font-size:20px; }
+    .admin-topbar .right{ flex-wrap:wrap; }
+    .section-head{ flex-wrap:nowrap; gap:8px; }
+    .section-head h2{ font-size:16px; display:block; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; flex:1 1 auto; }
+    .section-head .count{ flex:none; font-size:10px; padding:4px 8px; white-space:nowrap; }
+    .revert-btn{ min-height:40px; padding:10px 16px; }
+    .change-actions{ width:100%; }.del-log-btn{ width:40px; height:40px; }
+  }
+</style>
 </head>
 <body>
-<Fragment set:html={body} />
+<div id="loginScreen">
+  <div class="orb o1"></div><div class="orb o2"></div>
+  <div class="login-card">
+    <div class="login-logo">
+      <div class="mark"><span>D</span></div>
+      <h1>Últimos cambios</h1>
+    </div>
+    <p class="login-sub">Registro de auditoría del panel: quién cambió qué y cuándo, con opción de revertir.</p>
+    <form id="loginForm">
+      <div class="field">
+        <label for="adminEmail">Email</label>
+        <input type="email" id="adminEmail" autocomplete="username" required>
+      </div>
+      <div class="field">
+        <label for="adminPass">Contraseña</label>
+        <input type="password" id="adminPass" autocomplete="current-password" required>
+      </div>
+      <button type="submit" class="btn block" id="loginBtn">Entrar</button>
+      <p class="msg" id="loginMsg"></p>
+    </form>
+  </div>
+</div>
+
+<div id="panel">
+  <header class="admin-header">
+    <div class="orb o1"></div><div class="orb o2"></div>
+    <div class="wrap">
+      <div class="admin-topbar">
+        <h1>Últimos cambios</h1>
+        <div class="right">
+          <button class="btn ghost small theme-toggle-btn hdr-link" id="themeToggle" type="button" title="Modo claro / oscuro" aria-label="Cambiar tema">◐</button>
+          <a class="btn ghost small hdr-link" href="admin.html" style=" text-decoration:none;">Catálogo</a>
+          <a class="btn ghost small hdr-link" href="clientes.html" style=" text-decoration:none;">Clientes</a>
+          <a class="btn ghost small hdr-link" href="analiticas.html" style=" text-decoration:none;">Analíticas</a>
+          <button class="btn ghost small hdr-link" id="logoutBtn" type="button">Salir</button>
+        </div>
+      </div>
+      <p class="admin-sub">Cada cambio que se hace en el catálogo o en clientes queda registrado aquí: quién, cuándo y qué, con opción de deshacerlo.</p>
+    </div>
+  </header>
+
+  <div class="panel-body">
+    <div class="wrap">
+      <div class="section-card">
+        <div class="section-head">
+          <h2>Cambios recientes</h2>
+          <span class="count" id="changesCount">–</span>
+        </div>
+        <div id="changesList"><p style="color:var(--muted); font-size:14px; padding:6px 0;">Cargando…</p></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
 <script src="vendor/supabase.min.js?v=1" is:inline></script>
 <script src={`${base}utils.js?v=${V}`} is:inline></script>
 <script src={`${base}confirm-modal.js?v=${V}`} is:inline></script>

@@ -2,9 +2,7 @@
 // Página autónoma (panel privado): head propio con estilos en línea, sin el layout de marketing.
 const rawBase = import.meta.env.BASE_URL;
 const base = rawBase.endsWith('/') ? rawBase : rawBase + '/';
-const V = 32; // fix: cabecera de sección se partía en dos líneas feas en móvil
-const css = "\r\n  :root{\r\n    --navy:#0E2238; --navy-2:#16324B; --flame:#FF6B35; --flame-deep:#E2501C; --ice:#3AA6D9;\r\n    --gold:#FFB930; --cloud:#F3F6F9; --line:#E2E8EF; --muted:#5B6B7B; --ok:#1E9E5A; --err:#D8433B;\r\n  }\r\n  *{ margin:0; padding:0; box-sizing:border-box; }\r\n  html{ scroll-behavior:smooth; }\r\n  body{ font-family:'Inter',sans-serif; background:var(--cloud); color:var(--navy); min-height:100vh; overflow-x:hidden; }\r\n  \r\n  h1,h2,h3{ font-family:'Fraunces',serif; }\r\n  button{ font-family:'Inter',sans-serif; cursor:pointer; }\r\n  input,textarea,select{ font-family:'Inter',sans-serif; }\r\n\r\n  /* ================= LOGIN ================= */\r\n  #loginScreen{\r\n    position:fixed; inset:0; display:flex; align-items:center; justify-content:center; padding:20px;\r\n    background:\r\n      radial-gradient(90% 120% at 85% -10%, rgba(58,166,217,.30), transparent 55%),\r\n      radial-gradient(70% 90% at 5% 110%, rgba(255,107,53,.22), transparent 55%),\r\n      linear-gradient(160deg, #0E2238 0%, #081729 100%);\r\n    overflow:hidden; z-index:50; transition:opacity .5s ease, visibility .5s;\r\n  }\r\n  #loginScreen.hidden{ opacity:0; visibility:hidden; }\r\n  .orb{ position:absolute; border-radius:50%; filter:blur(60px); opacity:.5; animation:float 9s ease-in-out infinite; }\r\n  .orb.o1{ width:340px; height:340px; background:var(--ice); top:-90px; right:-60px; }\r\n  .orb.o2{ width:280px; height:280px; background:var(--flame); bottom:-70px; left:-50px; animation-delay:-3s; }\r\n  .orb.o3{ width:170px; height:170px; background:var(--gold); top:55%; right:16%; animation-delay:-6s; opacity:.3; }\r\n  @keyframes float{ 0%,100%{ transform:translateY(0) scale(1); } 50%{ transform:translateY(-26px) scale(1.05); } }\r\n\r\n  .login-card{\r\n    position:relative; z-index:1; width:100%; max-width:420px; background:rgba(255,255,255,.98);\r\n    border-radius:20px; padding:40px 36px 34px; box-shadow:0 30px 80px rgba(0,0,0,.35);\r\n    animation:cardIn .7s cubic-bezier(.22,1,.36,1) both;\r\n  }\r\n  @keyframes cardIn{ from{ opacity:0; transform:translateY(26px) scale(.97); } to{ opacity:1; transform:none; } }\r\n  .login-logo{ display:flex; align-items:center; gap:12px; margin-bottom:8px; }\r\n  .login-logo .mark{\r\n    width:44px; height:44px; border-radius:12px; background:var(--navy); color:#fff; display:flex;\r\n    align-items:center; justify-content:center; font-family:'Fraunces'; font-weight:700; font-size:22px; position:relative; overflow:hidden;\r\n  }\r\n  .login-logo .mark::after{\r\n    content:\"\"; position:absolute; inset:0;\r\n    background:radial-gradient(60% 60% at 70% 30%, rgba(58,166,217,.55), transparent 70%),\r\n               radial-gradient(60% 60% at 25% 80%, rgba(255,107,53,.55), transparent 70%);\r\n  }\r\n  .login-logo .mark span{ position:relative; z-index:1; }\r\n  .login-logo h1{ font-size:24px; }\r\n  .login-sub{ font-size:13.5px; color:var(--muted); margin-bottom:26px; }\r\n  .mode-pill{\r\n    display:inline-flex; align-items:center; gap:7px; font-family:'IBM Plex Mono'; font-size:11px;\r\n    font-weight:600; padding:5px 12px; border-radius:999px; margin-bottom:22px;\r\n  }\r\n  .mode-pill .dot{ width:7px; height:7px; border-radius:50%; animation:pulse 1.8s infinite; }\r\n  @keyframes pulse{ 0%,100%{ opacity:1; } 50%{ opacity:.35; } }\r\n  .mode-pill.demo{ background:#FFF3E8; color:var(--flame-deep); border:1px solid #FFD9C2; }\r\n  .mode-pill.demo .dot{ background:var(--flame); }\r\n  .mode-pill.live{ background:#E7F7EE; color:var(--ok); border:1px solid #BFE8D0; }\r\n  .mode-pill.live .dot{ background:var(--ok); }\r\n\r\n  .field{ margin-bottom:16px; }\r\n  .field label{ display:block; font-size:12.5px; font-weight:600; margin-bottom:6px; letter-spacing:.02em; }\r\n  .field input, .field textarea, .field select{\r\n    width:100%; padding:12px 14px; border:1.5px solid var(--line); border-radius:10px; font-size:14.5px;\r\n    transition:border-color .25s, box-shadow .25s; background:#fff; color:var(--navy);\r\n  }\r\n  .field textarea{ min-height:74px; resize:vertical; line-height:1.5; }\r\n  .field input:focus, .field textarea:focus, .field select:focus{\r\n    outline:none; border-color:var(--ice); box-shadow:0 0 0 3px rgba(58,166,217,.15);\r\n  }\r\n  .btn{\r\n    display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:13px 24px;\r\n    border-radius:11px; border:none; background:var(--flame); color:#fff; font-weight:600; font-size:14.5px;\r\n    transition:transform .2s, box-shadow .2s, background .2s; box-shadow:0 6px 18px rgba(255,107,53,.35);\r\n  }\r\n  .btn:hover{ background:var(--flame-deep); transform:translateY(-2px); box-shadow:0 10px 24px rgba(255,107,53,.4); }\r\n  .btn:active{ transform:translateY(0); }\r\n  .btn:disabled{ opacity:.55; cursor:not-allowed; transform:none; }\r\n  .btn.ghost{ background:transparent; color:var(--muted); border:1.5px solid var(--line); box-shadow:none; }\r\n  .btn.ghost:hover{ color:var(--navy); border-color:var(--muted); background:#fff; }\r\n  .btn.small{ padding:9px 16px; font-size:13px; border-radius:9px; }\r\n  .btn.danger{ background:transparent; color:var(--err); border:1.5px solid #F2C7C4; box-shadow:none; }\r\n  .btn.danger:hover{ background:#FDF1F0; border-color:var(--err); }\r\n  .btn.block{ width:100%; }\r\n  .msg{ font-size:13.5px; margin-top:12px; display:none; }\r\n  .msg.show{ display:block; animation:cardIn .3s ease both; }\r\n  .msg.ok{ color:var(--ok); } .msg.err{ color:var(--err); }\r\n\r\n  /* ================= PANEL ================= */\r\n  #panel{ display:none; }\r\n  .admin-header{\r\n    background:linear-gradient(160deg, #0E2238 0%, #12293F 100%); color:#fff; padding:26px 0 74px; position:relative; overflow:hidden;\r\n  }\r\n  .admin-header .orb{ opacity:.35; }\r\n  .wrap{ max-width:960px; margin:0 auto; padding:0 20px; position:relative; z-index:1; }\r\n  .admin-topbar{ display:flex; align-items:center; justify-content:space-between; gap:14px; flex-wrap:wrap; }\r\n  .admin-topbar h1{ font-size:24px; }\r\n  .admin-topbar .right{ display:flex; align-items:center; gap:12px; flex-wrap:wrap; }.hdr-link{ color:rgba(255,255,255,.8); border-color:rgba(255,255,255,.3); }.hdr-link:hover{ color:var(--navy); background:#fff; }\r\n  .admin-sub{ margin-top:10px; font-size:14px; color:rgba(255,255,255,.75); max-width:560px; line-height:1.55; }\r\n  .panel-body{ margin-top:-44px; padding-bottom:90px; }\r\n\r\n  .section-card{\r\n    background:#fff; border:1px solid var(--line); border-radius:16px; padding:24px; margin-bottom:26px;\r\n    box-shadow:0 10px 30px rgba(14,34,56,.06); animation:cardIn .5s ease both;\r\n  }\r\n  .section-head{ display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:16px; }\r\n  .section-head h2{ font-size:20px; display:flex; align-items:center; gap:10px; }\r\n  .section-head .count{ font-family:'IBM Plex Mono'; font-size:11px; color:var(--muted); background:var(--cloud); padding:4px 10px; border-radius:999px; }\r\n\r\n  .prod{ border:1px solid var(--line); border-radius:13px; margin-bottom:12px; overflow:hidden; transition:box-shadow .25s, border-color .25s; background:#fff; }\r\n  .prod:hover{ border-color:#CBD6E0; box-shadow:0 6px 16px rgba(14,34,56,.07); }\r\n  .prod.hidden-prod{ background:#FAFBFC; }\r\n  .prod.hidden-prod .prod-name, .prod.hidden-prod .prod-meta{ opacity:.45; }\r\n  .prod-row{ display:flex; align-items:center; gap:14px; padding:14px 16px; flex-wrap:wrap; }\r\n  .prod-info{ flex:1; min-width:0; }\r\n  .prod-name{ font-weight:600; font-size:14.5px; display:flex; align-items:center; gap:8px; overflow-wrap:break-word; }\r\n  .best-star{ color:var(--gold); font-size:15px; }\r\n  .prod-meta{ font-family:'IBM Plex Mono'; font-size:11px; color:var(--muted); margin-top:3px; overflow-wrap:anywhere; }\r\n  .prod-price{ font-family:'IBM Plex Mono'; font-weight:600; font-size:15px; white-space:nowrap; }\r\n  .prod-actions{ display:flex; align-items:center; gap:8px; }\r\n  .icon-btn{\r\n    width:34px; height:34px; border-radius:9px; border:1.5px solid var(--line); background:#fff; display:inline-flex;\r\n    align-items:center; justify-content:center; color:var(--muted); transition:all .2s;\r\n  }\r\n  .icon-btn:hover{ color:var(--navy); border-color:var(--muted); transform:translateY(-1px); }\r\n  .icon-btn.del:hover{ color:var(--err); border-color:var(--err); background:#FDF1F0; }\r\n  .icon-btn svg{ width:16px; height:16px; stroke:currentColor; fill:none; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }.transfer-btn{ padding:8px 12px; font-size:12.5px; }.transfer-menu{ position:fixed; min-width:190px; background:#fff; border:1px solid var(--line); border-radius:12px; box-shadow:0 14px 34px rgba(14,34,56,.18); padding:6px; display:none; flex-direction:column; gap:2px; z-index:200; }.transfer-menu.open{ display:flex; }.transfer-opt{ text-align:left; border:none; background:transparent; border-radius:8px; padding:8px 10px; font-size:13px; font-weight:600; font-family:'Inter'; cursor:pointer; color:var(--navy); transition:background .15s; }.transfer-opt:hover{ background:var(--cloud); }\r\n\r\n  /* Switch de visibilidad */\r\n  .switch{ position:relative; width:46px; height:26px; flex:none; }\r\n  .switch input{ opacity:0; width:0; height:0; }\r\n  .switch .track{\r\n    position:absolute; inset:0; border-radius:999px; background:#CBD6E0; transition:background .25s; cursor:pointer;\r\n  }\r\n  .switch .track::after{\r\n    content:\"\"; position:absolute; width:20px; height:20px; border-radius:50%; background:#fff; top:3px; left:3px;\r\n    transition:transform .25s cubic-bezier(.22,1,.36,1); box-shadow:0 2px 6px rgba(0,0,0,.25);\r\n  }\r\n  .switch input:checked + .track{ background:var(--ok); }\r\n  .switch input:checked + .track::after{ transform:translateX(20px); }\r\n  .switch input:focus-visible + .track{ box-shadow:0 0 0 3px rgba(58,166,217,.3); }\r\n\r\n  /* Formulario expandible */\r\n  .prod-form{ max-height:0; overflow:hidden; transition:max-height .45s cubic-bezier(.4,0,.2,1); background:var(--cloud); }\r\n  .prod-form-inner{ padding:20px 16px; border-top:1px solid var(--line); }\r\n  .form-grid{ display:grid; grid-template-columns:1fr 1fr; gap:0 18px; }\r\n  .form-grid .full{ grid-column:1 / -1; }\r\n  \r\n  .form-hint{ font-size:11.5px; color:var(--muted); margin-top:4px; }\r\n  .photo-row{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; }\r\n  .photo-row input[type=\"text\"]{ flex:1; min-width:180px; }\r\n  .photo-thumb{\r\n    width:56px; height:56px; border-radius:10px; object-fit:contain; background:#fff;\r\n    border:1.5px solid var(--line); flex:none; display:flex; align-items:center; justify-content:center;\r\n    font-size:9px; color:var(--muted); text-align:center; font-family:'IBM Plex Mono';\r\n  }\r\n  .upload-btn{ cursor:pointer; }\r\n  .check-row{ display:flex; align-items:center; gap:9px; margin:4px 0 16px; font-size:13.5px; font-weight:500; }\r\n  .check-row input{ width:17px; height:17px; accent-color:var(--flame); }\r\n  .form-foot{ display:flex; align-items:center; justify-content:flex-end; gap:10px; margin-top:6px; }\r\n\r\n  .add-btn{\r\n    width:100%; padding:15px; border:2px dashed #CBD6E0; border-radius:13px; background:transparent; color:var(--muted);\r\n    font-weight:600; font-size:14px; display:flex; align-items:center; justify-content:center; gap:8px; transition:all .25s;\r\n  }\r\n  .add-btn:hover{ border-color:var(--flame); color:var(--flame-deep); background:#FFF8F4; }\r\n\r\n  /* Toast */\r\n  #toast{\r\n    position:fixed; bottom:26px; left:50%; transform:translate(-50%, 80px); background:var(--navy); color:#fff;\r\n    padding:13px 22px; border-radius:12px; font-size:14px; font-weight:500; box-shadow:0 14px 34px rgba(0,0,0,.3);\r\n    transition:transform .4s cubic-bezier(.22,1,.36,1); z-index:100; max-width:90vw;\r\n  }\r\n  #toast.show{ transform:translate(-50%, 0); }\r\n  #toast.err{ background:var(--err); } [data-theme=\"dark\"]{ --cloud:#0F1A25; --navy:#E6EEF6; --navy-2:#B9CBDC; --line:#26384B; --muted:#93A5B6; }[data-theme=\"dark\"] body{ background:#0B131C; }[data-theme=\"dark\"] .login-card{ background:#141F2C; }[data-theme=\"dark\"] input, [data-theme=\"dark\"] textarea, [data-theme=\"dark\"] select{ background:#0F1A25; color:#E6EEF6; }[data-theme=\"dark\"] input::placeholder, [data-theme=\"dark\"] textarea::placeholder{ color:#5F7488; }[data-theme=\"dark\"] .btn.ghost:hover{ background:#1B2A3A; }[data-theme=\"dark\"] .section-card, [data-theme=\"dark\"] .filters-card, [data-theme=\"dark\"] .stats-pro, [data-theme=\"dark\"] .prod, [data-theme=\"dark\"] .lead, [data-theme=\"dark\"] .stat-card{ background:#141F2C; }[data-theme=\"dark\"] .prod:hover, [data-theme=\"dark\"] .lead:hover{ border-color:#3A4C60; box-shadow:none; }[data-theme=\"dark\"] .prod.hidden-prod{ background:#0F1A25; }[data-theme=\"dark\"] .icon-btn, [data-theme=\"dark\"] .photo-thumb{ background:#1B2A3A; }[data-theme=\"dark\"] .chip{ background:#1B2A3A; border-color:#26384B; }[data-theme=\"dark\"] .chip.active{ background:#173A5C; color:#fff; border-color:#173A5C; }[data-theme=\"dark\"] .transfer-menu{ background:#141F2C; border-color:#26384B; }[data-theme=\"dark\"] .transfer-opt{ color:#E6EEF6; }[data-theme=\"dark\"] .transfer-opt:hover{ background:#1B2A3A; }[data-theme=\"dark\"] .login-logo .mark{ background:#173A5C; }[data-theme=\"dark\"] #toast{ background:#1B2A3A; }[data-theme=\"dark\"] .switch .track{ background:#3A4C60; }[data-theme=\"dark\"] .prod-form{ background:#0F1A25; }[data-theme=\"dark\"] .prod-form-inner{ border-top-color:#26384B; }[data-theme=\"dark\"] .mode-pill.demo{ background:#3A2A18; border-color:#5A3D28; }[data-theme=\"dark\"] .mode-pill.live{ background:#12301F; border-color:#265F42; }[data-theme=\"dark\"] .add-btn{ border-color:#3A4C60; }[data-theme=\"dark\"] .add-btn:hover{ background:#2A2018; }[data-theme=\"dark\"] .empty-state{ background:#141F2C; }[data-theme=\"dark\"] .lead-msg, [data-theme=\"dark\"] .prod-form-inner{ border-color:#26384B; }[data-theme=\"dark\"] .theme-toggle-btn{ color:rgba(255,255,255,.85); }\r\n@media(max-width:640px){\r\n    .wrap{ padding:0 14px; }\r\n    .section-card{ padding:16px 14px; }\r\n    .admin-topbar{ flex-direction:column; align-items:flex-start; gap:10px; }\r\n    .admin-topbar h1{ font-size:22px; }\r\n    .admin-topbar .right{ flex-wrap:wrap; }\r\n    .prod-row{\r\n      display:grid; padding:12px 14px; column-gap:12px; row-gap:10px; gap:0;\r\n      grid-template-columns:auto 1fr;\r\n      grid-template-areas:\r\n        \"switch info\"\r\n        \"price actions\";\r\n      align-items:center;\r\n    }\r\n    .prod-row .switch{ grid-area:switch; }\r\n    .prod-info{ grid-area:info; }\r\n    .prod-price{ grid-area:price; font-size:16px; }\r\n    .prod-actions{ grid-area:actions; justify-self:end; }\r\n    .section-head{ flex-wrap:nowrap; gap:8px; }\r\n    .section-head h2{ font-size:16px; display:block; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; flex:1 1 auto; }\r\n    .section-head .count{ flex:none; font-size:10px; padding:4px 8px; white-space:nowrap; }\r\n    .section-head .chev{ flex:none; }\r\n    .icon-btn{ width:42px; height:42px; }\r\n    .btn.small{ min-height:40px; }\r\n    .field input, .field textarea, .field select, .admin-search input{ font-size:16px; }\r\n    .form-grid{ grid-template-columns:1fr; }\r\n  }\r\n";
-const body = "<!-- ===================== LOGIN ===================== -->\r\n<div id=\"loginScreen\">\r\n  <div class=\"orb o1\"></div><div class=\"orb o2\"></div><div class=\"orb o3\"></div>\r\n  <div class=\"login-card\">\r\n    <div class=\"login-logo\">\r\n      <div class=\"mark\"><span>D</span></div>\r\n      <h1>Panel Decogas</h1>\r\n    </div>\r\n    <p class=\"login-sub\">Gestión del catálogo: precios, fichas y visibilidad.</p>\r\n    <span class=\"mode-pill demo\" id=\"modeBadge\"><span class=\"dot\"></span><span id=\"modeText\">MODO DEMO – LOCAL</span></span>\r\n    <form id=\"loginForm\">\r\n      <div class=\"field\">\r\n        <label for=\"adminEmail\">Email</label>\r\n        <input type=\"email\" id=\"adminEmail\" autocomplete=\"username\" required>\r\n      </div>\r\n      <div class=\"field\">\r\n        <label for=\"adminPass\">Contraseña</label>\r\n        <input type=\"password\" id=\"adminPass\" autocomplete=\"current-password\" required>\r\n      </div>\r\n      <button type=\"submit\" class=\"btn block\" id=\"loginBtn\">Entrar al panel</button>\r\n      <p class=\"msg err\" id=\"loginMsg\"></p>\r\n    </form>\r\n    <p class=\"form-hint\" id=\"loginNote\" style=\"margin-top:16px; line-height:1.55;\"></p>\r\n  </div>\r\n</div>\r\n\r\n<!-- ===================== PANEL ===================== -->\r\n<div id=\"panel\">\r\n  <header class=\"admin-header\">\r\n    <div class=\"orb o1\"></div><div class=\"orb o2\"></div>\r\n    <div class=\"wrap\">\r\n      <div class=\"admin-topbar\">\r\n        <h1>Catálogo Decogas</h1>\r\n        <div class=\"right\">\r\n          <button class=\"btn ghost small theme-toggle-btn hdr-link\" id=\"themeToggle\" type=\"button\" title=\"Modo claro / oscuro\" aria-label=\"Cambiar tema\">\u25D0</button>\r\n          <a class=\"btn ghost small hdr-link\" href=\"clientes.html\" style=\" text-decoration:none;\">Clientes</a>\r\n          <a class=\"btn ghost small hdr-link\" href=\"analiticas.html\" style=\" text-decoration:none;\">Analíticas</a>\r\n          <a class=\"btn ghost small hdr-link\" href=\"cambios.html\" style=\" text-decoration:none;\">Últimos cambios</a>\r\n          <span class=\"mode-pill demo\" id=\"modeBadge2\" style=\"margin:0;\"><span class=\"dot\"></span><span id=\"modeText2\">MODO DEMO</span></span>\r\n          <button class=\"btn ghost small hdr-link\" id=\"logoutBtn\" type=\"button\">Salir</button>\r\n        </div>\r\n      </div>\r\n      <p class=\"admin-sub\">Cambia precios, edita fichas completas, añade productos nuevos o usa el interruptor para ocultarlos de la web sin borrarlos. Los cambios se publican al instante.</p>\r\n      <div id=\"dbWarn\" style=\"display:none; margin-top:14px; background:#FFF3E8; border:1px solid #FFD9C2; color:#E2501C; border-radius:11px; padding:13px 16px; font-size:13.5px; font-weight:600;\"></div>\r\n    </div>\r\n  </header>\r\n\r\n  <div class=\"panel-body\">\r\n    <div class=\"wrap\">\r\n      <div class=\"section-card\">\r\n        <div class=\"section-head\">\r\n          <h2>Calderas</h2>\r\n          <span class=\"count\" id=\"countCalderas\">–</span>\r\n        </div>\r\n        <div id=\"listCalderas\"></div>\r\n        <button class=\"add-btn\" data-add=\"calderas\" type=\"button\">\r\n          <svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.4\" stroke-linecap=\"round\"><path d=\"M12 5v14M5 12h14\"/></svg>\r\n          Añadir caldera\r\n        </button>\r\n      </div>\r\n\r\n      <div class=\"section-card\" style=\"animation-delay:.1s;\">\r\n        <div class=\"section-head\">\r\n          <h2>Aires acondicionados</h2>\r\n          <span class=\"count\" id=\"countAires\">–</span>\r\n        </div>\r\n        <div id=\"listAires\"></div>\r\n        <button class=\"add-btn\" data-add=\"aires\" type=\"button\">\r\n          <svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.4\" stroke-linecap=\"round\"><path d=\"M12 5v14M5 12h14\"/></svg>\r\n          Añadir aire acondicionado\r\n        </button>\r\n      </div>\r\n\r\n      <div class=\"section-card\" style=\"animation-delay:.2s;\">\r\n        <div class=\"section-head\">\r\n          <h2>Termos y calentadores</h2>\r\n          <span class=\"count\" id=\"countTermos\">–</span>\r\n        </div>\r\n        <div id=\"listTermos\"></div>\r\n        <button class=\"add-btn\" data-add=\"termos\" type=\"button\">\r\n          <svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.4\" stroke-linecap=\"round\"><path d=\"M12 5v14M5 12h14\"/></svg>\r\n          Añadir termo o calentador\r\n        </button>\r\n      </div>\r\n\r\n      <div class=\"section-card\" style=\"animation-delay:.3s;\">\r\n        <div class=\"section-head\">\r\n          <h2>Aerotermia</h2>\r\n          <span class=\"count\" id=\"countAerotermia\">–</span>\r\n        </div>\r\n        <p class=\"form-hint\" style=\"margin:-6px 0 14px;\">Categoría nueva: los equipos que añadas aquí salen OCULTOS de la web hasta que actives su interruptor de visibilidad.</p>\r\n        <div id=\"listAerotermia\"></div>\r\n        <button class=\"add-btn\" data-add=\"aerotermia\" type=\"button\">\r\n          <svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.4\" stroke-linecap=\"round\"><path d=\"M12 5v14M5 12h14\"/></svg>\r\n          Añadir equipo de aerotermia\r\n        </button>\r\n      </div>\r\n\r\n      <div class=\"section-card\" style=\"animation-delay:.4s;\">\r\n        <div class=\"section-head\">\r\n          <h2>No encontrados</h2>\r\n          <span class=\"count\" id=\"countNoencontrados\">–</span>\r\n        </div>\r\n        <p class=\"form-hint\" style=\"margin:-6px 0 14px;\">Modelos que aparecen en los folletos de proveedores pero no encajan con ningún producto del catálogo. Categoría interna: nunca sale en la web (aunque actives el interruptor). Usa \"Categoría\" en la ficha para moverlo a su sitio cuando lo tengas claro.</p>\r\n        <div id=\"listNoencontrados\"></div>\r\n        <button class=\"add-btn\" data-add=\"noencontrados\" type=\"button\">\r\n          <svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.4\" stroke-linecap=\"round\"><path d=\"M12 5v14M5 12h14\"/></svg>\r\n          Añadir a No encontrados\r\n        </button>\r\n      </div>\r\n\r\n      <div class=\"section-card\" style=\"animation-delay:.5s;\">\r\n        <div class=\"section-head\">\r\n          <h2>Repetidos</h2>\r\n          <span class=\"count\" id=\"countRepetidos\">–</span>\r\n        </div>\r\n        <p class=\"form-hint\" style=\"margin:-6px 0 14px;\">Productos que parecen ser la misma máquina repetida en el catálogo. Categoría interna: nunca sale en la web. Decide cuál te quedas, borra el otro, y usa \"Categoría\" en la ficha del bueno para devolverlo a su sitio.</p>\r\n        <div id=\"listRepetidos\"></div>\r\n        <button class=\"add-btn\" data-add=\"repetidos\" type=\"button\">\r\n          <svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.4\" stroke-linecap=\"round\"><path d=\"M12 5v14M5 12h14\"/></svg>\r\n          Añadir a Repetidos\r\n        </button>\r\n      </div>\r\n\r\n      <div class=\"section-card\" style=\"animation-delay:.6s;\">\r\n        <div class=\"section-head\">\r\n          <h2>Pendientes</h2>\r\n          <span class=\"count\" id=\"countPendientes\">–</span>\r\n        </div>\r\n        <p class=\"form-hint\" style=\"margin:-6px 0 14px;\">Aquí se van dejando los productos nuevos o los cambios de precio que se van proponiendo, para que los revises antes de darlos por buenos. Categoría interna: nunca sale en la web. Usa \"Categoría\" en la ficha para moverlo a su sitio definitivo cuando lo apruebes.</p>\r\n        <div id=\"listPendientes\"></div>\r\n        <button class=\"add-btn\" data-add=\"pendientes\" type=\"button\">\r\n          <svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.4\" stroke-linecap=\"round\"><path d=\"M12 5v14M5 12h14\"/></svg>\r\n          Añadir a Pendientes\r\n        </button>\r\n      </div>\r\n    </div>\r\n  </div>\r\n</div>\r\n\r\n<div id=\"toast\"></div>";
+const V = 33; // migración a sintaxis Astro normal (sin strings gigantes con \r\n)
 ---
 <!DOCTYPE html>
 <html lang="es">
@@ -16,10 +14,351 @@ const body = "<!-- ===================== LOGIN ===================== -->\r\n<div
 <title>Panel de administración – Decogas</title>
 <link rel="icon" type="image/svg+xml" href={`${base}favicon.svg`}>
 <link rel="stylesheet" href={`${base}fonts.css?v=1`}>
-<style is:inline set:html={css}></style>
+<style is:inline>
+  :root{
+    --navy:#0E2238; --navy-2:#16324B; --flame:#FF6B35; --flame-deep:#E2501C; --ice:#3AA6D9;
+    --gold:#FFB930; --cloud:#F3F6F9; --line:#E2E8EF; --muted:#5B6B7B; --ok:#1E9E5A; --err:#D8433B;
+  }
+  *{ margin:0; padding:0; box-sizing:border-box; }
+  html{ scroll-behavior:smooth; }
+  body{ font-family:'Inter',sans-serif; background:var(--cloud); color:var(--navy); min-height:100vh; overflow-x:hidden; }
+
+  h1,h2,h3{ font-family:'Fraunces',serif; }
+  button{ font-family:'Inter',sans-serif; cursor:pointer; }
+  input,textarea,select{ font-family:'Inter',sans-serif; }
+
+  /* ================= LOGIN ================= */
+  #loginScreen{
+    position:fixed; inset:0; display:flex; align-items:center; justify-content:center; padding:20px;
+    background:
+      radial-gradient(90% 120% at 85% -10%, rgba(58,166,217,.30), transparent 55%),
+      radial-gradient(70% 90% at 5% 110%, rgba(255,107,53,.22), transparent 55%),
+      linear-gradient(160deg, #0E2238 0%, #081729 100%);
+    overflow:hidden; z-index:50; transition:opacity .5s ease, visibility .5s;
+  }
+  #loginScreen.hidden{ opacity:0; visibility:hidden; }
+  .orb{ position:absolute; border-radius:50%; filter:blur(60px); opacity:.5; animation:float 9s ease-in-out infinite; }
+  .orb.o1{ width:340px; height:340px; background:var(--ice); top:-90px; right:-60px; }
+  .orb.o2{ width:280px; height:280px; background:var(--flame); bottom:-70px; left:-50px; animation-delay:-3s; }
+  .orb.o3{ width:170px; height:170px; background:var(--gold); top:55%; right:16%; animation-delay:-6s; opacity:.3; }
+  @keyframes float{ 0%,100%{ transform:translateY(0) scale(1); } 50%{ transform:translateY(-26px) scale(1.05); } }
+
+  .login-card{
+    position:relative; z-index:1; width:100%; max-width:420px; background:rgba(255,255,255,.98);
+    border-radius:20px; padding:40px 36px 34px; box-shadow:0 30px 80px rgba(0,0,0,.35);
+    animation:cardIn .7s cubic-bezier(.22,1,.36,1) both;
+  }
+  @keyframes cardIn{ from{ opacity:0; transform:translateY(26px) scale(.97); } to{ opacity:1; transform:none; } }
+  .login-logo{ display:flex; align-items:center; gap:12px; margin-bottom:8px; }
+  .login-logo .mark{
+    width:44px; height:44px; border-radius:12px; background:var(--navy); color:#fff; display:flex;
+    align-items:center; justify-content:center; font-family:'Fraunces'; font-weight:700; font-size:22px; position:relative; overflow:hidden;
+  }
+  .login-logo .mark::after{
+    content:""; position:absolute; inset:0;
+    background:radial-gradient(60% 60% at 70% 30%, rgba(58,166,217,.55), transparent 70%),
+               radial-gradient(60% 60% at 25% 80%, rgba(255,107,53,.55), transparent 70%);
+  }
+  .login-logo .mark span{ position:relative; z-index:1; }
+  .login-logo h1{ font-size:24px; }
+  .login-sub{ font-size:13.5px; color:var(--muted); margin-bottom:26px; }
+  .mode-pill{
+    display:inline-flex; align-items:center; gap:7px; font-family:'IBM Plex Mono'; font-size:11px;
+    font-weight:600; padding:5px 12px; border-radius:999px; margin-bottom:22px;
+  }
+  .mode-pill .dot{ width:7px; height:7px; border-radius:50%; animation:pulse 1.8s infinite; }
+  @keyframes pulse{ 0%,100%{ opacity:1; } 50%{ opacity:.35; } }
+  .mode-pill.demo{ background:#FFF3E8; color:var(--flame-deep); border:1px solid #FFD9C2; }
+  .mode-pill.demo .dot{ background:var(--flame); }
+  .mode-pill.live{ background:#E7F7EE; color:var(--ok); border:1px solid #BFE8D0; }
+  .mode-pill.live .dot{ background:var(--ok); }
+
+  .field{ margin-bottom:16px; }
+  .field label{ display:block; font-size:12.5px; font-weight:600; margin-bottom:6px; letter-spacing:.02em; }
+  .field input, .field textarea, .field select{
+    width:100%; padding:12px 14px; border:1.5px solid var(--line); border-radius:10px; font-size:14.5px;
+    transition:border-color .25s, box-shadow .25s; background:#fff; color:var(--navy);
+  }
+  .field textarea{ min-height:74px; resize:vertical; line-height:1.5; }
+  .field input:focus, .field textarea:focus, .field select:focus{
+    outline:none; border-color:var(--ice); box-shadow:0 0 0 3px rgba(58,166,217,.15);
+  }
+  .btn{
+    display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:13px 24px;
+    border-radius:11px; border:none; background:var(--flame); color:#fff; font-weight:600; font-size:14.5px;
+    transition:transform .2s, box-shadow .2s, background .2s; box-shadow:0 6px 18px rgba(255,107,53,.35);
+  }
+  .btn:hover{ background:var(--flame-deep); transform:translateY(-2px); box-shadow:0 10px 24px rgba(255,107,53,.4); }
+  .btn:active{ transform:translateY(0); }
+  .btn:disabled{ opacity:.55; cursor:not-allowed; transform:none; }
+  .btn.ghost{ background:transparent; color:var(--muted); border:1.5px solid var(--line); box-shadow:none; }
+  .btn.ghost:hover{ color:var(--navy); border-color:var(--muted); background:#fff; }
+  .btn.small{ padding:9px 16px; font-size:13px; border-radius:9px; }
+  .btn.danger{ background:transparent; color:var(--err); border:1.5px solid #F2C7C4; box-shadow:none; }
+  .btn.danger:hover{ background:#FDF1F0; border-color:var(--err); }
+  .btn.block{ width:100%; }
+  .msg{ font-size:13.5px; margin-top:12px; display:none; }
+  .msg.show{ display:block; animation:cardIn .3s ease both; }
+  .msg.ok{ color:var(--ok); } .msg.err{ color:var(--err); }
+
+  /* ================= PANEL ================= */
+  #panel{ display:none; }
+  .admin-header{
+    background:linear-gradient(160deg, #0E2238 0%, #12293F 100%); color:#fff; padding:26px 0 74px; position:relative; overflow:hidden;
+  }
+  .admin-header .orb{ opacity:.35; }
+  .wrap{ max-width:960px; margin:0 auto; padding:0 20px; position:relative; z-index:1; }
+  .admin-topbar{ display:flex; align-items:center; justify-content:space-between; gap:14px; flex-wrap:wrap; }
+  .admin-topbar h1{ font-size:24px; }
+  .admin-topbar .right{ display:flex; align-items:center; gap:12px; flex-wrap:wrap; }.hdr-link{ color:rgba(255,255,255,.8); border-color:rgba(255,255,255,.3); }.hdr-link:hover{ color:var(--navy); background:#fff; }
+  .admin-sub{ margin-top:10px; font-size:14px; color:rgba(255,255,255,.75); max-width:560px; line-height:1.55; }
+  .panel-body{ margin-top:-44px; padding-bottom:90px; }
+
+  .section-card{
+    background:#fff; border:1px solid var(--line); border-radius:16px; padding:24px; margin-bottom:26px;
+    box-shadow:0 10px 30px rgba(14,34,56,.06); animation:cardIn .5s ease both;
+  }
+  .section-head{ display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:16px; }
+  .section-head h2{ font-size:20px; display:flex; align-items:center; gap:10px; }
+  .section-head .count{ font-family:'IBM Plex Mono'; font-size:11px; color:var(--muted); background:var(--cloud); padding:4px 10px; border-radius:999px; }
+
+  .prod{ border:1px solid var(--line); border-radius:13px; margin-bottom:12px; overflow:hidden; transition:box-shadow .25s, border-color .25s; background:#fff; }
+  .prod:hover{ border-color:#CBD6E0; box-shadow:0 6px 16px rgba(14,34,56,.07); }
+  .prod.hidden-prod{ background:#FAFBFC; }
+  .prod.hidden-prod .prod-name, .prod.hidden-prod .prod-meta{ opacity:.45; }
+  .prod-row{ display:flex; align-items:center; gap:14px; padding:14px 16px; flex-wrap:wrap; }
+  .prod-info{ flex:1; min-width:0; }
+  .prod-name{ font-weight:600; font-size:14.5px; display:flex; align-items:center; gap:8px; overflow-wrap:break-word; }
+  .best-star{ color:var(--gold); font-size:15px; }
+  .prod-meta{ font-family:'IBM Plex Mono'; font-size:11px; color:var(--muted); margin-top:3px; overflow-wrap:anywhere; }
+  .prod-price{ font-family:'IBM Plex Mono'; font-weight:600; font-size:15px; white-space:nowrap; }
+  .prod-actions{ display:flex; align-items:center; gap:8px; }
+  .icon-btn{
+    width:34px; height:34px; border-radius:9px; border:1.5px solid var(--line); background:#fff; display:inline-flex;
+    align-items:center; justify-content:center; color:var(--muted); transition:all .2s;
+  }
+  .icon-btn:hover{ color:var(--navy); border-color:var(--muted); transform:translateY(-1px); }
+  .icon-btn.del:hover{ color:var(--err); border-color:var(--err); background:#FDF1F0; }
+  .icon-btn svg{ width:16px; height:16px; stroke:currentColor; fill:none; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }.transfer-btn{ padding:8px 12px; font-size:12.5px; }.transfer-menu{ position:fixed; min-width:190px; background:#fff; border:1px solid var(--line); border-radius:12px; box-shadow:0 14px 34px rgba(14,34,56,.18); padding:6px; display:none; flex-direction:column; gap:2px; z-index:200; }.transfer-menu.open{ display:flex; }.transfer-opt{ text-align:left; border:none; background:transparent; border-radius:8px; padding:8px 10px; font-size:13px; font-weight:600; font-family:'Inter'; cursor:pointer; color:var(--navy); transition:background .15s; }.transfer-opt:hover{ background:var(--cloud); }
+
+  /* Switch de visibilidad */
+  .switch{ position:relative; width:46px; height:26px; flex:none; }
+  .switch input{ opacity:0; width:0; height:0; }
+  .switch .track{
+    position:absolute; inset:0; border-radius:999px; background:#CBD6E0; transition:background .25s; cursor:pointer;
+  }
+  .switch .track::after{
+    content:""; position:absolute; width:20px; height:20px; border-radius:50%; background:#fff; top:3px; left:3px;
+    transition:transform .25s cubic-bezier(.22,1,.36,1); box-shadow:0 2px 6px rgba(0,0,0,.25);
+  }
+  .switch input:checked + .track{ background:var(--ok); }
+  .switch input:checked + .track::after{ transform:translateX(20px); }
+  .switch input:focus-visible + .track{ box-shadow:0 0 0 3px rgba(58,166,217,.3); }
+
+  /* Formulario expandible */
+  .prod-form{ max-height:0; overflow:hidden; transition:max-height .45s cubic-bezier(.4,0,.2,1); background:var(--cloud); }
+  .prod-form-inner{ padding:20px 16px; border-top:1px solid var(--line); }
+  .form-grid{ display:grid; grid-template-columns:1fr 1fr; gap:0 18px; }
+  .form-grid .full{ grid-column:1 / -1; }
+
+  .form-hint{ font-size:11.5px; color:var(--muted); margin-top:4px; }
+  .photo-row{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+  .photo-row input[type="text"]{ flex:1; min-width:180px; }
+  .photo-thumb{
+    width:56px; height:56px; border-radius:10px; object-fit:contain; background:#fff;
+    border:1.5px solid var(--line); flex:none; display:flex; align-items:center; justify-content:center;
+    font-size:9px; color:var(--muted); text-align:center; font-family:'IBM Plex Mono';
+  }
+  .upload-btn{ cursor:pointer; }
+  .check-row{ display:flex; align-items:center; gap:9px; margin:4px 0 16px; font-size:13.5px; font-weight:500; }
+  .check-row input{ width:17px; height:17px; accent-color:var(--flame); }
+  .form-foot{ display:flex; align-items:center; justify-content:flex-end; gap:10px; margin-top:6px; }
+
+  .add-btn{
+    width:100%; padding:15px; border:2px dashed #CBD6E0; border-radius:13px; background:transparent; color:var(--muted);
+    font-weight:600; font-size:14px; display:flex; align-items:center; justify-content:center; gap:8px; transition:all .25s;
+  }
+  .add-btn:hover{ border-color:var(--flame); color:var(--flame-deep); background:#FFF8F4; }
+
+  /* Toast */
+  #toast{
+    position:fixed; bottom:26px; left:50%; transform:translate(-50%, 80px); background:var(--navy); color:#fff;
+    padding:13px 22px; border-radius:12px; font-size:14px; font-weight:500; box-shadow:0 14px 34px rgba(0,0,0,.3);
+    transition:transform .4s cubic-bezier(.22,1,.36,1); z-index:100; max-width:90vw;
+  }
+  #toast.show{ transform:translate(-50%, 0); }
+  #toast.err{ background:var(--err); } [data-theme="dark"]{ --cloud:#0F1A25; --navy:#E6EEF6; --navy-2:#B9CBDC; --line:#26384B; --muted:#93A5B6; }[data-theme="dark"] body{ background:#0B131C; }[data-theme="dark"] .login-card{ background:#141F2C; }[data-theme="dark"] input, [data-theme="dark"] textarea, [data-theme="dark"] select{ background:#0F1A25; color:#E6EEF6; }[data-theme="dark"] input::placeholder, [data-theme="dark"] textarea::placeholder{ color:#5F7488; }[data-theme="dark"] .btn.ghost:hover{ background:#1B2A3A; }[data-theme="dark"] .section-card, [data-theme="dark"] .filters-card, [data-theme="dark"] .stats-pro, [data-theme="dark"] .prod, [data-theme="dark"] .lead, [data-theme="dark"] .stat-card{ background:#141F2C; }[data-theme="dark"] .prod:hover, [data-theme="dark"] .lead:hover{ border-color:#3A4C60; box-shadow:none; }[data-theme="dark"] .prod.hidden-prod{ background:#0F1A25; }[data-theme="dark"] .icon-btn, [data-theme="dark"] .photo-thumb{ background:#1B2A3A; }[data-theme="dark"] .chip{ background:#1B2A3A; border-color:#26384B; }[data-theme="dark"] .chip.active{ background:#173A5C; color:#fff; border-color:#173A5C; }[data-theme="dark"] .transfer-menu{ background:#141F2C; border-color:#26384B; }[data-theme="dark"] .transfer-opt{ color:#E6EEF6; }[data-theme="dark"] .transfer-opt:hover{ background:#1B2A3A; }[data-theme="dark"] .login-logo .mark{ background:#173A5C; }[data-theme="dark"] #toast{ background:#1B2A3A; }[data-theme="dark"] .switch .track{ background:#3A4C60; }[data-theme="dark"] .prod-form{ background:#0F1A25; }[data-theme="dark"] .prod-form-inner{ border-top-color:#26384B; }[data-theme="dark"] .mode-pill.demo{ background:#3A2A18; border-color:#5A3D28; }[data-theme="dark"] .mode-pill.live{ background:#12301F; border-color:#265F42; }[data-theme="dark"] .add-btn{ border-color:#3A4C60; }[data-theme="dark"] .add-btn:hover{ background:#2A2018; }[data-theme="dark"] .empty-state{ background:#141F2C; }[data-theme="dark"] .lead-msg, [data-theme="dark"] .prod-form-inner{ border-color:#26384B; }[data-theme="dark"] .theme-toggle-btn{ color:rgba(255,255,255,.85); }
+@media(max-width:640px){
+    .wrap{ padding:0 14px; }
+    .section-card{ padding:16px 14px; }
+    .admin-topbar{ flex-direction:column; align-items:flex-start; gap:10px; }
+    .admin-topbar h1{ font-size:22px; }
+    .admin-topbar .right{ flex-wrap:wrap; }
+    .prod-row{
+      display:grid; padding:12px 14px; column-gap:12px; row-gap:10px; gap:0;
+      grid-template-columns:auto 1fr;
+      grid-template-areas:
+        "switch info"
+        "price actions";
+      align-items:center;
+    }
+    .prod-row .switch{ grid-area:switch; }
+    .prod-info{ grid-area:info; }
+    .prod-price{ grid-area:price; font-size:16px; }
+    .prod-actions{ grid-area:actions; justify-self:end; }
+    .section-head{ flex-wrap:nowrap; gap:8px; }
+    .section-head h2{ font-size:16px; display:block; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; flex:1 1 auto; }
+    .section-head .count{ flex:none; font-size:10px; padding:4px 8px; white-space:nowrap; }
+    .section-head .chev{ flex:none; }
+    .icon-btn{ width:42px; height:42px; }
+    .btn.small{ min-height:40px; }
+    .field input, .field textarea, .field select, .admin-search input{ font-size:16px; }
+    .form-grid{ grid-template-columns:1fr; }
+  }
+</style>
 </head>
 <body>
-<Fragment set:html={body} />
+<!-- ===================== LOGIN ===================== -->
+<div id="loginScreen">
+  <div class="orb o1"></div><div class="orb o2"></div><div class="orb o3"></div>
+  <div class="login-card">
+    <div class="login-logo">
+      <div class="mark"><span>D</span></div>
+      <h1>Panel Decogas</h1>
+    </div>
+    <p class="login-sub">Gestión del catálogo: precios, fichas y visibilidad.</p>
+    <span class="mode-pill demo" id="modeBadge"><span class="dot"></span><span id="modeText">MODO DEMO – LOCAL</span></span>
+    <form id="loginForm">
+      <div class="field">
+        <label for="adminEmail">Email</label>
+        <input type="email" id="adminEmail" autocomplete="username" required>
+      </div>
+      <div class="field">
+        <label for="adminPass">Contraseña</label>
+        <input type="password" id="adminPass" autocomplete="current-password" required>
+      </div>
+      <button type="submit" class="btn block" id="loginBtn">Entrar al panel</button>
+      <p class="msg err" id="loginMsg"></p>
+    </form>
+    <p class="form-hint" id="loginNote" style="margin-top:16px; line-height:1.55;"></p>
+  </div>
+</div>
+
+<!-- ===================== PANEL ===================== -->
+<div id="panel">
+  <header class="admin-header">
+    <div class="orb o1"></div><div class="orb o2"></div>
+    <div class="wrap">
+      <div class="admin-topbar">
+        <h1>Catálogo Decogas</h1>
+        <div class="right">
+          <button class="btn ghost small theme-toggle-btn hdr-link" id="themeToggle" type="button" title="Modo claro / oscuro" aria-label="Cambiar tema">◐</button>
+          <a class="btn ghost small hdr-link" href="clientes.html" style=" text-decoration:none;">Clientes</a>
+          <a class="btn ghost small hdr-link" href="analiticas.html" style=" text-decoration:none;">Analíticas</a>
+          <a class="btn ghost small hdr-link" href="cambios.html" style=" text-decoration:none;">Últimos cambios</a>
+          <span class="mode-pill demo" id="modeBadge2" style="margin:0;"><span class="dot"></span><span id="modeText2">MODO DEMO</span></span>
+          <button class="btn ghost small hdr-link" id="logoutBtn" type="button">Salir</button>
+        </div>
+      </div>
+      <p class="admin-sub">Cambia precios, edita fichas completas, añade productos nuevos o usa el interruptor para ocultarlos de la web sin borrarlos. Los cambios se publican al instante.</p>
+      <div id="dbWarn" style="display:none; margin-top:14px; background:#FFF3E8; border:1px solid #FFD9C2; color:#E2501C; border-radius:11px; padding:13px 16px; font-size:13.5px; font-weight:600;"></div>
+    </div>
+  </header>
+
+  <div class="panel-body">
+    <div class="wrap">
+      <div class="section-card">
+        <div class="section-head">
+          <h2>Calderas</h2>
+          <span class="count" id="countCalderas">–</span>
+        </div>
+        <div id="listCalderas"></div>
+        <button class="add-btn" data-add="calderas" type="button">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+          Añadir caldera
+        </button>
+      </div>
+
+      <div class="section-card" style="animation-delay:.1s;">
+        <div class="section-head">
+          <h2>Aires acondicionados</h2>
+          <span class="count" id="countAires">–</span>
+        </div>
+        <div id="listAires"></div>
+        <button class="add-btn" data-add="aires" type="button">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+          Añadir aire acondicionado
+        </button>
+      </div>
+
+      <div class="section-card" style="animation-delay:.2s;">
+        <div class="section-head">
+          <h2>Termos y calentadores</h2>
+          <span class="count" id="countTermos">–</span>
+        </div>
+        <div id="listTermos"></div>
+        <button class="add-btn" data-add="termos" type="button">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+          Añadir termo o calentador
+        </button>
+      </div>
+
+      <div class="section-card" style="animation-delay:.3s;">
+        <div class="section-head">
+          <h2>Aerotermia</h2>
+          <span class="count" id="countAerotermia">–</span>
+        </div>
+        <p class="form-hint" style="margin:-6px 0 14px;">Categoría nueva: los equipos que añadas aquí salen OCULTOS de la web hasta que actives su interruptor de visibilidad.</p>
+        <div id="listAerotermia"></div>
+        <button class="add-btn" data-add="aerotermia" type="button">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+          Añadir equipo de aerotermia
+        </button>
+      </div>
+
+      <div class="section-card" style="animation-delay:.4s;">
+        <div class="section-head">
+          <h2>No encontrados</h2>
+          <span class="count" id="countNoencontrados">–</span>
+        </div>
+        <p class="form-hint" style="margin:-6px 0 14px;">Modelos que aparecen en los folletos de proveedores pero no encajan con ningún producto del catálogo. Categoría interna: nunca sale en la web (aunque actives el interruptor). Usa "Categoría" en la ficha para moverlo a su sitio cuando lo tengas claro.</p>
+        <div id="listNoencontrados"></div>
+        <button class="add-btn" data-add="noencontrados" type="button">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+          Añadir a No encontrados
+        </button>
+      </div>
+
+      <div class="section-card" style="animation-delay:.5s;">
+        <div class="section-head">
+          <h2>Repetidos</h2>
+          <span class="count" id="countRepetidos">–</span>
+        </div>
+        <p class="form-hint" style="margin:-6px 0 14px;">Productos que parecen ser la misma máquina repetida en el catálogo. Categoría interna: nunca sale en la web. Decide cuál te quedas, borra el otro, y usa "Categoría" en la ficha del bueno para devolverlo a su sitio.</p>
+        <div id="listRepetidos"></div>
+        <button class="add-btn" data-add="repetidos" type="button">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+          Añadir a Repetidos
+        </button>
+      </div>
+
+      <div class="section-card" style="animation-delay:.6s;">
+        <div class="section-head">
+          <h2>Pendientes</h2>
+          <span class="count" id="countPendientes">–</span>
+        </div>
+        <p class="form-hint" style="margin:-6px 0 14px;">Aquí se van dejando los productos nuevos o los cambios de precio que se van proponiendo, para que los revises antes de darlos por buenos. Categoría interna: nunca sale en la web. Usa "Categoría" en la ficha para moverlo a su sitio definitivo cuando lo apruebes.</p>
+        <div id="listPendientes"></div>
+        <button class="add-btn" data-add="pendientes" type="button">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+          Añadir a Pendientes
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
 <script src="vendor/supabase.min.js?v=1" is:inline></script>
 <script src={`${base}utils.js?v=${V}`} is:inline></script>
 <script src={`${base}confirm-modal.js?v=${V}`} is:inline></script>
