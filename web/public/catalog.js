@@ -214,7 +214,7 @@
       return brands.map(function (b) {
         var items = POOL.filter(function (p) { return p.brand === b; }).sort(byCapacity(POWERSORT === "desc" ? "desc" : "asc"));
         return '<div class="brand-group">' +
-          '<h3 class="brand-title">' + esc(b) + ' <span class="count">' + items.length + " modelo" + (items.length > 1 ? "s" : "") + '</span></h3>' +
+          '<h3 class="brand-title"><span class="brand-title-txt">' + esc(b) + '</span><span class="count">' + items.length + " modelo" + (items.length > 1 ? "s" : "") + '</span></h3>' +
           '<div class="product-grid3">' + items.map(cardHTML).join("") + '</div>' +
         '</div>';
       }).join("");

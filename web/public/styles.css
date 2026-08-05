@@ -546,11 +546,16 @@
   .vt-btn:hover{ color:var(--navy); border-color:var(--navy-soft); }
   .vt-btn.active{ background:var(--navy); color:#fff; border-color:var(--navy); }
   .vt-btn:active{ transform:scale(.94); }
+  /* Area de toque minima recomendada (~40px) en movil; en escritorio se queda compacto */
+  @media(hover:none){ .vt-btn{ width:40px; height:40px; } }
 
   /* ---------- Vistas ---------- */
   #catalogRoot.view-grid4 .product-grid3{ grid-template-columns:repeat(4, 1fr); gap:18px; }
   @media(max-width:1100px){ #catalogRoot.view-grid4 .product-grid3{ grid-template-columns:repeat(3,1fr); } }
   @media(max-width:820px){ #catalogRoot.view-grid4 .product-grid3{ grid-template-columns:repeat(2,1fr); } }
+  /* En movil estrecho, 2 columnas dejan ~150px por tarjeta: los botones "WhatsApp"/"Comparar"
+     no caben y el texto se parte a 2 lineas feo. Se colapsa a 1 columna. */
+  @media(max-width:480px){ #catalogRoot.view-grid4 .product-grid3{ grid-template-columns:1fr; } }
   #catalogRoot.view-grid4 .p-visual{ height:150px; }
   #catalogRoot.view-grid4 .p-name{ font-size:14.5px; }
   #catalogRoot.view-grid4 .p-price{ font-size:20px; }
@@ -614,8 +619,12 @@
     display:flex; align-items:center; gap:12px; font-family:'Fraunces'; font-weight:600; font-size:25px;
     color:var(--navy); margin-bottom:22px; padding-bottom:14px; border-bottom:2px solid var(--line);
   }
+  /* min-width:0 + ellipsis: con nombres de marca largos (p.ej. "Mitsubishi Electric")
+     en movil, sin esto el flex row envolvia el texto a 2 lineas dejando el badge
+     de recuento flotando raro en medio (mismo bug que ayer en el panel). */
+  .brand-title-txt{ flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
   .brand-title .count{
-    font-family:'IBM Plex Mono'; font-size:11.5px; color:var(--muted); font-weight:500;
+    flex:none; font-family:'IBM Plex Mono'; font-size:11.5px; color:var(--muted); font-weight:500;
     background:var(--cloud); padding:4px 11px; border-radius:999px; border:1px solid var(--line);
   }
 
@@ -719,6 +728,9 @@
 .calc-result{ opacity:0; transform:translateY(16px); transition:opacity .5s ease, transform .5s ease; }
 .calc-result.show{ opacity:1; transform:none; }
 .power-row{ display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:18px; }
+/* En moviles estrechos (calculadora de aires: valores en frigorias, p.ej. "2.500 frig.")
+   el numero a 30px no cabe en ~100px de columna y se parte feo dentro del recuadro. */
+@media(max-width:480px){ .power-row{ grid-template-columns:1fr; } }
 .power-box{ background:var(--cloud); border-radius:13px; padding:18px; text-align:center; }
 .power-box .pw-label{ font-family:'IBM Plex Mono'; font-size:10.5px; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); }
 .power-box .pw-value{ font-family:'Fraunces',serif; font-size:30px; font-weight:700; color:var(--navy); margin-top:6px; }
@@ -997,6 +1009,13 @@
 .article-prose table{ width:100%; border-collapse:collapse; margin:20px 0; font-size:14px; }
 .article-prose th{ background:var(--navy); color:#fff; padding:10px 12px; text-align:left; font-size:12.5px; }
 .article-prose td{ padding:10px 12px; border-bottom:1px solid var(--line); color:#3D4C5C; }
+/* Las tablas de las guias vienen del Markdown como <table> suelta (sin wrapper .table-scroll).
+   En movil, con body{overflow-x:hidden} el contenido que no cabe se recorta en vez de hacer
+   scroll: se ve la tabla cortada e ilegible. display:block habilita overflow-x directamente
+   sobre la propia tabla, sin tocar el Markdown de los articulos. */
+@media(max-width:640px){
+  .article-prose table{ display:block; overflow-x:auto; -webkit-overflow-scrolling:touch; }
+}
 .article-prose iframe{ max-width:100%; border-radius:14px; }
 
 /* Trampa anti-bots: invisible para personas, rellenable por robots */
