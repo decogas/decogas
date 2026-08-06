@@ -93,6 +93,10 @@ async function main() {
       continue;
     }
     const { type, installNote } = metaCategoria(file);
+    // El registro en DECOGAS_DATASETS es OBLIGATORIO: los cuatro data-*.js
+    // escriben sobre el mismo window.DECOGAS_DATA y gana el último cargado.
+    // catalog.js:15 resuelve el catálogo correcto con DATASETS[data-page];
+    // sin este bloque, /calderas.html y /termos.html muestran los aires.
     const js = `${cabecera(file)}window.DECOGAS_DATA = {
   page: "${category}",
   type: "${esc(type)}",
@@ -101,6 +105,10 @@ async function main() {
 ${productos.map(productoAJs).join(',\n')}
   ]
 };
+
+// Registro para páginas que cargan varios catálogos (admin.html)
+window.DECOGAS_DATASETS = window.DECOGAS_DATASETS || {};
+window.DECOGAS_DATASETS["${category}"] = window.DECOGAS_DATA;
 `;
     writeFileSync(PUBLIC_DIR + file, js, 'utf8');
     console.log(`[generate-data-fallback] ${category}: ${productos.length} productos → public/${file}`);

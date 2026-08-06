@@ -81,15 +81,11 @@ window.DECOGAS_DATA = {
       description:"El 3x1 más completo: una unidad de 3,5 kW para el salón y dos de 2,5 kW para dormitorios, todo con una sola unidad exterior.",
       features:["1 unidad de 3,5 kW + 2 de 2,5 kW","1 sola unidad exterior","Compresor inverter","Gas refrigerante R32","Control independiente por estancia"],
       idealFor:"Salón y 2 estancias con 1 unidad exterior.", efficiency:"A++", img:"https://ygailcynbblqvugunleq.supabase.co/storage/v1/object/public/productos/hisense-multisplit.jpg" },
-    { brand:"Samsung", slug:"aire-acondicionado-1x1-samsung-ar40h12c-wifi", name:"Samsung AR40H12C WiFi", specs:["Split inverter","WiFi","Gas R32"], price:800, pop:100,
-      description:"El aire acondicionado split 1x1 Samsung AR40H09C WiFi ofrece la climatización ideal para estancias de entre 15 y 22 m². Gracias a su potencia de 2.236 frigorías (2,6 kW) y a su avanzada tecnología Digital Inverter, garantiza un enfriamiento rápido y eficiente con una clasificación energética A++, cuidando tanto de tu confort como de tu factura eléctrica. Este modelo destaca por incluir conectividad WiFi de serie para controlarlo desde el móvil con la app SmartThings, un funcionamiento supersilencioso de solo 20 dB ideal para dormitorios, y un filtro de alta densidad que purifica el aire de alérgenos y polvo. Todo ello impulsado por el gas ecológico R32 de última generación.",
-      features:["Control WiFi desde el móvil (SmartThings)","Tecnología Digital Inverter","Funcionamiento supersilencioso","Filtro de alta densidad"],
-      idealFor:"Hasta 30 m².", efficiency:"A++", img:"https://ygailcynbblqvugunleq.supabase.co/storage/v1/object/public/productos/samsung-ar35-wifi.jpg" },
     { brand:"Ferroli", slug:"ferroli-giada-s-24-wifi", name:"Ferroli Giada S 24 WiFi", specs:["Split inverter","WiFi + App de serie","Triple filtro"], price:1250, pop:100,
       description:"El Ferroli Giada S 24 Wifi es un avanzado sistema de climatización que combina eficiencia energética y tecnología de vanguardia. Diseñado para ofrecer confort y sostenibilidad, este aire acondicionado es ideal para quienes buscan un ambiente perfecto en cualquier estación del año. Refrigerante Ecológico: R32 Capacidad Frigorífica: 5,86 kW Control Inteligente: Compatible con Google Home y Amazon Alexa",
       features:["Control WiFi y App de serie","Compatible con Google Home y Alexa","Compresor DC Inverter","Triple filtro + Bio HEPA"],
       idealFor:"Hasta 55 m².", efficiency:"A++", img:"https://ygailcynbblqvugunleq.supabase.co/storage/v1/object/public/productos/ferroli-giada-s-24-wifi.jpg" },
-    { brand:"Samsung", slug:"aire-acondicionado-1x1-samsung-ar40h09c-wifi", name:"Samsung AR40H09C WiFi", specs:["Split inverter","WiFi","Gas R32"], price:750, pop:100,
+    { brand:"Samsung", slug:"aire-acondicionado-1x1-samsung-ar40h09c-wifi", name:"Samsung AR40H09C WiFi", specs:["Split inverter","WiFi","Gas R32"], price:795, pop:100,
       description:"El aire acondicionado split 1x1 Samsung AR40H09C WiFi ofrece la climatización ideal para estancias de entre 15 y 22 m². Gracias a su potencia de 2.236 frigorías (2,6 kW) y a su avanzada tecnología Digital Inverter, garantiza un enfriamiento rápido y eficiente con una clasificación energética A++, cuidando tanto de tu confort como de tu factura eléctrica. Este modelo destaca por incluir conectividad WiFi de serie para controlarlo desde el móvil con la app SmartThings, un funcionamiento supersilencioso de solo 20 dB ideal para dormitorios, y un filtro de alta densidad que purifica el aire de alérgenos y polvo. Todo ello impulsado por el gas ecológico R32 de última generación.",
       features:["Control WiFi desde el móvil (SmartThings)","Tecnología Digital Inverter","Funcionamiento supersilencioso (20 dB)","Filtro de alta densidad"],
       idealFor:"Hasta 22 m².", efficiency:"A++", img:"https://ygailcynbblqvugunleq.supabase.co/storage/v1/object/public/productos/samsung-ar35-wifi.jpg" },
@@ -109,6 +105,10 @@ window.DECOGAS_DATA = {
       description:"El aire acondicionado Ferroli Giada S 12 Wifi combina eficiencia energética y tecnología avanzada para ofrecer un confort superior. Equipado con un sistema de control WIFI compatible con Google Home y Amazon Alexa, este modelo garantiza un manejo sencillo y eficiente. Refrigerante ecológico: R32 Capacidad Frigorífica: 3,35 kW Clasificación energética: A++ en frío, A+++ en calor",
       features:["Control WiFi y App de serie","Compatible con Google Home y Alexa","Compresor DC Inverter","Triple filtro + Bio HEPA"],
       idealFor:"Hasta 30 m².", efficiency:"A+++", img:"https://ygailcynbblqvugunleq.supabase.co/storage/v1/object/public/productos/ferroli-giada-s-12-wifi.jpg" },
+    { brand:"Samsung", slug:"aire-acondicionado-1x1-samsung-ar40h12c-wifi", name:"Samsung AR40H12C WiFi", specs:["Split inverter","WiFi","Gas R32"], price:850, pop:100,
+      description:"El aire acondicionado split 1x1 Samsung AR40H09C WiFi ofrece la climatización ideal para estancias de entre 15 y 22 m². Gracias a su potencia de 2.236 frigorías (2,6 kW) y a su avanzada tecnología Digital Inverter, garantiza un enfriamiento rápido y eficiente con una clasificación energética A++, cuidando tanto de tu confort como de tu factura eléctrica. Este modelo destaca por incluir conectividad WiFi de serie para controlarlo desde el móvil con la app SmartThings, un funcionamiento supersilencioso de solo 20 dB ideal para dormitorios, y un filtro de alta densidad que purifica el aire de alérgenos y polvo. Todo ello impulsado por el gas ecológico R32 de última generación.",
+      features:["Control WiFi desde el móvil (SmartThings)","Tecnología Digital Inverter","Funcionamiento supersilencioso","Filtro de alta densidad"],
+      idealFor:"Hasta 30 m².", efficiency:"A++", img:"https://ygailcynbblqvugunleq.supabase.co/storage/v1/object/public/productos/samsung-ar35-wifi.jpg" },
     { brand:"Ferroli", slug:"ferroli-giada-s-18-wifi", name:"Ferroli Giada S 18 WiFi", specs:["Split inverter","WiFi + App de serie","Triple filtro"], price:1000, pop:100,
       description:"El Ferroli Giada S 18 Wifi es un avanzado sistema de climatización que combina eficiencia energética y tecnología de vanguardia. Diseñado para ofrecer confort y sostenibilidad, este aire acondicionado es ideal para quienes buscan un ambiente saludable y controlado desde cualquier lugar. Refrigerante Ecológico: R32 Capacidad Frigorífica: 5,27 kW Control Inteligente: Compatible con Google Home y Amazon Alexa",
       features:["Control WiFi y App de serie","Compatible con Google Home y Alexa","Compresor DC Inverter","Triple filtro + Bio HEPA"],
@@ -167,3 +167,7 @@ window.DECOGAS_DATA = {
       idealFor:"Hasta 65 m².", efficiency:"A++", img:"https://ygailcynbblqvugunleq.supabase.co/storage/v1/object/public/productos/samsung-windfree-comfort-s2.png" }
   ]
 };
+
+// Registro para páginas que cargan varios catálogos (admin.html)
+window.DECOGAS_DATASETS = window.DECOGAS_DATASETS || {};
+window.DECOGAS_DATASETS["aires"] = window.DECOGAS_DATA;

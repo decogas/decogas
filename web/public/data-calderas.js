@@ -57,6 +57,10 @@ window.DECOGAS_DATA = {
       description:"La opción de 28 kW más ajustada de precio del catálogo: condensación con potencia para dos baños sin disparar el presupuesto.",
       features:["Caldera de condensación","28 kW de potencia","Excelente relación calidad-precio","Formato compacto","Fácil mantenimiento"],
       idealFor:"Hasta 150 m² y 2 baños.", efficiency:"A", img:"https://ygailcynbblqvugunleq.supabase.co/storage/v1/object/public/productos/hermann-micracom-condens-28.png" },
+    { brand:"Ferroli", slug:"ferroli-bluehelix-tech-rrt-34-c", name:"Ferroli BlueHelix Tech RRT 34 C", specs:["Condensación","Termostato modulante incluido","Compresor DC"], price:1550, pop:100,
+      description:"La caldera Ferroli Bluehelix Tech RRT 34 C garantiza un hogar cálido y eficiente, adaptándose a tus necesidades energéticas con facilidad y precisión. Potencia superior: 32,5 kW para calefacción, 34,7 kW para ACS Caudal máximo: 19,5 litros por minuto a 25 &ordm;C Versatilidad de combustible: Compatible con Gas Natural y Propano",
+      features:["Alta eficiencia energética (condensación)","Caudalímetro y termostato incluidos","Encendido electrónico","Bajo nivel sonoro","Termostato modulante RRT incluido"],
+      idealFor:"Viviendas de hasta 180 m² con 2-3 baños.", efficiency:"A", img:"https://ygailcynbblqvugunleq.supabase.co/storage/v1/object/public/productos/ferroli-bluehelix-tech-rrt-34-c.jpg" },
     { brand:"Vaillant", slug:"vaillant-ecotec-exclusive-vmw-43cf-1-7-senso-comfort-radio", name:"Vaillant ecoTec Exclusive VMW 43CF/1-7 Senso Comfort Radio", specs:["Condensación","Gama Exclusive","Termostato Radio incl."], price:3450, pop:100,
       description:"La caldera Vaillant EcoTec Exclusive VMW 43CF/1-7 redefine el confort en el hogar con su avanzada tecnología de condensación, garantizando eficiencia y conectividad en un diseño moderno. Potencia superior: 33,5 kW para calefacción, 42,8 kW para ACS Caudal de agua caliente: 24,9 litros por minuto a 25 &ordm;C Rango de modulación: 1:12 para un rendimiento óptimo",
       features:["Alta eficiencia energética (condensación)","Caudalímetro y termostato incluidos","Encendido electrónico","Bajo nivel sonoro","Termostato modulante Senso Comfort incluido"],
@@ -189,13 +193,13 @@ window.DECOGAS_DATA = {
       description:"La caldera Ferroli Bluehelix Tech RRT 28 C garantiza un hogar cálido y eficiente, adaptándose a tus necesidades energéticas con facilidad y precisión. Potencia de calefacción: 26 kW para áreas de 100-130 m² Caudal de ACS: 28,5 kW con 16,1 l/min a 25 &ordm;C Versatilidad de combustible: Compatible con Gas Natural y Propano",
       features:["Alta eficiencia energética (condensación)","Caudalímetro y termostato incluidos","Encendido electrónico","Bajo nivel sonoro","Termostato modulante RRT incluido"],
       idealFor:"Viviendas de hasta 140 m² con 2 baños.", efficiency:"A", img:"https://ygailcynbblqvugunleq.supabase.co/storage/v1/object/public/productos/ferroli-bluehelix-tech-rrt-28-c.jpg" },
-    { brand:"Ferroli", slug:"ferroli-bluehelix-tech-rrt-34-c", name:"Ferroli BlueHelix Tech RRT 34 C", specs:["Condensación","Termostato modulante incluido","Compresor DC"], price:1550, pop:100,
-      description:"La caldera Ferroli Bluehelix Tech RRT 34 C garantiza un hogar cálido y eficiente, adaptándose a tus necesidades energéticas con facilidad y precisión. Potencia superior: 32,5 kW para calefacción, 34,7 kW para ACS Caudal máximo: 19,5 litros por minuto a 25 &ordm;C Versatilidad de combustible: Compatible con Gas Natural y Propano",
-      features:["Alta eficiencia energética (condensación)","Caudalímetro y termostato incluidos","Encendido electrónico","Bajo nivel sonoro","Termostato modulante RRT incluido"],
-      idealFor:"Viviendas de hasta 180 m² con 2-3 baños.", efficiency:"A", img:"https://ygailcynbblqvugunleq.supabase.co/storage/v1/object/public/productos/ferroli-bluehelix-tech-rrt-34-c.jpg" },
     { brand:"Junkers (grupo Bosch)", slug:"caldera-bosch-condens-6000-w-25-36", name:"Bosch Condens 6000 W 25/36", specs:["Condensación","Gama superior Bosch","Caudalímetro incl."], price:2195, pop:100,
       description:"La Caldera Bosch Condens 6000 W 25/36 es la elección ideal para hogares que buscan eficiencia y confort, proporcionando calefacción potente y agua caliente al instante. Potencia eficiente: 25 kW para calefacción, 36 kW para ACS Rendimiento superior: Hasta 94% en calefacción Tecnología avanzada: Bosch Heatronic 4 con gestión climática",
       features:["Alta eficiencia energética (condensación)","Caudalímetro y termostato incluidos","Encendido electrónico","Bajo nivel sonoro"],
       idealFor:"Viviendas de hasta 180 m² con 2-3 baños.", efficiency:"A", img:"https://ygailcynbblqvugunleq.supabase.co/storage/v1/object/public/productos/bosch-condens-6000-w.webp" }
   ]
 };
+
+// Registro para páginas que cargan varios catálogos (admin.html)
+window.DECOGAS_DATASETS = window.DECOGAS_DATASETS || {};
+window.DECOGAS_DATASETS["calderas"] = window.DECOGAS_DATA;

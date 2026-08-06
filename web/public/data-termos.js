@@ -14,3 +14,7 @@ window.DECOGAS_DATA = {
       idealFor:"", efficiency:"", img:"https://ygailcynbblqvugunleq.supabase.co/storage/v1/object/public/productos/termo-electrico-cabel-100l-vertical.jpg" }
   ]
 };
+
+// Registro para páginas que cargan varios catálogos (admin.html)
+window.DECOGAS_DATASETS = window.DECOGAS_DATASETS || {};
+window.DECOGAS_DATASETS["termos"] = window.DECOGAS_DATA;
