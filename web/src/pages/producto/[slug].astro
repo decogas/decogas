@@ -130,7 +130,7 @@ const scripts = ['utils.js', 'config.js', 'prices.js', 'data-calderas.js', 'data
           )}
 
           <div class="prod-price-box">
-            <div class="prod-price"><strong>{fmt(price)} €</strong> <span>IVA e instalación estándar incluidos</span></div>
+            <div class="prod-price"><strong><span data-price-slug={p.slug}>{fmt(price)}</span> €</strong> <span>IVA e instalación estándar incluidos</span></div>
             <div class="prod-fin">Financiación sin intereses: <strong>{cuota(12)} €/mes</strong> (12 m) · <strong>{cuota(24)} €/mes</strong> (24 m) · <strong>{cuota(36)} €/mes</strong> (36 m)</div>
           </div>
 
