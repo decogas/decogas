@@ -2,7 +2,7 @@
 // Página autónoma (panel privado): head propio con estilos en línea, sin el layout de marketing.
 const rawBase = import.meta.env.BASE_URL;
 const base = rawBase.endsWith('/') ? rawBase : rawBase + '/';
-const V = 6; // migración a sintaxis Astro normal (sin strings gigantes con \r\n)
+const V = 7; // fix real: grid 1fr sin minmax(0,..) no se encogia + overflow-x en html
 ---
 <!DOCTYPE html>
 <html lang="es">
@@ -20,6 +20,7 @@ const V = 6; // migración a sintaxis Astro normal (sin strings gigantes con \r\
     --gold:#FFB930; --cloud:#F3F6F9; --line:#E2E8EF; --muted:#5B6B7B; --ok:#1E9E5A; --err:#D8433B;
   }
   *{ margin:0; padding:0; box-sizing:border-box; }
+  html{ overflow-x:hidden; }
   body{ font-family:'Inter',sans-serif; background:var(--cloud); color:var(--navy); min-height:100vh; overflow-x:hidden; }
 
   h1,h2,h3{ font-family:'Fraunces',serif; }
@@ -96,7 +97,7 @@ const V = 6; // migración a sintaxis Astro normal (sin strings gigantes con \r\
   #toast.err{ background:var(--err); } [data-theme="dark"]{ --cloud:#0F1A25; --navy:#E6EEF6; --navy-2:#B9CBDC; --line:#26384B; --muted:#93A5B6; }[data-theme="dark"] body{ background:#0B131C; }[data-theme="dark"] .login-card{ background:#141F2C; }[data-theme="dark"] input, [data-theme="dark"] textarea, [data-theme="dark"] select{ background:#0F1A25; color:#E6EEF6; }[data-theme="dark"] input::placeholder, [data-theme="dark"] textarea::placeholder{ color:#5F7488; }[data-theme="dark"] .btn.ghost:hover{ background:#1B2A3A; }[data-theme="dark"] .section-card, [data-theme="dark"] .filters-card, [data-theme="dark"] .stats-pro, [data-theme="dark"] .prod, [data-theme="dark"] .lead, [data-theme="dark"] .stat-card{ background:#141F2C; }[data-theme="dark"] .prod:hover, [data-theme="dark"] .lead:hover{ border-color:#3A4C60; box-shadow:none; }[data-theme="dark"] .prod.hidden-prod{ background:#0F1A25; }[data-theme="dark"] .icon-btn, [data-theme="dark"] .photo-thumb{ background:#1B2A3A; }[data-theme="dark"] .chip{ background:#1B2A3A; border-color:#26384B; }[data-theme="dark"] .chip.active{ background:#173A5C; color:#fff; border-color:#173A5C; }[data-theme="dark"] .range-menu{ background:#141F2C; border-color:#26384B; }[data-theme="dark"] .range-opt{ color:#E6EEF6; }[data-theme="dark"] .range-opt:hover{ background:#1B2A3A; }[data-theme="dark"] .range-opt.active{ background:#173A5C; color:#fff; }[data-theme="dark"] .login-logo .mark{ background:#173A5C; }[data-theme="dark"] #toast{ background:#1B2A3A; }[data-theme="dark"] .switch .track{ background:#3A4C60; }[data-theme="dark"] .prod-form{ background:#0F1A25; }[data-theme="dark"] .prod-form-inner{ border-top-color:#26384B; }[data-theme="dark"] .mode-pill.demo{ background:#3A2A18; border-color:#5A3D28; }[data-theme="dark"] .mode-pill.live{ background:#12301F; border-color:#265F42; }[data-theme="dark"] .add-btn{ border-color:#3A4C60; }[data-theme="dark"] .add-btn:hover{ background:#2A2018; }[data-theme="dark"] .empty-state{ background:#141F2C; }[data-theme="dark"] .lead-msg, [data-theme="dark"] .prod-form-inner{ border-color:#26384B; }[data-theme="dark"] .theme-toggle-btn{ color:rgba(255,255,255,.85); }
 .day-chart{ display:flex; align-items:flex-end; gap:5px; }
   .day-chart .aday{ flex:1; display:flex; flex-direction:column; align-items:center; gap:3px; cursor:pointer; }
-  .analitica-lists{ display:grid; grid-template-columns:1fr 1fr; gap:24px; }
+  .analitica-lists{ display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:24px; }
 @media(max-width:640px){
     .wrap{ padding:0 14px; }
     .section-card{ padding:16px 14px; }
@@ -113,7 +114,7 @@ const V = 6; // migración a sintaxis Astro normal (sin strings gigantes con \r\
     .day-chart .aday{ flex:0 0 20px; min-width:20px; }
   }
   @media(max-width:600px){
-    .analitica-lists{ grid-template-columns:1fr; gap:18px; }
+    .analitica-lists{ grid-template-columns:minmax(0,1fr); gap:18px; }
   }
 </style>
 </head>

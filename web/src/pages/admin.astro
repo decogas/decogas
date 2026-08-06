@@ -2,7 +2,7 @@
 // Página autónoma (panel privado): head propio con estilos en línea, sin el layout de marketing.
 const rawBase = import.meta.env.BASE_URL;
 const base = rawBase.endsWith('/') ? rawBase : rawBase + '/';
-const V = 33; // migración a sintaxis Astro normal (sin strings gigantes con \r\n)
+const V = 34; // fix: desbordamiento horizontal real (overflow-x en html + grid minmax)
 ---
 <!DOCTYPE html>
 <html lang="es">
@@ -21,6 +21,7 @@ const V = 33; // migración a sintaxis Astro normal (sin strings gigantes con \r
   }
   *{ margin:0; padding:0; box-sizing:border-box; }
   html{ scroll-behavior:smooth; }
+  html{ overflow-x:hidden; }
   body{ font-family:'Inter',sans-serif; background:var(--cloud); color:var(--navy); min-height:100vh; overflow-x:hidden; }
 
   h1,h2,h3{ font-family:'Fraunces',serif; }
