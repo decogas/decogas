@@ -1351,58 +1351,6 @@ nav.main-nav a[aria-current="page"]::after{ right:0; }
 [data-theme="dark"] .reciente-name{ color:#EAF2F8; }
 .reciente-price{ font-family:'IBM Plex Mono'; font-size:11.5px; color:var(--flame-deep); }
 
-/* ---- España campeona del Mundial 2026: texto gigante + confeti (caduca 26/07) ---- */
-.confeti{ position:fixed; inset:0; width:100vw; height:100vh; pointer-events:none; z-index:360; }
-/* Modal de "España campeona": caja oscura sólida = contraste garantizado */
-.mundial-hero{
-  position:fixed; inset:0; z-index:355; pointer-events:none;
-  display:flex; align-items:center; justify-content:center; text-align:center; padding:20px;
-  background:rgba(6,13,22,.74);
-  -webkit-backdrop-filter:blur(3px); backdrop-filter:blur(3px);
-  animation:mhIn .5s var(--ease); transition:opacity .9s ease;
-}
-.mundial-hero.out{ opacity:0; }
-.mh-box{
-  position:relative; overflow:hidden;
-  display:flex; flex-direction:column; align-items:center; gap:10px;
-  padding:clamp(40px,6vw,60px) clamp(30px,6vw,64px) clamp(34px,5vw,48px);
-  border-radius:28px; max-width:600px;
-  background:
-    radial-gradient(120% 80% at 50% -10%, rgba(255,196,0,.16), transparent 60%),
-    linear-gradient(180deg, #16375A 0%, #0A1B2E 55%, #07131F 100%);
-  border:1px solid rgba(255,196,0,.4);
-  box-shadow:0 40px 120px rgba(0,0,0,.65), 0 0 0 6px rgba(255,196,0,.06), inset 0 1px 0 rgba(255,255,255,.1);
-  animation:mhPop .7s var(--ease);
-}
-/* Franja de la bandera de España arriba */
-.mh-box::before{
-  content:""; position:absolute; top:0; left:0; right:0; height:6px;
-  background:linear-gradient(90deg, #C60B1E 0 28%, #FFC400 28% 72%, #C60B1E 72% 100%);
-}
-.mh-glow{ position:absolute; top:-40%; left:50%; width:140%; height:140%; transform:translateX(-50%);
-  background:radial-gradient(closest-side, rgba(255,196,0,.14), transparent 70%); pointer-events:none;
-  animation:mhShine 4s ease-in-out infinite; }
-@keyframes mhShine{ 0%,100%{ opacity:.5; } 50%{ opacity:1; } }
-.mh-trophy{ font-size:clamp(48px,8vw,76px); line-height:1; filter:drop-shadow(0 8px 20px rgba(255,196,0,.4)); animation:mhBob 2.4s ease-in-out infinite; position:relative; }
-@keyframes mhBob{ 0%,100%{ transform:translateY(0) rotate(-3deg); } 50%{ transform:translateY(-8px) rotate(3deg); } }
-.mh-eyebrow{
-  font-family:'IBM Plex Mono'; letter-spacing:.2em; text-transform:uppercase;
-  font-size:clamp(10px,1.3vw,13px); font-weight:600; color:#FFD54A; position:relative;
-}
-.mh-title{
-  font-family:'Fraunces'; font-weight:700; letter-spacing:-.02em;
-  font-size:clamp(38px,6.5vw,68px); line-height:1.02; position:relative;
-  background:linear-gradient(180deg, #FFFFFF 0%, #FFE9A8 100%);
-  -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; color:#fff;
-}
-.mh-sub{ font-family:'Inter'; font-weight:600; font-size:clamp(15px,2vw,19px); color:rgba(255,255,255,.85); position:relative; }
-.mh-flag{ font-size:1.1em; }
-.mh-stars{ color:#FFC400; letter-spacing:.18em; font-size:clamp(13px,1.6vw,16px); margin-top:2px; position:relative; text-shadow:0 2px 10px rgba(255,196,0,.5); }
-@media (prefers-reduced-motion: reduce){ .mh-glow, .mh-trophy{ animation:none; } }
-@keyframes mhIn{ from{ opacity:0; } }
-@keyframes mhPop{ from{ opacity:0; transform:scale(.82) translateY(20px); } }
-@media (prefers-reduced-motion: reduce){ .mundial-hero, .mh-box{ animation:none; } }
-
 /* ================================================================
    v31 — Pulido de interacción (revisión Emil Kowalski)
    Feedback de pulsado en todo lo presionable + hover solo en ratón
