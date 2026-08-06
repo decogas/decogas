@@ -21,9 +21,13 @@
   Cross-Origin-Resource-Policy: same-site
   X-Permitted-Cross-Domain-Policies: none
   # Lista blanca de lo único que el navegador puede cargar o contactar.
-  # script-src es solo 'self': el SDK de Supabase está auto-alojado en /vendor/.
-  # frame-src permite el mapa de Google de la portada.
-  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: https://*.supabase.co; connect-src 'self' https://*.supabase.co https://formsubmit.co; frame-src https://www.google.com; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self' mailto:; upgrade-insecure-requests
+  # El SDK de Supabase está auto-alojado en /vendor/. script-src/connect-src
+  # incluyen los dominios de Google Ads (gtag.js + medición de conversiones).
+  # frame-src permite el mapa de Google de la portada. Mantener sincronizada
+  # con la misma CSP de .htaccess (esta es la que de verdad se aplica en
+  # Nicalia; esta cabecera es inerte ahí, solo documenta intención / sirve
+  # si algún día se sirve desde Netlify o Cloudflare Pages).
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: https://*.supabase.co https://www.googletagmanager.com https://www.google.com https://www.googleadservices.com https://googleads.g.doubleclick.net; connect-src 'self' https://*.supabase.co https://formsubmit.co https://www.googletagmanager.com https://www.google.com https://www.googleadservices.com https://googleads.g.doubleclick.net; frame-src https://www.google.com; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self' mailto:; upgrade-insecure-requests
 
 # ------------------------------------------------------------
 # Paneles privados: que no se indexen ni se queden guardados

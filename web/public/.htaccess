@@ -6,6 +6,12 @@
   Header always set Referrer-Policy "strict-origin-when-cross-origin"
   Header always set Strict-Transport-Security "max-age=31536000"
   Header always set Permissions-Policy "geolocation=(), microphone=(), camera=()"
+  # Lista blanca de lo único que el navegador puede cargar o contactar.
+  # script-src/connect-src incluyen los dominios de Google Ads (gtag.js +
+  # medición de conversiones) además de Supabase y FormSubmit. frame-src
+  # permite el mapa de Google de la portada. NO se incluye Google Analytics
+  # (no se usa): la analítica propia va contra Supabase (ya cubierto).
+  Header always set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: https://*.supabase.co https://www.googletagmanager.com https://www.google.com https://www.googleadservices.com https://googleads.g.doubleclick.net; connect-src 'self' https://*.supabase.co https://formsubmit.co https://www.googletagmanager.com https://www.google.com https://www.googleadservices.com https://googleads.g.doubleclick.net; frame-src https://www.google.com; object-src 'none'; base-uri 'self'; frame-ancestors 'none'; form-action 'self' mailto:; upgrade-insecure-requests"
 </IfModule>
 
 # Página 404 propia del sitio.
