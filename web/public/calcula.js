@@ -199,7 +199,11 @@
         '<div class="budget-ref">Ref. ' + ref + '<br>' + esc(fecha) + '</div>' +
       "</div>" +
       '<div class="budget-name-field">' +
-        '<input type="text" id="budgetName" placeholder="Tu nombre (opcional, aparecer\u00E1 en el presupuesto)" autocomplete="name">' +
+        '<label for="budgetName" class="sr-only">Tu nombre</label>' +
+        '<input type="text" id="budgetName" placeholder="Tu nombre (aparecer\u00E1 en el presupuesto)" autocomplete="name">' +
+        '<label for="budgetTel" class="sr-only">Tu tel\u00E9fono</label>' +
+        '<input type="tel" id="budgetTel" placeholder="Tu tel\u00E9fono (para llamarte y confirmar)" autocomplete="tel" inputmode="tel">' +
+        '<p class="budget-name-hint">Con tu tel\u00E9fono te confirmamos disponibilidad y fecha de instalaci\u00F3n. Sin compromiso.</p>' +
       "</div>" +
       '<div class="budget-lines">' +
         '<div class="budget-line"><span><strong>' + equipoLabel + ":</strong> " + esc(p.name) + " (" + esc(p.brand) + ")</span></div>" +
@@ -243,7 +247,68 @@
     };
     updateWa();
     $("budgetName").addEventListener("input", updateWa);
-    $("budgetPrint").addEventListener("click", function () { window.print(); });
+
+    // ---------- Captura del lead ----------
+    // Hasta ahora la calculadora no guardaba NADA: el presupuesto vivía en el DOM
+    // y se perdía al cerrar la pestaña. Todo dependía de que el visitante pulsara
+    // WhatsApp, saliera de la web y encima enviara el mensaje. Ahora el lead se
+    // guarda al pulsar WhatsApp o PDF, ANTES de irse, y sin bloquear la acción si
+    // el guardado falla (mejor perder el registro que perder al cliente).
+    var yaGuardado = false;
+    var guardarLead = function (via) {
+      if (yaGuardado) return Promise.resolve();
+      yaGuardado = true;
+      var cfg = window.DECOGAS_CONFIG || {};
+      var nombre = ($("budgetName").value || "").trim();
+      var tel = ($("budgetTel").value || "").trim();
+      var cut = function (s, n) { return String(s || "").slice(0, n); };
+      var lead = {
+        // `name` es obligatorio en la BD y exige 2-80 caracteres.
+        name: cut(nombre || ("Presupuesto web " + ref), 80),
+        phone: cut(tel, 25),
+        email: "",
+        interest: cut(equipoLabel, 60),
+        message: cut(
+          "Presupuesto generado con la calculadora (" + via + ").\n" +
+          "Ref: " + ref + "\n" +
+          equipoLabel + ": " + p.name + " (" + p.brand + ")\n" +
+          contextLine(cat) + "\n" +
+          "Total con instalación estándar e IVA: " + eur(p.price) + " €", 2000)
+      };
+      if (!cfg.supabaseUrl || !cfg.supabaseAnonKey) {
+        try {
+          var arr = JSON.parse(localStorage.getItem("decogas_leads") || "[]");
+          arr.unshift(Object.assign({ created_at: new Date().toISOString() }, lead));
+          localStorage.setItem("decogas_leads", JSON.stringify(arr));
+        } catch (err) { /* sin almacenamiento */ }
+        return Promise.resolve();
+      }
+      return fetch(cfg.supabaseUrl.replace(/\/+$/, "") + "/rest/v1/leads", {
+        method: "POST",
+        headers: {
+          apikey: cfg.supabaseAnonKey,
+          Authorization: "Bearer " + cfg.supabaseAnonKey,
+          "Content-Type": "application/json",
+          Prefer: "return=minimal"
+        },
+        body: JSON.stringify(lead)
+      }).then(function (r) {
+        if (!r.ok) throw new Error("leads " + r.status);
+      }).catch(function (e) {
+        // Si el guardado falla, permitimos reintentar en la siguiente acción.
+        yaGuardado = false;
+        if (window.console) console.error("[decogas] no se pudo guardar el lead de la calculadora:", e.message);
+      });
+    };
+
+    // WhatsApp: guardamos primero y dejamos que el enlace siga su curso.
+    // No usamos preventDefault: bloquear la navegación para esperar a la red
+    // arriesga que el navegador cancele la apertura de WhatsApp.
+    $("budgetWa").addEventListener("click", function () { guardarLead("WhatsApp"); });
+    $("budgetPrint").addEventListener("click", function () {
+      guardarLead("PDF");
+      window.print();
+    });
 
     bmodal.classList.add("open");
     document.body.style.overflow = "hidden";

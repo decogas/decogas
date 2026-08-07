@@ -3,8 +3,8 @@
 // Se escribe UNA vez y lo comparten todas las páginas raíz de marketing.
 const rawBase = import.meta.env.BASE_URL; // '/decogas' (sin barra final)
 const base = rawBase.endsWith('/') ? rawBase : rawBase + '/'; // → '/decogas/'
-const ASSET_V = 50; // quitado codigo muerto: banner del Mundial 2026 (caduco 27/07)
-const STYLES_V = 68; // quitado CSS muerto del banner del Mundial 2026
+const ASSET_V = 51; // la calculadora guarda el lead + etiquetas accesibles
+const STYLES_V = 69; // contraste AA (--flame-btn, --flame-deep) + foco atrapado en overlays
 const GOOGLE_ADS_ID = 'AW-18358011669';
 // Página actual (formato 'file': /decogas/calderas.html) para marcar el menú activo
 const currentFile = Astro.url.pathname.split('/').pop() || 'index.html';

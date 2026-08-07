@@ -4,8 +4,15 @@
     --navy-soft:#173A5C;
     --paper:#FFFFFF;
     --cloud:#F4F5F7;          /* neutral más limpio y premium (menos azulado) */
-    --flame:#FF6B35;
-    --flame-deep:#E2501C;
+    --flame:#FF6B35;          /* naranja de MARCA: decoración, fondos, iconos */
+    /* --flame-deep se usa en TEXTO sobre fondo claro (eyebrows, enlaces de guía,
+       precios, mensajes de error). #E2501C daba 3,89:1 sobre blanco, por debajo
+       del 4,5:1 que exige WCAG AA. #C4430E da 5,05:1 y es casi el mismo tono. */
+    --flame-deep:#C4430E;
+    /* Naranja para BOTONES con texto blanco encima. El de marca (#FF6B35) da
+       2,84:1 con #fff: ilegible en móvil a pleno sol y para présbitas, que es
+       justo el público que cambia una caldera. Este da 5,12:1. */
+    --flame-btn:#C24310;
     --ice:#3AA6D9;
     --gold:#FFB930;
     --text:#111C27;           /* cuerpo un punto más profundo (mejor jerarquía) */
@@ -86,7 +93,7 @@
     border:1.5px solid transparent; transition:transform .2s var(--ease), box-shadow .2s var(--ease), background .2s;
     white-space:nowrap;
   }
-  .btn-flame{ background:var(--flame); color:#fff; box-shadow:0 8px 20px rgba(14,34,56,.16), inset 0 1px 0 rgba(255,255,255,.22); }
+  .btn-flame{ background:var(--flame-btn); color:#fff; box-shadow:0 8px 20px rgba(14,34,56,.16), inset 0 1px 0 rgba(255,255,255,.22); }
   .btn-flame:hover{ background:var(--flame-deep); transform:translateY(-2px); box-shadow:0 16px 34px rgba(14,34,56,.22), inset 0 1px 0 rgba(255,255,255,.22); }
   .btn-ghost{ border-color:rgba(255,255,255,.35); color:#fff; }
   .btn-ghost:hover{ background:rgba(255,255,255,.1); transform:translateY(-2px); }
@@ -136,9 +143,13 @@
   .mobile-nav{
     position:fixed; inset:0; background:var(--navy); z-index:250;
     display:flex; flex-direction:column; align-items:center; justify-content:center; gap:28px;
-    transform:translateY(-100%); transition:transform .4s var(--ease);
+    transform:translateY(-100%); transition:transform .4s var(--ease), visibility .4s;
+    /* visibility:hidden saca sus 11 controles del recorrido de tabulación mientras
+       está cerrado. Sin esto, el foco desaparecía de la pantalla durante 13
+       pulsaciones de Tab en todas las páginas: indistinguible de "la web se ha roto". */
+    visibility:hidden;
   }
-  .mobile-nav.open{ transform:translateY(0); }
+  .mobile-nav.open{ transform:translateY(0); visibility:visible; }
   .mobile-nav a{ color:#fff; font-family:'Fraunces'; font-size:28px; }
   .mobile-nav .close-btn{ position:absolute; top:24px; right:28px; background:none; border:none; }
   .mobile-nav .close-btn svg{ width:28px; height:28px; stroke:#fff; }
@@ -676,9 +687,10 @@
 
 .search-overlay{
   position:fixed; top:0; left:0; right:0; z-index:300; background:#fff; box-shadow:0 24px 60px rgba(14,34,56,.25);
-  transform:translateY(-110%); transition:transform .35s cubic-bezier(.4,0,.2,1); padding:18px 0 8px;
+  transform:translateY(-110%); transition:transform .35s cubic-bezier(.4,0,.2,1), visibility .35s; padding:18px 0 8px;
+  visibility:hidden;   /* mismo motivo que .mobile-nav: no tabulable si está cerrado */
 }
-.search-overlay.open{ transform:translateY(0); }
+.search-overlay.open{ transform:translateY(0); visibility:visible; }
 .search-box{ display:flex; align-items:center; gap:12px; border:2px solid var(--line); border-radius:13px; padding:0 16px; transition:border-color .25s; }
 .search-box:focus-within{ border-color:var(--flame); }
 .search-box svg{ width:19px; height:19px; stroke:var(--muted); fill:none; stroke-width:2.2; stroke-linecap:round; flex:none; }
@@ -955,12 +967,18 @@
 .budget-head{ display:flex; align-items:flex-start; justify-content:space-between; gap:14px; margin-bottom:6px; }
 .budget-head h3{ font-size:23px; }
 .budget-ref{ font-family:'IBM Plex Mono'; font-size:11px; color:var(--muted); text-align:right; line-height:1.6; }
-.budget-name-field{ margin:14px 0 4px; }
+/* Solo para lectores de pantalla: etiqueta accesible sin ocupar espacio visual. */
+.sr-only{
+  position:absolute; width:1px; height:1px; padding:0; margin:-1px;
+  overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0;
+}
+.budget-name-field{ margin:14px 0 4px; display:flex; flex-direction:column; gap:8px; }
 .budget-name-field input{
   width:100%; padding:11px 14px; border:1.5px dashed var(--line); border-radius:10px;
   font-family:'Inter'; font-size:14px; color:var(--navy);
 }
 .budget-name-field input:focus{ outline:none; border-color:var(--flame); border-style:solid; }
+.budget-name-hint{ font-size:12px; color:var(--muted); margin:0; line-height:1.45; }
 .budget-lines{ margin:16px 0; }
 .budget-line{
   display:flex; justify-content:space-between; gap:14px; padding:11px 2px; font-size:14px;
@@ -1230,6 +1248,10 @@ nav.main-nav a[aria-current="page"]::after{ right:0; }
   --navy-soft:#B9CBDC;
   --aero-card-bg:#141F2C; /* tarjetas de aerotermia con fondo fijo en claro */
   --shadow:0 14px 40px rgba(0,0,0,.5);
+  /* El bloque oscuro no redefinía --flame-deep: el naranja oscuro sobre tarjeta
+     oscura daba 4,14:1. Este da ~7:1 (mismo tono que ya usan los enlaces del blog
+     en oscuro, styles.css .article-prose a). */
+  --flame-deep:#FF8A5B;
 }
 
 /* --- Sitios que usaban var(--navy) como FONDO: azul oscuro fijo --- */
