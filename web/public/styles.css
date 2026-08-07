@@ -1116,7 +1116,10 @@ nav.main-nav a[aria-current="page"]::after{ right:0; }
 .prod-price-box{ background:var(--cloud); border:1px solid var(--line); border-radius:14px; padding:16px 18px; margin-bottom:18px; }
 .prod-price{ font-size:15px; }
 .prod-price strong{ font-family:'Fraunces'; font-size:32px; color:var(--navy); margin-right:8px; }
-.prod-price span{ font-size:12.5px; color:var(--muted); }
+/* Solo el texto de al lado ("IVA e instalación incluidos") va pequeño.
+   El > directo es importante: dentro de <strong> hay un <span data-price-slug>
+   con la cifra, que debe heredar los 32px del <strong>, no encogerse. */
+.prod-price > span{ font-size:12.5px; color:var(--muted); }
 .prod-fin{ font-size:13px; color:var(--muted); margin-top:8px; }
 .prod-fin strong{ color:var(--navy); }
 .prod-ctas{ display:flex; flex-wrap:wrap; gap:10px; margin-bottom:18px; }

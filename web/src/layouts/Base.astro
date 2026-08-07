@@ -4,7 +4,7 @@
 const rawBase = import.meta.env.BASE_URL; // '/decogas' (sin barra final)
 const base = rawBase.endsWith('/') ? rawBase : rawBase + '/'; // → '/decogas/'
 const ASSET_V = 51; // la calculadora guarda el lead + etiquetas accesibles
-const STYLES_V = 69; // contraste AA (--flame-btn, --flame-deep) + foco atrapado en overlays
+const STYLES_V = 70; // fix: la cifra del precio se encogia en la ficha de producto
 const GOOGLE_ADS_ID = 'AW-18358011669';
 // Página actual (formato 'file': /decogas/calderas.html) para marcar el menú activo
 const currentFile = Astro.url.pathname.split('/').pop() || 'index.html';
