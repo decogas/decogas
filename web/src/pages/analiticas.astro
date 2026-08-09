@@ -2,7 +2,7 @@
 // Página autónoma (panel privado): head propio con estilos en línea, sin el layout de marketing.
 const rawBase = import.meta.env.BASE_URL;
 const base = rawBase.endsWith('/') ? rawBase : rawBase + '/';
-const V = 7; // fix real: grid 1fr sin minmax(0,..) no se encogia + overflow-x en html
+const V = 8; // fix: la analitica perdia eventos por el tope de 1000 filas de PostgREST
 ---
 <!DOCTYPE html>
 <html lang="es">

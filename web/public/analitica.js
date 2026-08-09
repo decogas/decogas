@@ -55,6 +55,31 @@
     return path.replace(/^\//, "").replace(/\.html?$/, "").replace(/\/$/, "") || "Inicio";
   }
 
+  // PostgREST devuelve como MUCHO 1.000 filas por respuesta, y ese tope lo pone
+  // el servidor: el `.limit(50000)` del cliente no lo sube. Con más de 1.000
+  // eventos en el rango, la analítica perdía el resto EN SILENCIO y los días
+  // más recientes aparecían a cero (con 1.326 eventos reales en 30 días, el
+  // panel mostraba 983 visitas y el 06/08 salía como 0 teniendo 222). Se pagina
+  // con .range() hasta agotar, igual que scripts/backup-supabase.mjs.
+  function fetchAll(tabla, columnas, since, until) {
+    var PAGINA = 1000;
+    var filas = [];
+    function siguiente(desde) {
+      return sb.from(tabla).select(columnas)
+        .gte("created_at", since).lte("created_at", until)
+        .order("created_at", { ascending: true })
+        .range(desde, desde + PAGINA - 1)
+        .then(function (res) {
+          if (res.error) return res;
+          var lote = res.data || [];
+          filas = filas.concat(lote);
+          if (lote.length < PAGINA) return { data: filas, error: null };
+          return siguiente(desde + PAGINA);
+        });
+    }
+    return siguiente(0);
+  }
+
   function load(force) {
     if (busy || (done && !force)) return;
     var el = box(); if (!el) return;
@@ -62,8 +87,8 @@
     el.innerHTML = '<p style="color:var(--muted); font-size:14px; padding:6px 0;">Cargando datos…</p>';
     var since = RANGE.since.toISOString(), until = RANGE.until.toISOString();
     Promise.all([
-      sb.from("web_events").select("type,path,source,session,device,created_at").gte("created_at", since).lte("created_at", until).limit(50000),
-      sb.from("leads").select("created_at").gte("created_at", since).lte("created_at", until).limit(5000)
+      fetchAll("web_events", "type,path,source,session,device,created_at", since, until),
+      fetchAll("leads", "created_at", since, until)
     ]).then(function (res) {
       busy = false;
       if (res[0].error) {

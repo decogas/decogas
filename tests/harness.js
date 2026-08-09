@@ -170,6 +170,10 @@ function makeContext(opts) {
   if (!win.location.href) win.location.href = "https://decogas.test/index.html";
   // Respetamos lo que ya traiga `win` (los tests pueden pasar sus propios
   // stubs dentro del objeto window) y sólo rellenamos lo que falte.
+  // Un window real los tiene; varios scripts registran listeners de scroll/resize
+  // para cerrar menús flotantes. Sin esto, cargarlos revienta en los tests.
+  win.addEventListener = opts.addEventListener || win.addEventListener || function () {};
+  win.removeEventListener = opts.removeEventListener || win.removeEventListener || function () {};
   win.alert = opts.alert || win.alert || function () {};
   win.confirm = opts.confirm || win.confirm || function () { return true; };
   win.DecogasConfirm = opts.DecogasConfirm || win.DecogasConfirm || { ask: function () { return Promise.resolve(true); } };

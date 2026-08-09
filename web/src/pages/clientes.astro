@@ -2,7 +2,7 @@
 // Página autónoma (panel privado): head propio con estilos en línea, sin el layout de marketing.
 const rawBase = import.meta.env.BASE_URL;
 const base = rawBase.endsWith('/') ? rawBase : rawBase + '/';
-const V = 26; // fix: desbordamiento horizontal real (overflow-x en html)
+const V = 27; // fix: el desplegable de estado quedaba tapado por la ficha siguiente
 ---
 <!DOCTYPE html>
 <html lang="es">
@@ -133,7 +133,7 @@ const V = 26; // fix: desbordamiento horizontal real (overflow-x en html)
   .lead-estado.est-pendiente{ background:#FFF3D6; border-color:#F2D48A; color:#8A6100; }
   .lead-estado.est-llamado{ background:#E3F2FB; border-color:#A9D7F2; color:#0F5E8C; }
   .lead-estado.est-presupuestado{ background:#E8EAF6; border-color:#B9C0E8; color:#2E3A8C; }
-  .lead-estado.est-aprobado{ background:#E7F7EE; border-color:#A9DFBB; color:#157A43; } .lead-estado.est-denegado{ background:#FCE9E7; border-color:#F2C2BC; color:#B3261E; }.lead-estado-wrap{ position:relative; display:inline-flex; }.lead-estado-caret{ flex:none; transition:transform .2s; }.lead-estado[aria-expanded="true"] .lead-estado-caret{ transform:rotate(180deg); }.lead-estado-menu{ position:absolute; top:calc(100% + 6px); left:0; min-width:168px; background:#fff; border:1px solid var(--line); border-radius:12px; box-shadow:0 14px 34px rgba(14,34,56,.14); padding:6px; display:none; flex-direction:column; gap:2px; z-index:20; }.lead-estado-menu.open{ display:flex; }.lead-estado-opt{ text-align:left; border:none; background:transparent; border-radius:8px; padding:8px 10px; font-size:12.5px; font-weight:600; font-family:'Inter'; cursor:pointer; color:var(--navy); transition:background .15s; }.lead-estado-opt:hover{ background:var(--cloud); }.lead-estado-opt.active{ background:var(--ice); color:#fff; }
+  .lead-estado.est-aprobado{ background:#E7F7EE; border-color:#A9DFBB; color:#157A43; } .lead-estado.est-denegado{ background:#FCE9E7; border-color:#F2C2BC; color:#B3261E; }.lead-estado-wrap{ position:relative; display:inline-flex; }.lead-estado-caret{ flex:none; transition:transform .2s; }.lead-estado[aria-expanded="true"] .lead-estado-caret{ transform:rotate(180deg); }.lead-estado-menu{ position:fixed; min-width:168px; background:#fff; border:1px solid var(--line); border-radius:12px; box-shadow:0 14px 34px rgba(14,34,56,.14); padding:6px; display:none; flex-direction:column; gap:2px; z-index:400; }.lead-estado-menu.open{ display:flex; }.lead-estado-opt{ text-align:left; border:none; background:transparent; border-radius:8px; padding:8px 10px; font-size:12.5px; font-weight:600; font-family:'Inter'; cursor:pointer; color:var(--navy); transition:background .15s; }.lead-estado-opt:hover{ background:var(--cloud); }.lead-estado-opt.active{ background:var(--ice); color:#fff; }
   .stats-pro{ display:grid; grid-template-columns:1.5fr 1fr; gap:22px; background:#fff; border:1px solid var(--line); border-radius:14px; padding:20px 22px; margin-bottom:20px; box-shadow:0 10px 30px rgba(14,34,56,.06); animation:cardIn .5s ease both; }
   @media(max-width:720px){ .stats-pro{ grid-template-columns:1fr; gap:16px; } }
   .stats-pro h4{ font-family:'IBM Plex Mono'; font-size:11px; text-transform:uppercase; letter-spacing:.07em; color:var(--muted); margin-bottom:12px; }

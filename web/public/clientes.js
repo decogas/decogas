@@ -265,11 +265,6 @@
                 '<button type="button" class="lead-estado est-' + esc(l.estado) + '" data-id="' + esc(l.id) + '" aria-haspopup="listbox" aria-expanded="false" aria-label="Estado de la solicitud">' +
                   esc(ESTADO_LABEL[l.estado]) + ESTADO_CARET +
                 '</button>' +
-                '<div class="lead-estado-menu" role="listbox">' +
-                  ESTADOS.map(function (s) {
-                    return '<button type="button" class="lead-estado-opt est-' + s + (s === l.estado ? " active" : "") + '" data-value="' + s + '" role="option"' + (s === l.estado ? ' aria-selected="true"' : "") + ">" + ESTADO_LABEL[s] + "</button>";
-                  }).join("") +
-                "</div>" +
               "</div>"
             : "") +
           (l.id ? '<button class="lead-del" data-id="' + esc(l.id) + '" type="button">Eliminar</button>' : "") +
@@ -332,35 +327,77 @@
 
   // Desplegable de estado (propio, no <select> nativo: así se puede dar
   // estilo al menú abierto — bordes redondeados y sombra como el resto del panel).
-  function closeEstadoMenu(menu) {
-    menu.classList.remove("open");
-    menu.previousElementSibling.setAttribute("aria-expanded", "false");
+  //
+  // Menú flotante ÚNICO colgado de <body> con position:fixed. Antes vivía dentro
+  // de cada ficha con position:absolute, pero .lead tiene una animación de entrada
+  // con transform, y eso crea un contexto de apilamiento por ficha: el z-index del
+  // menú no podía ganar a la ficha siguiente y quedaba tapado por ella. Es el mismo
+  // problema (y la misma solución) que el menú "Transferir a" del panel de catálogo.
+  var estadoMenuEl = null;
+  var estadoTrigger = null;
+
+  function getEstadoMenu() {
+    if (!estadoMenuEl) {
+      estadoMenuEl = document.createElement("div");
+      estadoMenuEl.className = "lead-estado-menu";
+      estadoMenuEl.setAttribute("role", "listbox");
+      document.body.appendChild(estadoMenuEl);
+    }
+    return estadoMenuEl;
   }
+  function closeEstadoMenu() {
+    if (!estadoMenuEl) return;
+    estadoMenuEl.classList.remove("open");
+    if (estadoTrigger) estadoTrigger.setAttribute("aria-expanded", "false");
+    estadoTrigger = null;
+  }
+  function openEstadoMenu(trigger) {
+    var actual = (trigger.className.match(/est-([a-z]+)/) || [])[1] || "";
+    var menu = getEstadoMenu();
+    menu.innerHTML = ESTADOS.map(function (s) {
+      return '<button type="button" class="lead-estado-opt est-' + s + (s === actual ? " active" : "") +
+        '" data-value="' + s + '" role="option"' + (s === actual ? ' aria-selected="true"' : "") + ">" +
+        ESTADO_LABEL[s] + "</button>";
+    }).join("");
+    // Se mide con el menú ya visible para conocer su alto real y decidir
+    // si cabe debajo del botón o hay que abrirlo hacia arriba.
+    menu.classList.add("open");
+    var r = trigger.getBoundingClientRect();
+    var alto = menu.offsetHeight;
+    var cabeDebajo = r.bottom + alto + 8 <= window.innerHeight;
+    menu.style.left = Math.max(8, Math.min(r.left, window.innerWidth - menu.offsetWidth - 8)) + "px";
+    if (cabeDebajo) {
+      menu.style.top = (r.bottom + 6) + "px";
+      menu.style.bottom = "auto";
+    } else {
+      menu.style.top = Math.max(8, r.top - alto - 6) + "px";
+      menu.style.bottom = "auto";
+    }
+    trigger.setAttribute("aria-expanded", "true");
+    estadoTrigger = trigger;
+  }
+
   document.addEventListener("click", function (e) {
-    var openMenu = document.querySelector(".lead-estado-menu.open");
     var trigger = e.target.closest(".lead-estado");
     if (trigger) {
-      var menu = trigger.nextElementSibling;
-      var wasOpen = menu.classList.contains("open");
-      if (openMenu && openMenu !== menu) closeEstadoMenu(openMenu);
-      menu.classList.toggle("open", !wasOpen);
-      trigger.setAttribute("aria-expanded", String(!wasOpen));
+      var abiertoParaEste = estadoMenuEl && estadoMenuEl.classList.contains("open") && estadoTrigger === trigger;
+      closeEstadoMenu();
+      if (!abiertoParaEste) openEstadoMenu(trigger);
       return;
     }
     var opt = e.target.closest(".lead-estado-opt");
-    if (opt) {
-      var optMenu = opt.closest(".lead-estado-menu");
-      closeEstadoMenu(optMenu);
-      cambiarEstado(optMenu.previousElementSibling, opt.dataset.value);
+    if (opt && estadoMenuEl && estadoMenuEl.contains(opt)) {
+      var t = estadoTrigger;
+      closeEstadoMenu();
+      if (t) cambiarEstado(t, opt.dataset.value);
       return;
     }
-    if (openMenu) closeEstadoMenu(openMenu);
+    if (estadoMenuEl && estadoMenuEl.classList.contains("open")) closeEstadoMenu();
   });
   document.addEventListener("keydown", function (e) {
-    if (e.key !== "Escape") return;
-    var openMenu = document.querySelector(".lead-estado-menu.open");
-    if (openMenu) closeEstadoMenu(openMenu);
+    if (e.key === "Escape") closeEstadoMenu();
   });
+  window.addEventListener("scroll", closeEstadoMenu, true);
 
   // Cambio de estado de una solicitud (v7): guarda y revierte si falla
   function cambiarEstado(trigger, nuevo) {
