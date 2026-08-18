@@ -285,7 +285,13 @@
         if (anyOk) {
           try { localStorage.setItem("decogas_last_send", String(Date.now())); } catch (err) {}
           if (window.gtag && cfg.googleAdsConversions && cfg.googleAdsConversions.formulario) {
-            window.gtag("event", "conversion", { send_to: cfg.googleAdsConversions.formulario });
+            var userData = {};
+            if (lead.email) userData.email = lead.email;
+            if (lead.phone) {
+              var digits = lead.phone.replace(/[^\d+]/g, "");
+              userData.phone_number = digits.indexOf("+") === 0 ? digits : "+34" + digits;
+            }
+            window.gtag("event", "conversion", { send_to: cfg.googleAdsConversions.formulario, user_data: userData });
           }
           if (successOverlay) {
             successOverlay.classList.add("show");
