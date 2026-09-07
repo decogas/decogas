@@ -231,6 +231,40 @@ const V = 27;
   .est-instalado{ background:#DFF0F5; color:#1B7A93; border-color:#A9D6E2; }
   .est-cancelado{ background:#F4E7E7; color:#B4453A; border-color:#E3C2BE; }
 
+  /* --- Conmutador de vista y contador --- */
+  .barra-vista{ display:flex; align-items:center; gap:14px; flex-wrap:wrap; margin-bottom:10px; }
+  .resultados{ font-size:13px; color:var(--muted); font-variant-numeric:tabular-nums; }
+
+  /* --- Vista en cuadrícula, con foto --- */
+  .cuadricula{
+    display:grid; grid-template-columns:repeat(auto-fill, minmax(210px, 1fr));
+    gap:14px; margin-bottom:8px;
+  }
+  .tarjeta{
+    background:#fff; border:1px solid var(--line); border-radius:14px;
+    overflow:hidden; display:flex; flex-direction:column;
+  }
+  .tarjeta:hover{ border-color:var(--muted); }
+  .tarjeta-foto{
+    height:150px; background:#fff; display:flex; align-items:center; justify-content:center;
+    border-bottom:1px solid var(--line); padding:10px;
+  }
+  .tarjeta-foto img{ max-width:100%; max-height:100%; object-fit:contain; }
+  .tarjeta-foto .sin-foto{ font-size:12px; color:var(--muted); }
+  .tarjeta-cuerpo{ padding:12px 14px 14px; display:flex; flex-direction:column; gap:4px; flex:1; }
+  .tarjeta-cuerpo .ped-nom{ font-size:14px; line-height:1.25; }
+  .tarjeta-pie{
+    margin-top:auto; padding-top:10px;
+    display:flex; align-items:center; justify-content:space-between; gap:8px;
+  }
+  .tarjeta-pie .btn-wa{ padding:7px 13px; font-size:12.5px; }
+
+  /* La foto del producto viene sobre fondo blanco: en modo oscuro se deja el
+     recuadro blanco a propósito, si no el producto (que es blanco) desaparece. */
+  [data-theme="dark"] .tarjeta{ background:#141F2C; }
+  [data-theme="dark"] .tarjeta-foto{ background:#F7FAFC; border-bottom-color:#26384B; }
+  [data-theme="dark"] .tarjeta:hover{ border-color:#3A4C60; }
+
   [data-theme="dark"] .ped, [data-theme="dark"] .hist{ background:#141F2C; }
   [data-theme="dark"] .ped:hover, [data-theme="dark"] .hist:hover{ border-color:#3A4C60; }
   [data-theme="dark"] .ped-cat .prov{ background:#1B2A3A; border-color:#26384B; }
@@ -300,6 +334,13 @@ const V = 27;
             <label for="qProd">Buscar máquina</label>
             <input type="text" id="qProd" placeholder="Marca o modelo…" autocomplete="off">
           </div>
+        </div>
+        <div class="barra-vista">
+          <div class="chips" id="vistaBtns">
+            <button class="chip active" data-vista="lista" type="button">Lista</button>
+            <button class="chip" data-vista="cuadricula" type="button">Cuadrícula</button>
+          </div>
+          <span id="resultados" class="resultados"></span>
         </div>
         <div class="chips" id="catChips">
           <button class="chip active" data-cat="" type="button">Todas</button>
