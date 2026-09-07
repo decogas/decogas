@@ -1,8 +1,9 @@
 ---
 // Página autónoma (panel privado): head propio con estilos en línea, sin el layout de marketing.
+// Mismo patrón que clientes.astro — comparte sesión con el resto del panel.
 const rawBase = import.meta.env.BASE_URL;
 const base = rawBase.endsWith('/') ? rawBase : rawBase + '/';
-const V = 27; // fix: el desplegable de estado quedaba tapado por la ficha siguiente
+const V = 27;
 ---
 <!DOCTYPE html>
 <html lang="es">
@@ -11,7 +12,7 @@ const V = 27; // fix: el desplegable de estado quedaba tapado por la ficha sigui
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <script>(function(){try{var t=localStorage.getItem("decogas_theme");if(t!=="dark"&&t!=="light")t=(window.matchMedia&&matchMedia("(prefers-color-scheme:dark)").matches)?"dark":"light";document.documentElement.setAttribute("data-theme",t);}catch(e){}})();</script>
 <meta name="robots" content="noindex, nofollow">
-<title>Clientes — Decogas</title>
+<title>Pedidos — Decogas</title>
 <link rel="icon" type="image/svg+xml" href={`${base}favicon.svg`}>
 <link rel="stylesheet" href={`${base}fonts.css?v=1`}>
 <style is:inline>
@@ -180,6 +181,65 @@ const V = 27; // fix: el desplegable de estado quedaba tapado por la ficha sigui
     .stats-row .stat-card:last-child{ grid-column:1 / -1; }
   }
 </style>
+<style is:inline>
+  /* --- Pedidos: estilos propios, encima de los del panel --- */
+  .ped-cat{ display:flex; align-items:center; gap:10px; margin:26px 0 12px; }
+  .ped-cat h2{ font-size:16px; letter-spacing:.02em; }
+  .ped-cat .prov{
+    font-size:12px; font-weight:700; letter-spacing:.04em; text-transform:uppercase;
+    padding:4px 10px; border-radius:999px; background:var(--cloud);
+    border:1px solid var(--line); color:var(--muted);
+  }
+  .ped-cat .linea{ flex:1; height:1px; background:var(--line); }
+
+  .ped{
+    background:#fff; border:1px solid var(--line); border-radius:14px;
+    padding:14px 16px; margin-bottom:10px;
+    display:grid; grid-template-columns:1fr auto auto; gap:14px; align-items:center;
+  }
+  .ped:hover{ border-color:var(--muted); }
+  .ped-nom{ font-weight:700; font-size:15px; color:var(--navy); }
+  .ped-meta{ font-size:12.5px; color:var(--muted); margin-top:3px; }
+  .ped-meta b{ color:var(--navy-2); font-weight:600; }
+  .ped-precio{ font-variant-numeric:tabular-nums; font-weight:700; color:var(--navy); white-space:nowrap; }
+
+  .btn-wa{
+    display:inline-flex; align-items:center; gap:8px;
+    background:#25D366; color:#0B3D22; border:none; border-radius:10px;
+    padding:9px 16px; font-family:'Inter',sans-serif; font-size:13px; font-weight:700;
+    cursor:pointer; text-decoration:none; white-space:nowrap;
+  }
+  .btn-wa:hover{ background:#1FBB59; }
+  .btn-wa svg{ width:15px; height:15px; fill:currentColor; }
+
+  /* Historial de pedidos */
+  .hist{ display:grid; grid-template-columns:1fr auto auto auto; gap:14px; align-items:center;
+    background:#fff; border:1px solid var(--line); border-radius:14px; padding:13px 16px; margin-bottom:9px; }
+  .hist-fecha{ font-size:12.5px; color:var(--muted); white-space:nowrap; font-variant-numeric:tabular-nums; }
+  .hist-del{ background:none; border:none; color:var(--muted); cursor:pointer; font-size:16px; line-height:1; padding:4px 6px; border-radius:6px; }
+  .hist-del:hover{ color:var(--err); background:var(--cloud); }
+
+  .est{
+    font-size:11.5px; font-weight:700; letter-spacing:.04em; text-transform:uppercase;
+    padding:6px 12px; border-radius:999px; border:1px solid; cursor:pointer;
+    font-family:'Inter',sans-serif; white-space:nowrap;
+  }
+  .est-pedido{    background:#FBF0DC; color:#B4761A; border-color:#E8CFA0; }
+  .est-confirmado{background:#E2EFF8; color:#1F6FA8; border-color:#B4D6EC; }
+  .est-pagado{    background:#EDE6F8; color:#6B4BA8; border-color:#CFC0EC; }
+  .est-recibido{  background:#E4F4EC; color:#1F8A5B; border-color:#B0DEC7; }
+  .est-instalado{ background:#DFF0F5; color:#1B7A93; border-color:#A9D6E2; }
+  .est-cancelado{ background:#F4E7E7; color:#B4453A; border-color:#E3C2BE; }
+
+  [data-theme="dark"] .ped, [data-theme="dark"] .hist{ background:#141F2C; }
+  [data-theme="dark"] .ped:hover, [data-theme="dark"] .hist:hover{ border-color:#3A4C60; }
+  [data-theme="dark"] .ped-cat .prov{ background:#1B2A3A; border-color:#26384B; }
+  [data-theme="dark"] .hist-del:hover{ background:#1B2A3A; }
+  @media (max-width:640px){
+    .ped{ grid-template-columns:1fr; gap:10px; }
+    .hist{ grid-template-columns:1fr auto; }
+  }
+</style>
 </head>
 <body>
 <div id="loginScreen">
@@ -187,9 +247,9 @@ const V = 27; // fix: el desplegable de estado quedaba tapado por la ficha sigui
   <div class="login-card">
     <div class="login-logo">
       <div class="mark"><span>D</span></div>
-      <h1>Clientes Decogas</h1>
+      <h1>Pedidos Decogas</h1>
     </div>
-    <p class="login-sub">Solicitudes recibidas desde el formulario de la web.</p>
+    <p class="login-sub">Pedidos a proveedores y seguimiento de cada máquina.</p>
     <form id="loginForm">
       <div class="field">
         <label for="adminEmail">Email</label>
@@ -210,53 +270,56 @@ const V = 27; // fix: el desplegable de estado quedaba tapado por la ficha sigui
     <div class="orb o1"></div><div class="orb o2"></div>
     <div class="wrap">
       <div class="admin-topbar">
-        <h1>Clientes</h1>
+        <h1>Pedidos</h1>
         <div class="right">
           <button class="btn ghost small theme-toggle-btn hdr-link" id="themeToggle" type="button" title="Modo claro / oscuro" aria-label="Cambiar tema">◐</button>
           <a class="btn ghost small hdr-link" href={`${base}index.html`}>← Volver a la web</a>
           <a class="btn ghost small hdr-link" href="admin.html">Catálogo</a>
-          <a class="btn ghost small hdr-link" href="pedidos.html">Pedidos</a>
+          <a class="btn ghost small hdr-link" href="clientes.html">Clientes</a>
           <a class="btn ghost small hdr-link" href="analiticas.html">Analíticas</a>
           <a class="btn ghost small hdr-link" href="cambios.html">Últimos cambios</a>
           <button class="btn ghost small hdr-link" id="logoutBtn" type="button">Salir</button>
         </div>
       </div>
-      <p class="admin-sub">Cada persona que envía el formulario de la web aparece aquí al instante, y además recibes un aviso por correo con sus datos.</p>
+      <p class="admin-sub">Pulsa «Pedir» y se abre WhatsApp con el mensaje ya escrito para el proveedor que corresponde. El pedido queda registrado abajo para seguirle la pista.</p>
     </div>
   </header>
 
   <div class="panel-body">
     <div class="wrap">
       <div class="stats-row">
-        <div class="stat-card"><div class="num" id="statTotal">0</div><div class="lbl">Clientes totales</div></div>
-        <div class="stat-card" style="animation-delay:.07s;"><div class="num" id="statMes">0</div><div class="lbl">Este mes</div></div>
-        <div class="stat-card" style="animation-delay:.14s;"><div class="num" id="statFiltered">0</div><div class="lbl">En el filtro actual</div></div>
+        <div class="stat-card"><div class="num" id="statMes">0</div><div class="lbl">Pedidos este mes</div></div>
+        <div class="stat-card" style="animation-delay:.07s;"><div class="num" id="statCamino">0</div><div class="lbl">En camino</div></div>
+        <div class="stat-card" style="animation-delay:.14s;"><div class="num" id="statAlmacen">0</div><div class="lbl">En almacén</div></div>
+        <div class="stat-card" style="animation-delay:.21s;"><div class="num" id="statTotal">0</div><div class="lbl">Pedidos totales</div></div>
       </div>
 
       <div class="filters-card">
         <div class="filters-grid">
           <div>
-            <label for="qName">Buscar por nombre</label>
-            <input type="text" id="qName" placeholder="Escribe un nombre…" autocomplete="off">
-          </div>
-          <div>
-            <label for="qFrom">Desde</label>
-            <input type="date" id="qFrom">
-          </div>
-          <div>
-            <label for="qTo">Hasta</label>
-            <input type="date" id="qTo">
+            <label for="qProd">Buscar máquina</label>
+            <input type="text" id="qProd" placeholder="Marca o modelo…" autocomplete="off">
           </div>
         </div>
-        <div class="chips" id="interestChips">
-          <button class="chip active" data-int="" type="button">Todos</button>
-          <button class="chip" data-int="caldera" type="button">Caldera</button>
-          <button class="chip" data-int="aire" type="button">Aire acondicionado</button>
-          <button class="chip" data-int="otro" type="button">Otros</button>
+        <div class="chips" id="catChips">
+          <button class="chip active" data-cat="" type="button">Todas</button>
+          <button class="chip" data-cat="calderas" type="button">Calderas</button>
+          <button class="chip" data-cat="aires" type="button">Aires</button>
+          <button class="chip" data-cat="termos" type="button">Termos</button>
         </div>
       </div>
 
-      <div id="leadsList"></div>
+      <div class="section-card">
+        <h2 style="font-size:17px;margin-bottom:4px;">Hacer un pedido</h2>
+        <p style="font-size:13.5px;color:var(--muted);margin-bottom:6px;">El mensaje se escribe solo con el modelo y el proveedor de cada máquina.</p>
+        <div id="catalogo"></div>
+      </div>
+
+      <div class="section-card" style="margin-top:22px;">
+        <h2 style="font-size:17px;margin-bottom:4px;">Pedidos hechos</h2>
+        <p style="font-size:13.5px;color:var(--muted);margin-bottom:6px;">Pulsa el estado para avanzarlo.</p>
+        <div id="historial"></div>
+      </div>
     </div>
   </div>
 </div>
@@ -266,7 +329,7 @@ const V = 27; // fix: el desplegable de estado quedaba tapado por la ficha sigui
 <script src={`${base}utils.js?v=${V}`} is:inline></script>
 <script src={`${base}confirm-modal.js?v=${V}`} is:inline></script>
 <script src={`${base}config.js?v=${V}`} is:inline></script>
-<script src={`${base}clientes.js?v=${V}`} is:inline></script>
+<script src={`${base}pedidos.js?v=${V}`} is:inline></script>
 <script>(function(){var b=document.getElementById("themeToggle");if(!b)return;b.addEventListener("click",function(){var d=document.documentElement.getAttribute("data-theme")==="dark";var n=d?"light":"dark";document.documentElement.setAttribute("data-theme",n);try{localStorage.setItem("decogas_theme",n);}catch(e){}});})();</script>
 </body>
 </html>
