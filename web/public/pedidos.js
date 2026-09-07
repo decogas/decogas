@@ -50,6 +50,18 @@
   var PEDIDOS = [];
   var FILTRO = { texto: "", categoria: "" };
 
+  // Vista del catálogo: lista (compacta, para pedir rápido) o cuadrícula (con
+  // foto, para reconocer la máquina de un vistazo). Se recuerda entre visitas.
+  var VISTA = "lista";
+  try { VISTA = localStorage.getItem("decogas_pedidos_vista") || "lista"; } catch (e) { /* sin storage */ }
+
+  // Se usa la foto original tal cual, sin pasar por el transformador de
+  // imágenes de Supabase. Se midió: las fotos del catálogo pesan entre 4 y
+  // 23 KB, así que reducirlas ahorraba ~1 KB y a cambio metía una dependencia
+  // más (el servicio de transformación) que puede fallar en silencio.
+  // Si algún día se suben fotos grandes, aquí es donde habría que reducirlas.
+  function miniatura(url) { return url || ""; }
+
   var toastTimer;
   function toast(text, isErr) {
     var t = $("toast");
@@ -99,11 +111,11 @@
   // ---------- Carga ----------
   function cargar() {
     if (!LIVE) { pintar(); return; }
-    sb.from("products").select("slug,name,brand,category,price").eq("visible", true).order("category").order("name")
+    sb.from("products").select("slug,name,brand,category,price,img").eq("visible", true).order("category").order("name")
       .then(function (res) {
         if (res.error) { toast("No se pudo cargar el catálogo.", true); return; }
         CATALOGO = res.data || [];
-        pintarCatalogo();
+        aplicarVista();
       });
     cargarPedidos();
   }
@@ -152,17 +164,63 @@
 
   var ICONO_WA = '<svg viewBox="0 0 24 24"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.87.5 3.62 1.44 5.15L2 22l5.09-1.53a9.87 9.87 0 0 0 4.95 1.31c5.46 0 9.91-4.45 9.91-9.91S17.5 2 12.04 2zm5.79 14.16c-.24.68-1.4 1.3-1.93 1.36-.5.05-.95.24-3.2-.67-2.7-1.09-4.42-3.85-4.55-4.03-.13-.18-1.09-1.45-1.09-2.77 0-1.31.69-1.96.93-2.23.24-.27.53-.34.7-.34.18 0 .35 0 .5.01.16.01.38-.06.59.45.22.53.74 1.84.8 1.97.07.14.11.29.02.47-.09.18-.13.29-.26.45-.13.16-.28.35-.4.47-.13.13-.27.28-.12.54.16.27.7 1.15 1.5 1.86 1.03.92 1.9 1.2 2.17 1.34.27.13.42.11.58-.07.16-.18.67-.78.85-1.05.18-.27.35-.22.59-.13.24.09 1.54.73 1.8.86.27.13.44.2.5.31.07.11.07.63-.17 1.31z"/></svg>';
 
+  // Una ficha en la lista compacta.
+  function filaLista(p) {
+    return '<div class="ped">' +
+      '<div>' +
+        '<div class="ped-nom">' + esc(p.name) + '</div>' +
+        '<div class="ped-meta">' + esc(p.brand || "") +
+          ' · pedido a <b>' + esc(proveedorDe(p).nombre) + '</b></div>' +
+      '</div>' +
+      '<div class="ped-precio">' + (p.price ? Number(p.price).toLocaleString("es-ES") + " €" : "") + '</div>' +
+      '<a class="btn-wa" href="' + esc(enlaceWhatsApp(p)) + '" target="_blank" rel="noopener" data-slug="' + esc(p.slug) + '">' +
+        ICONO_WA + 'Pedir</a>' +
+    '</div>';
+  }
+
+  // Una tarjeta en la cuadrícula, con foto.
+  function tarjeta(p) {
+    var foto = miniatura(p.img);
+    return '<div class="tarjeta">' +
+      '<div class="tarjeta-foto">' +
+        (foto ? '<img src="' + esc(foto) + '" alt="' + esc(p.name) + '" loading="lazy">'
+              : '<span class="sin-foto">sin foto</span>') +
+      '</div>' +
+      '<div class="tarjeta-cuerpo">' +
+        '<div class="ped-nom">' + esc(p.name) + '</div>' +
+        '<div class="ped-meta">' + esc(p.brand || "") +
+          ' · <b>' + esc(proveedorDe(p).nombre) + '</b></div>' +
+        '<div class="tarjeta-pie">' +
+          '<span class="ped-precio">' + (p.price ? Number(p.price).toLocaleString("es-ES") + " €" : "") + '</span>' +
+          '<a class="btn-wa" href="' + esc(enlaceWhatsApp(p)) + '" target="_blank" rel="noopener" data-slug="' + esc(p.slug) + '">' +
+            ICONO_WA + 'Pedir</a>' +
+        '</div>' +
+      '</div>' +
+    '</div>';
+  }
+
   function pintarCatalogo() {
     var lista = CATALOGO.filter(pasaFiltro);
     var cont = $("catalogo");
+
+    // El contador ayuda cuando se busca: dice cuántas quedan tras filtrar.
+    var res = $("resultados");
+    if (res) {
+      res.textContent = lista.length === CATALOGO.length
+        ? CATALOGO.length + " máquinas"
+        : lista.length + " de " + CATALOGO.length + " máquinas";
+    }
+
     if (!lista.length) {
-      cont.innerHTML = '<div class="empty-state">No hay máquinas que coincidan con el filtro.</div>';
+      cont.innerHTML = '<div class="empty-state">No hay máquinas que coincidan con la búsqueda.</div>';
       return;
     }
+
     // Agrupadas por categoría, con el proveedor visible en la cabecera.
     var porCat = {};
     lista.forEach(function (p) { (porCat[p.category] = porCat[p.category] || []).push(p); });
 
+    var esGrid = VISTA === "cuadricula";
     var html = "";
     Object.keys(porCat).sort().forEach(function (cat) {
       var prov = PROVEEDORES[cat] || {};
@@ -170,18 +228,9 @@
         '<h2>' + esc(cat.charAt(0).toUpperCase() + cat.slice(1)) + '</h2>' +
         '<span class="prov">' + esc(prov.nombre || "sin proveedor") + '</span>' +
         '<span class="linea"></span></div>';
-      porCat[cat].forEach(function (p) {
-        html += '<div class="ped">' +
-          '<div>' +
-            '<div class="ped-nom">' + esc(p.name) + '</div>' +
-            '<div class="ped-meta">' + esc(p.brand || "") +
-              ' · pedido a <b>' + esc(proveedorDe(p).nombre) + '</b></div>' +
-          '</div>' +
-          '<div class="ped-precio">' + (p.price ? Number(p.price).toLocaleString("es-ES") + " €" : "") + '</div>' +
-          '<a class="btn-wa" href="' + esc(enlaceWhatsApp(p)) + '" target="_blank" rel="noopener" data-slug="' + esc(p.slug) + '">' +
-            ICONO_WA + 'Pedir</a>' +
-        '</div>';
-      });
+      html += esGrid ? '<div class="cuadricula">' : '';
+      porCat[cat].forEach(function (p) { html += esGrid ? tarjeta(p) : filaLista(p); });
+      html += esGrid ? '</div>' : '';
     });
     cont.innerHTML = html;
 
@@ -294,10 +343,30 @@
 
   function pintar() { pintarCatalogo(); pintarHistorial(); pintarStats(); }
 
+  // ---------- Vista: lista / cuadrícula ----------
+  function aplicarVista() {
+    Array.prototype.forEach.call(document.querySelectorAll("#vistaBtns .chip"), function (b) {
+      b.classList.toggle("active", b.getAttribute("data-vista") === VISTA);
+    });
+    pintarCatalogo();
+  }
+  Array.prototype.forEach.call(document.querySelectorAll("#vistaBtns .chip"), function (b) {
+    b.addEventListener("click", function () {
+      VISTA = b.getAttribute("data-vista");
+      try { localStorage.setItem("decogas_pedidos_vista", VISTA); } catch (e) { /* sin storage */ }
+      aplicarVista();
+    });
+  });
+
   // ---------- Filtros ----------
+  // Buscar mientras se escribe, sin esperar a nada.
   $("qProd").addEventListener("input", function () {
     FILTRO.texto = this.value.trim();
     pintarCatalogo();
+  });
+  // Escape limpia la búsqueda: es lo que espera cualquiera al teclear.
+  $("qProd").addEventListener("keydown", function (e) {
+    if (e.key === "Escape" && this.value) { this.value = ""; FILTRO.texto = ""; pintarCatalogo(); }
   });
   Array.prototype.forEach.call(document.querySelectorAll("#catChips .chip"), function (c) {
     c.addEventListener("click", function () {
