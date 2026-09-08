@@ -231,6 +231,59 @@ const V = 27;
   .est-instalado{ background:#DFF0F5; color:#1B7A93; border-color:#A9D6E2; }
   .est-cancelado{ background:#F4E7E7; color:#B4453A; border-color:#E3C2BE; }
 
+  /* --- Coste y margen --- */
+  .ped-costes{ text-align:right; }
+  .linea-coste{ display:flex; align-items:center; gap:6px; justify-content:flex-end; margin-top:3px; }
+  .coste{ font-size:12.5px; font-weight:700; color:var(--navy-2); font-variant-numeric:tabular-nums; }
+  .coste.estimado{ font-weight:600; color:var(--muted); font-style:italic; }
+  .coste.sin{ font-weight:600; color:var(--muted); font-style:italic; }
+  .margen{ font-size:12px; color:var(--ok, #1F8A5B); font-weight:600; font-variant-numeric:tabular-nums; }
+  .btn-coste{
+    background:none; border:1px solid var(--line); color:var(--muted);
+    border-radius:7px; cursor:pointer; font-size:12px; line-height:1;
+    padding:4px 7px;
+  }
+  .btn-coste:hover{ color:var(--navy); border-color:var(--muted); background:var(--cloud); }
+  .tarjeta .linea-coste{ justify-content:flex-start; margin-top:6px; }
+
+  /* --- Ventana para cambiar el coste --- */
+  .modal-coste{
+    position:fixed; inset:0; z-index:600; display:flex; align-items:center; justify-content:center;
+    background:rgba(14,34,56,.45); padding:20px;
+  }
+  .modal-caja{
+    background:#fff; border-radius:16px; padding:24px; width:100%; max-width:380px;
+    box-shadow:0 24px 60px rgba(14,34,56,.3);
+  }
+  .modal-caja h3{ font-size:17px; color:var(--navy); margin-bottom:3px; }
+  .modal-sub{ font-size:13px; color:var(--muted); margin-bottom:18px; }
+  .modal-caja label{ display:block; font-size:13px; font-weight:700; color:var(--navy-2); margin-bottom:7px; }
+  .campo-euro{ position:relative; }
+  .campo-euro input{
+    width:100%; font-size:22px; font-weight:700; padding:12px 40px 12px 14px;
+    border:1.5px solid var(--line); border-radius:11px; color:var(--navy);
+    font-variant-numeric:tabular-nums;
+  }
+  .campo-euro input:focus{ outline:2px solid var(--flame, #FF6B35); outline-offset:1px; border-color:transparent; }
+  .campo-euro span{
+    position:absolute; right:15px; top:50%; transform:translateY(-50%);
+    font-size:18px; font-weight:700; color:var(--muted);
+  }
+  .modal-aviso{ font-size:12.5px; color:var(--muted); margin-top:10px; line-height:1.45; }
+  .modal-margen{ margin-top:12px; font-size:14px; color:var(--navy-2); }
+  .modal-margen .negativo{ color:var(--err, #C0442E); font-weight:600; }
+  .modal-hist{
+    margin-top:16px; padding-top:14px; border-top:1px solid var(--line);
+    font-size:12.5px; color:var(--muted); display:grid; gap:4px;
+  }
+  .modal-hist b{ color:var(--navy-2); font-size:12px; text-transform:uppercase; letter-spacing:.06em; }
+  .modal-botones{ display:flex; gap:10px; justify-content:flex-end; margin-top:20px; }
+
+  [data-theme="dark"] .modal-caja{ background:#141F2C; }
+  [data-theme="dark"] .campo-euro input{ background:#0F1A25; color:#E6EEF6; border-color:#26384B; }
+  [data-theme="dark"] .btn-coste{ border-color:#26384B; }
+  [data-theme="dark"] .btn-coste:hover{ background:#1B2A3A; color:#E6EEF6; }
+
   /* --- Conmutador de vista y contador --- */
   .barra-vista{ display:flex; align-items:center; gap:14px; flex-wrap:wrap; margin-bottom:10px; }
   .resultados{ font-size:13px; color:var(--muted); font-variant-numeric:tabular-nums; }
