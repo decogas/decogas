@@ -3,7 +3,7 @@
 // Mismo patrón que clientes.astro — comparte sesión con el resto del panel.
 const rawBase = import.meta.env.BASE_URL;
 const base = rawBase.endsWith('/') ? rawBase : rawBase + '/';
-const V = 27;
+const V = 28; // fix: marcos anidados, foto en la lista y botón de coste visible
 ---
 <!DOCTYPE html>
 <html lang="es">
@@ -192,12 +192,26 @@ const V = 27;
   }
   .ped-cat .linea{ flex:1; height:1px; background:var(--line); }
 
+  .titulo-seccion{ font-size:17px; color:var(--navy); margin-bottom:3px; }
+  .sub-seccion{ font-size:13.5px; color:var(--muted); margin-bottom:14px; }
+
+  /* Misma ficha que en Clientes (.lead): mismo borde, mismo radio y mismo
+     ritmo. Antes iba dentro de un .section-card y se veían marcos dentro de
+     marcos, que es justo lo que no hay en el resto del panel. */
   .ped{
-    background:#fff; border:1px solid var(--line); border-radius:14px;
-    padding:14px 16px; margin-bottom:10px;
-    display:grid; grid-template-columns:1fr auto auto; gap:14px; align-items:center;
+    background:#fff; border:1px solid var(--line); border-radius:13px;
+    padding:14px 16px; margin-bottom:11px;
+    transition:box-shadow .25s, border-color .25s;
+    display:grid; grid-template-columns:52px 1fr auto auto; gap:14px; align-items:center;
   }
   .ped:hover{ border-color:var(--muted); }
+  .ped-mini{
+    width:52px; height:52px; border-radius:9px; background:#fff;
+    border:1px solid var(--line); display:flex; align-items:center;
+    justify-content:center; padding:4px; overflow:hidden;
+  }
+  .ped-mini img{ max-width:100%; max-height:100%; object-fit:contain; }
+  .ped-datos{ min-width:0; }
   .ped-nom{ font-weight:700; font-size:15px; color:var(--navy); }
   .ped-meta{ font-size:12.5px; color:var(--muted); margin-top:3px; }
   .ped-meta b{ color:var(--navy-2); font-weight:600; }
@@ -238,10 +252,13 @@ const V = 27;
   .coste.estimado{ font-weight:600; color:var(--muted); font-style:italic; }
   .coste.sin{ font-weight:600; color:var(--muted); font-style:italic; }
   .margen{ font-size:12px; color:var(--ok, #1F8A5B); font-weight:600; font-variant-numeric:tabular-nums; }
+  /* Antes era un icono diminuto y pasaba desapercibido. Ahora es un botón
+     con texto y con altura suficiente para pulsarlo bien en el móvil. */
   .btn-coste{
+    display:inline-flex; align-items:center; gap:5px;
     background:none; border:1px solid var(--line); color:var(--muted);
-    border-radius:7px; cursor:pointer; font-size:12px; line-height:1;
-    padding:4px 7px;
+    border-radius:8px; cursor:pointer; font-size:12px; font-weight:600;
+    line-height:1; padding:7px 11px; font-family:'Inter',sans-serif;
   }
   .btn-coste:hover{ color:var(--navy); border-color:var(--muted); background:var(--cloud); }
   .tarjeta .linea-coste{ justify-content:flex-start; margin-top:6px; }
@@ -319,11 +336,21 @@ const V = 27;
   [data-theme="dark"] .tarjeta:hover{ border-color:#3A4C60; }
 
   [data-theme="dark"] .ped, [data-theme="dark"] .hist{ background:#141F2C; }
+  [data-theme="dark"] .ped:hover{ border-color:#3A4C60; }
+  /* El recuadro de la foto se deja claro también en modo oscuro: los productos
+     son blancos y sobre fondo oscuro desaparecerían. */
+  [data-theme="dark"] .ped-mini{ background:#F7FAFC; border-color:#26384B; }
   [data-theme="dark"] .ped:hover, [data-theme="dark"] .hist:hover{ border-color:#3A4C60; }
   [data-theme="dark"] .ped-cat .prov{ background:#1B2A3A; border-color:#26384B; }
   [data-theme="dark"] .hist-del:hover{ background:#1B2A3A; }
   @media (max-width:640px){
-    .ped{ grid-template-columns:1fr; gap:10px; }
+    /* La foto y los datos arriba; abajo el precio a la izquierda y el botón
+       a la derecha. Antes el botón se estiraba a todo el ancho y quedaba
+       enorme, que es lo que se veía en el móvil. */
+    .ped{ grid-template-columns:52px 1fr; gap:12px; }
+    .ped-costes{ grid-column:1 / -1; text-align:left; }
+    .ped .btn-wa{ grid-column:1 / -1; justify-content:center; }
+    .linea-coste{ justify-content:flex-start; }
     .hist{ grid-template-columns:1fr auto; }
   }
 </style>
@@ -403,17 +430,13 @@ const V = 27;
         </div>
       </div>
 
-      <div class="section-card">
-        <h2 style="font-size:17px;margin-bottom:4px;">Hacer un pedido</h2>
-        <p style="font-size:13.5px;color:var(--muted);margin-bottom:6px;">El mensaje se escribe solo con el modelo y el proveedor de cada máquina.</p>
-        <div id="catalogo"></div>
-      </div>
+      <h2 class="titulo-seccion">Hacer un pedido</h2>
+      <p class="sub-seccion">Pulsa «Pedir» y se abre WhatsApp con el mensaje escrito. El lápiz cambia lo que nos cuesta.</p>
+      <div id="catalogo"></div>
 
-      <div class="section-card" style="margin-top:22px;">
-        <h2 style="font-size:17px;margin-bottom:4px;">Pedidos hechos</h2>
-        <p style="font-size:13.5px;color:var(--muted);margin-bottom:6px;">Pulsa el estado para avanzarlo.</p>
-        <div id="historial"></div>
-      </div>
+      <h2 class="titulo-seccion" style="margin-top:34px;">Pedidos hechos</h2>
+      <p class="sub-seccion">Aquí aparece cada pedido que hagas. Pulsa su estado para avanzarlo.</p>
+      <div id="historial"></div>
     </div>
   </div>
 </div>
