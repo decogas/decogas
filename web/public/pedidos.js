@@ -194,7 +194,6 @@
     return "Hola, buenos días.\n\n" +
       "Os hacemos pedido de:\n" +
       "· " + p.name + (p.brand ? " (" + p.brand + ")" : "") + " — 1 ud.\n\n" +
-      "Confirmadme disponibilidad y plazo de entrega, por favor.\n" +
       "Gracias.\n\n" +
       "Instalaciones Decogas";
   }
@@ -218,14 +217,17 @@
   // Una ficha en la lista compacta.
   function filaLista(p) {
     return '<div class="ped">' +
-      '<div>' +
+      '<div class="ped-mini">' +
+        (p.img ? '<img src="' + esc(p.img) + '" alt="" loading="lazy">' : '') +
+      '</div>' +
+      '<div class="ped-datos">' +
         '<div class="ped-nom">' + esc(p.name) + '</div>' +
         '<div class="ped-meta">' + esc(p.brand || "") +
           ' · pedido a <b>' + esc(proveedorDe(p).nombre) + '</b></div>' +
       '</div>' +
       '<div class="ped-costes">' +
         '<div class="ped-precio">' + (p.price ? Number(p.price).toLocaleString("es-ES") + " €" : "") + '</div>' +
-        '<div class="linea-coste">' + bloqueCoste(p) + '<button class="btn-coste" data-edit="' + esc(p.slug) + '" type="button" title="Cambiar el coste">✎</button>' + '</div>' +
+        '<div class="linea-coste">' + bloqueCoste(p) + '<button class="btn-coste" data-edit="' + esc(p.slug) + '" type="button" title="Cambiar lo que nos cuesta">✎ Coste</button>' + '</div>' +
       '</div>' +
       '<a class="btn-wa" href="' + esc(enlaceWhatsApp(p)) + '" target="_blank" rel="noopener" data-slug="' + esc(p.slug) + '">' +
         ICONO_WA + 'Pedir</a>' +
@@ -244,7 +246,7 @@
         '<div class="ped-nom">' + esc(p.name) + '</div>' +
         '<div class="ped-meta">' + esc(p.brand || "") +
           ' · <b>' + esc(proveedorDe(p).nombre) + '</b></div>' +
-        '<div class="linea-coste">' + bloqueCoste(p) + '<button class="btn-coste" data-edit="' + esc(p.slug) + '" type="button" title="Cambiar el coste">✎</button>' + '</div>' +
+        '<div class="linea-coste">' + bloqueCoste(p) + '<button class="btn-coste" data-edit="' + esc(p.slug) + '" type="button" title="Cambiar lo que nos cuesta">✎ Coste</button>' + '</div>' +
         '<div class="tarjeta-pie">' +
           '<span class="ped-precio">' + (p.price ? Number(p.price).toLocaleString("es-ES") + " €" : "") + '</span>' +
           '<a class="btn-wa" href="' + esc(enlaceWhatsApp(p)) + '" target="_blank" rel="noopener" data-slug="' + esc(p.slug) + '">' +
@@ -419,7 +421,9 @@
   function pintarHistorial() {
     var cont = $("historial");
     if (!PEDIDOS.length) {
-      cont.innerHTML = '<div class="empty-state">Todavía no hay pedidos registrados.</div>';
+      cont.innerHTML = '<div class="empty-state">Todavía no has hecho ningún pedido.<br>' +
+        'En cuanto pulses «Pedir» en una máquina, aparecerá aquí y podrás ir cambiando su estado ' +
+        '(pedido → confirmado → pagado → recibido → instalado).</div>';
       return;
     }
     cont.innerHTML = PEDIDOS.map(function (r) {
