@@ -46,7 +46,16 @@
     recibido: "Recibido", instalado: "Instalado", cancelado: "Cancelado"
   };
 
+  // ---------- CONFIGURACIÓN: coste orientativo ----------
+  // Mientras no haya coste real introducido, se muestra una ESTIMACIÓN a
+  // partir del PVP, marcada siempre como "aprox." para no confundirla con un
+  // dato bueno. No es un precio inventado por nadie: sale de aplicar este
+  // margen. Cambia el número si vuestro margen habitual es otro.
+  var MARGEN_ORIENTATIVO = 0.30;   // 30% => coste estimado = 70% del PVP
+
   var CATALOGO = [];
+  var COSTES = {};      // slug -> { coste, creado_at }  (el vigente)
+  var HISTORICO = {};   // slug -> [filas, de más nueva a más vieja]
   var PEDIDOS = [];
   var FILTRO = { texto: "", categoria: "" };
 
@@ -115,9 +124,51 @@
       .then(function (res) {
         if (res.error) { toast("No se pudo cargar el catálogo.", true); return; }
         CATALOGO = res.data || [];
-        aplicarVista();
+        cargarCostes();
       });
     cargarPedidos();
+  }
+
+  // Los costes se leen enteros (son pocos) y se agrupa por máquina: la fila
+  // más reciente de cada una es su coste vigente, y el resto es su histórico.
+  function cargarCostes() {
+    if (!LIVE) { aplicarVista(); return; }
+    sb.from("costes").select("*").order("creado_at", { ascending: false })
+      .then(function (res) {
+        COSTES = {}; HISTORICO = {};
+        if (!res.error) {
+          (res.data || []).forEach(function (r) {
+            if (!HISTORICO[r.producto_slug]) HISTORICO[r.producto_slug] = [];
+            HISTORICO[r.producto_slug].push(r);
+            if (!COSTES[r.producto_slug]) COSTES[r.producto_slug] = r;  // la primera es la más reciente
+          });
+        }
+        aplicarVista();
+      });
+  }
+
+  // Devuelve el coste de una máquina: el real si lo hay, si no el estimado.
+  function costeDe(p) {
+    var real = COSTES[p.slug];
+    if (real) return { valor: Number(real.coste), estimado: false, fecha: real.creado_at };
+    if (!p.price) return { valor: null, estimado: true, fecha: null };
+    return { valor: Math.round(Number(p.price) * (1 - MARGEN_ORIENTATIVO)), estimado: true, fecha: null };
+  }
+
+  function eur(n) { return Number(n).toLocaleString("es-ES") + " €"; }
+
+  // Bloque de coste + margen, igual en lista y en cuadrícula.
+  function bloqueCoste(p) {
+    var c = costeDe(p);
+    if (c.valor === null) return '<span class="coste sin">sin coste</span>';
+    var margen = p.price ? Number(p.price) - c.valor : null;
+    var pct = (margen !== null && p.price) ? Math.round(margen / Number(p.price) * 100) : null;
+    return '<span class="coste' + (c.estimado ? ' estimado' : '') + '" title="' +
+        (c.estimado ? 'Estimado a partir del PVP. Pulsa el lápiz para poner el real.'
+                    : 'Coste real, actualizado el ' + new Date(c.fecha).toLocaleDateString("es-ES")) + '">' +
+      (c.estimado ? 'aprox. ' : '') + eur(c.valor) +
+      '</span>' +
+      (margen !== null ? '<span class="margen">+' + eur(margen) + (pct !== null ? ' · ' + pct + '%' : '') + '</span>' : '');
   }
 
   function cargarPedidos() {
@@ -172,7 +223,10 @@
         '<div class="ped-meta">' + esc(p.brand || "") +
           ' · pedido a <b>' + esc(proveedorDe(p).nombre) + '</b></div>' +
       '</div>' +
-      '<div class="ped-precio">' + (p.price ? Number(p.price).toLocaleString("es-ES") + " €" : "") + '</div>' +
+      '<div class="ped-costes">' +
+        '<div class="ped-precio">' + (p.price ? Number(p.price).toLocaleString("es-ES") + " €" : "") + '</div>' +
+        '<div class="linea-coste">' + bloqueCoste(p) + '<button class="btn-coste" data-edit="' + esc(p.slug) + '" type="button" title="Cambiar el coste">✎</button>' + '</div>' +
+      '</div>' +
       '<a class="btn-wa" href="' + esc(enlaceWhatsApp(p)) + '" target="_blank" rel="noopener" data-slug="' + esc(p.slug) + '">' +
         ICONO_WA + 'Pedir</a>' +
     '</div>';
@@ -190,6 +244,7 @@
         '<div class="ped-nom">' + esc(p.name) + '</div>' +
         '<div class="ped-meta">' + esc(p.brand || "") +
           ' · <b>' + esc(proveedorDe(p).nombre) + '</b></div>' +
+        '<div class="linea-coste">' + bloqueCoste(p) + '<button class="btn-coste" data-edit="' + esc(p.slug) + '" type="button" title="Cambiar el coste">✎</button>' + '</div>' +
         '<div class="tarjeta-pie">' +
           '<span class="ped-precio">' + (p.price ? Number(p.price).toLocaleString("es-ES") + " €" : "") + '</span>' +
           '<a class="btn-wa" href="' + esc(enlaceWhatsApp(p)) + '" target="_blank" rel="noopener" data-slug="' + esc(p.slug) + '">' +
@@ -234,6 +289,10 @@
     });
     cont.innerHTML = html;
 
+    Array.prototype.forEach.call(cont.querySelectorAll(".btn-coste"), function (b) {
+      b.addEventListener("click", function () { editarCoste(b.getAttribute("data-edit")); });
+    });
+
     // Al pulsar: se abre WhatsApp (por el href) y además se registra el pedido.
     Array.prototype.forEach.call(cont.querySelectorAll(".btn-wa"), function (a) {
       a.addEventListener("click", function () {
@@ -241,6 +300,98 @@
         if (p) registrarPedido(p);
       });
     });
+  }
+
+  // ---------- Editar el coste ----------
+  // Guardar NO pisa el valor anterior: añade una fila nueva. Así queda el
+  // histórico de lo que ha ido costando cada máquina.
+  function editarCoste(slug) {
+    var p = CATALOGO.filter(function (x) { return x.slug === slug; })[0];
+    if (!p) return;
+    var c = costeDe(p);
+    var hist = HISTORICO[slug] || [];
+
+    var fondo = document.createElement("div");
+    fondo.className = "modal-coste";
+    fondo.innerHTML =
+      '<div class="modal-caja">' +
+        '<h3>' + esc(p.name) + '</h3>' +
+        '<p class="modal-sub">' + esc(p.brand || "") +
+          (p.price ? ' · se vende a ' + eur(p.price) : '') + '</p>' +
+        '<label for="inpCoste">¿Cuánto nos cuesta?</label>' +
+        '<div class="campo-euro">' +
+          '<input type="number" id="inpCoste" step="0.01" min="0" inputmode="decimal" ' +
+            'value="' + (c.estimado ? '' : c.valor) + '" ' +
+            'placeholder="' + (c.valor !== null ? c.valor : '0') + '">' +
+          '<span>€</span>' +
+        '</div>' +
+        (c.estimado ? '<p class="modal-aviso">Ahora mismo es una estimación a partir del precio de venta. En cuanto pongas el real, deja de estimarse.</p>' : '') +
+        '<div id="calcMargen" class="modal-margen"></div>' +
+        (hist.length ? '<div class="modal-hist"><b>Cambios anteriores</b>' +
+            hist.slice(0, 5).map(function (r) {
+              return '<div>' + new Date(r.creado_at).toLocaleDateString("es-ES") +
+                ' · ' + eur(r.coste) + '</div>';
+            }).join("") + '</div>' : '') +
+        '<div class="modal-botones">' +
+          '<button class="btn ghost" id="btnCancelar" type="button">Cancelar</button>' +
+          '<button class="btn" id="btnGuardar" type="button">Guardar</button>' +
+        '</div>' +
+      '</div>';
+    document.body.appendChild(fondo);
+
+    var inp = fondo.querySelector("#inpCoste");
+    inp.focus();
+    inp.select();
+
+    // El margen se recalcula según escribes, para verlo antes de guardar.
+    function recalcular() {
+      var v = parseFloat(inp.value);
+      var caja = fondo.querySelector("#calcMargen");
+      if (!p.price || isNaN(v)) { caja.textContent = ""; return; }
+      var m = Number(p.price) - v;
+      var pct = Math.round(m / Number(p.price) * 100);
+      caja.innerHTML = m >= 0
+        ? 'Margen: <b>' + eur(m) + '</b> (' + pct + '%)'
+        : '<span class="negativo">Cuidado: costaría más de lo que se vende (' + eur(m) + ')</span>';
+    }
+    inp.addEventListener("input", recalcular);
+    recalcular();
+
+    function cerrar() { document.body.removeChild(fondo); document.removeEventListener("keydown", teclas); }
+    function teclas(e) {
+      if (e.key === "Escape") cerrar();
+      if (e.key === "Enter") guardar();
+    }
+    document.addEventListener("keydown", teclas);
+    fondo.addEventListener("click", function (e) { if (e.target === fondo) cerrar(); });
+    fondo.querySelector("#btnCancelar").addEventListener("click", cerrar);
+
+    function guardar() {
+      var v = parseFloat(inp.value);
+      if (isNaN(v) || v < 0) { toast("Escribe un importe válido.", true); return; }
+      if (!LIVE) { toast("Modo demo: no se guarda."); cerrar(); return; }
+      fondo.querySelector("#btnGuardar").disabled = true;
+      currentEmail().then(function (email) {
+        return sb.from("costes").insert([{ producto_slug: slug, coste: v, creado_por: email || null }]);
+      }).then(function (res) {
+        if (res && res.error) { toast("No se pudo guardar el coste.", true); fondo.querySelector("#btnGuardar").disabled = false; return; }
+        toast("Coste actualizado.");
+        cerrar();
+        cargarCostes();
+      }).catch(function () {
+        toast("No se pudo guardar el coste.", true);
+        fondo.querySelector("#btnGuardar").disabled = false;
+      });
+    }
+    fondo.querySelector("#btnGuardar").addEventListener("click", guardar);
+  }
+
+  // Correo del usuario, para dejar constancia de quién cambió el precio.
+  function currentEmail() {
+    if (!LIVE) return Promise.resolve("");
+    return sb.auth.getUser().then(function (r) {
+      return (r && r.data && r.data.user && r.data.user.email) || "";
+    }).catch(function () { return ""; });
   }
 
   // ---------- Registrar ----------
@@ -253,6 +404,7 @@
       categoria: p.category,
       proveedor: prov.nombre,
       precio: p.price || null,
+      coste: costeDe(p).valor,     // lo que costaba HOY: si mañana sube, este pedido conserva el suyo
       estado: "pedido"
     };
     if (!LIVE) { toast("Modo demo: no se guarda."); return; }
