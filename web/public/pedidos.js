@@ -190,17 +190,31 @@
   // ---------- El mensaje de cada máquina ----------
   // Independiente para cada una: lleva su modelo, su marca y el proveedor al
   // que le toca. Se abre en WhatsApp escrito y solo hay que darle a enviar.
-  function mensajeDe(p) {
-    var prov = proveedorDe(p);
+  function mensajeDe(p, cant) {
+    cant = cant || 1;
     return "Hola, buenos días.\n\n" +
       "Os hacemos pedido de:\n" +
-      "· " + p.name + (p.brand ? " (" + p.brand + ")" : "") + " — 1 ud.\n\n" +
+      "· " + p.name + (p.brand ? " (" + p.brand + ")" : "") +
+        " — " + cant + (cant === 1 ? " ud." : " uds.") + "\n\n" +
       "Gracias.\n\n" +
       "Instalaciones Decogas";
   }
 
-  function enlaceWhatsApp(p) {
-    return "https://wa.me/" + proveedorDe(p).tel + "?text=" + encodeURIComponent(mensajeDe(p));
+  function enlaceWhatsApp(p, cant) {
+    return "https://wa.me/" + proveedorDe(p).tel + "?text=" + encodeURIComponent(mensajeDe(p, cant));
+  }
+
+  // Cantidad elegida para cada máquina antes de pedirla. Vive solo en memoria:
+  // se reinicia a 1 al recargar, que es lo que se espera.
+  var CANTIDADES = {};
+  function cantidadDe(slug) { return CANTIDADES[slug] || 1; }
+
+  function selectorCantidad(p) {
+    return '<div class="cant" data-cant-slug="' + esc(p.slug) + '">' +
+      '<button type="button" class="cant-btn" data-paso="-1" aria-label="Quitar una">−</button>' +
+      '<span class="cant-num">' + cantidadDe(p.slug) + '</span>' +
+      '<button type="button" class="cant-btn" data-paso="1" aria-label="Añadir una">+</button>' +
+    '</div>';
   }
 
   // ---------- Pintar el catálogo ----------
@@ -230,7 +244,8 @@
         '<div class="ped-precio">' + (p.price ? Number(p.price).toLocaleString("es-ES") + " €" : "") + '</div>' +
         '<div class="linea-coste">' + bloqueCoste(p) + '<button class="btn-coste" data-edit="' + esc(p.slug) + '" type="button" title="Cambiar lo que nos cuesta">✎ Coste</button>' + '</div>' +
       '</div>' +
-      '<a class="btn-wa" href="' + esc(enlaceWhatsApp(p)) + '" target="_blank" rel="noopener" data-slug="' + esc(p.slug) + '">' +
+      selectorCantidad(p) +
+      '<a class="btn-wa" href="' + esc(enlaceWhatsApp(p, cantidadDe(p.slug))) + '" target="_blank" rel="noopener" data-slug="' + esc(p.slug) + '">' +
         ICONO_WA + 'Pedir</a>' +
     '</div>';
   }
@@ -250,7 +265,8 @@
         '<div class="linea-coste">' + bloqueCoste(p) + '<button class="btn-coste" data-edit="' + esc(p.slug) + '" type="button" title="Cambiar lo que nos cuesta">✎ Coste</button>' + '</div>' +
         '<div class="tarjeta-pie">' +
           '<span class="ped-precio">' + (p.price ? Number(p.price).toLocaleString("es-ES") + " €" : "") + '</span>' +
-          '<a class="btn-wa" href="' + esc(enlaceWhatsApp(p)) + '" target="_blank" rel="noopener" data-slug="' + esc(p.slug) + '">' +
+          selectorCantidad(p) +
+          '<a class="btn-wa" href="' + esc(enlaceWhatsApp(p, cantidadDe(p.slug))) + '" target="_blank" rel="noopener" data-slug="' + esc(p.slug) + '">' +
             ICONO_WA + 'Pedir</a>' +
         '</div>' +
       '</div>' +
@@ -291,6 +307,21 @@
       html += esGrid ? '</div>' : '';
     });
     cont.innerHTML = html;
+
+    Array.prototype.forEach.call(cont.querySelectorAll(".cant-btn"), function (b) {
+      b.addEventListener("click", function () {
+        var caja = b.closest(".cant");
+        var slug = caja.getAttribute("data-cant-slug");
+        var nueva = Math.max(1, Math.min(99, cantidadDe(slug) + Number(b.getAttribute("data-paso"))));
+        CANTIDADES[slug] = nueva;
+        // Se actualiza en el sitio, sin repintar toda la lista: si se repintara
+        // se perdería el scroll y molestaría al pulsar varias veces seguidas.
+        caja.querySelector(".cant-num").textContent = nueva;
+        var p = CATALOGO.filter(function (x) { return x.slug === slug; })[0];
+        var enlace = caja.parentNode.querySelector(".btn-wa");
+        if (p && enlace) enlace.setAttribute("href", enlaceWhatsApp(p, nueva));
+      });
+    });
 
     Array.prototype.forEach.call(cont.querySelectorAll(".btn-coste"), function (b) {
       b.addEventListener("click", function () { editarCoste(b.getAttribute("data-edit")); });
@@ -407,39 +438,93 @@
       categoria: p.category,
       proveedor: prov.nombre,
       precio: p.price || null,
+      cantidad: cantidadDe(p.slug),
       coste: costeDe(p).valor,     // lo que costaba HOY: si mañana sube, este pedido conserva el suyo
       estado: "pedido"
     };
     if (!LIVE) { toast("Modo demo: no se guarda."); return; }
     sb.from("pedidos").insert([fila]).select().then(function (res) {
       if (res.error) { toast("Se abrió WhatsApp, pero no se pudo guardar el pedido.", true); return; }
-      toast("Pedido registrado a " + prov.nombre + ".");
+      toast("Pedido registrado a " + prov.nombre + " (" + cantidadDe(p.slug) + " ud" + (cantidadDe(p.slug) === 1 ? "" : "s") + ").");
+      CANTIDADES[p.slug] = 1;   // vuelve a 1 para el siguiente
       cargarPedidos();
     });
   }
 
+  // Un pedido está "en camino" mientras no haya llegado ni se haya cancelado.
+  function esEnCamino(r) {
+    return r.estado === "pedido" || r.estado === "confirmado" || r.estado === "pagado";
+  }
+
+  // Días que puede estar un pedido sin llegar antes de que lo marquemos.
+  // Un pedido que lleva tres semanas sin aparecer suele ser un pedido perdido,
+  // y eso es justo el descuido que esta página viene a evitar.
+  var DIAS_AVISO = 14;
+
+  function diasDesde(fecha) {
+    return Math.floor((Date.now() - new Date(fecha).getTime()) / 86400000);
+  }
+  function vaConRetraso(r) {
+    return esEnCamino(r) && diasDesde(r.created_at) >= DIAS_AVISO;
+  }
+
   // ---------- Historial ----------
+  var FILTRO_PED = { texto: "", estado: "" };
+
+  function pasaFiltroPedido(r) {
+    if (FILTRO_PED.estado === "retraso") { if (!vaConRetraso(r)) return false; }
+    else if (FILTRO_PED.estado && r.estado !== FILTRO_PED.estado) return false;
+    if (FILTRO_PED.texto) {
+      var t = norm(r.producto + " " + (r.marca || "") + " " + (r.proveedor || ""));
+      if (t.indexOf(norm(FILTRO_PED.texto)) === -1) return false;
+    }
+    return true;
+  }
+
   function pintarHistorial() {
     var cont = $("historial");
     if (!PEDIDOS.length) {
       cont.innerHTML = '<div class="empty-state">Todavía no has hecho ningún pedido.<br>' +
         'En cuanto pulses «Pedir» en una máquina, aparecerá aquí y podrás ir cambiando su estado ' +
         '(pedido → confirmado → pagado → recibido → instalado).</div>';
+      var cajaF = $("filtrosPedidos"); if (cajaF) cajaF.style.display = "none";
       return;
     }
-    cont.innerHTML = PEDIDOS.map(function (r) {
+    var cajaF = $("filtrosPedidos"); if (cajaF) cajaF.style.display = "";
+
+    var conRetraso = PEDIDOS.filter(vaConRetraso).length;
+    var avisoBtn = $("chipRetraso");
+    if (avisoBtn) {
+      avisoBtn.style.display = conRetraso ? "" : "none";
+      avisoBtn.textContent = "Sin llegar (" + conRetraso + ")";
+    }
+
+    var lista = PEDIDOS.filter(pasaFiltroPedido);
+    if (!lista.length) {
+      cont.innerHTML = '<div class="empty-state">Ningún pedido coincide con la búsqueda.</div>';
+      return;
+    }
+
+    cont.innerHTML = lista.map(function (r) {
       var f = new Date(r.created_at);
       var fecha = f.toLocaleDateString("es-ES", { day: "2-digit", month: "short" }) +
         " · " + f.toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit" });
-      return '<div class="hist">' +
+      var cant = r.cantidad || 1;
+      var gasto = gastoDe(r);
+      var retraso = vaConRetraso(r);
+      return '<div class="hist' + (retraso ? ' hist-retraso' : '') + '">' +
         '<div>' +
-          '<div class="ped-nom">' + esc(r.producto) + '</div>' +
-          '<div class="ped-meta">' + esc(r.marca || "") + ' · <b>' + esc(r.proveedor || "") + '</b></div>' +
+          '<div class="ped-nom">' + esc(r.producto) +
+            (cant > 1 ? ' <span class="cant-badge">×' + cant + '</span>' : '') + '</div>' +
+          '<div class="ped-meta">' + esc(r.marca || "") + ' · <b>' + esc(r.proveedor || "") + '</b>' +
+            (gasto ? ' · ' + eur(gasto) : '') + '</div>' +
+          (retraso ? '<div class="aviso-retraso">Lleva ' + diasDesde(r.created_at) + ' días sin llegar</div>' : '') +
         '</div>' +
         '<div class="hist-fecha">' + esc(fecha) + '</div>' +
         '<span class="lead-estado-wrap"><button class="lead-estado est-' + esc(r.estado) + '" ' +
           'data-id="' + esc(r.id) + '" type="button" aria-haspopup="listbox" aria-expanded="false">' +
           esc(ESTADO_LABEL[r.estado] || r.estado) + CARET + '</button></span>' +
+        '<button class="hist-repetir" data-rep="' + esc(r.id) + '" type="button" title="Volver a pedir lo mismo">Repetir</button>' +
         '<button class="hist-del" data-del="' + esc(r.id) + '" type="button" title="Borrar">✕</button>' +
       '</div>';
     }).join("");
@@ -447,6 +532,22 @@
     Array.prototype.forEach.call(cont.querySelectorAll(".hist-del"), function (b) {
       b.addEventListener("click", function () { borrar(b.getAttribute("data-del")); });
     });
+    Array.prototype.forEach.call(cont.querySelectorAll(".hist-repetir"), function (b) {
+      b.addEventListener("click", function () { repetir(b.getAttribute("data-rep")); });
+    });
+  }
+
+  // Vuelve a pedir lo mismo: abre WhatsApp con el mensaje y lo registra otra vez.
+  function repetir(id) {
+    var r = PEDIDOS.filter(function (x) { return String(x.id) === String(id); })[0];
+    if (!r) return;
+    var p = CATALOGO.filter(function (x) { return x.slug === r.producto_slug; })[0];
+    if (!p) { toast("Esa máquina ya no está en el catálogo.", true); return; }
+    var cant = r.cantidad || 1;
+    window.open(enlaceWhatsApp(p, cant), "_blank", "noopener");
+    CANTIDADES[p.slug] = cant;
+    registrarPedido(p);
+    CANTIDADES[p.slug] = 1;
   }
 
   function cambiarEstado(id, nuevo) {
@@ -549,18 +650,27 @@
   window.addEventListener("scroll", cerrarMenu, true);
 
   // ---------- Contadores ----------
+  // Lo que costó un pedido: su coste por su cantidad.
+  function gastoDe(r) {
+    if (r.coste === null || r.coste === undefined) return 0;
+    return Number(r.coste) * (r.cantidad || 1);
+  }
+
   function pintarStats() {
     var ahora = new Date();
     var delMes = PEDIDOS.filter(function (r) {
       var f = new Date(r.created_at);
-      return f.getMonth() === ahora.getMonth() && f.getFullYear() === ahora.getFullYear();
+      return f.getMonth() === ahora.getMonth() && f.getFullYear() === ahora.getFullYear()
+        && r.estado !== "cancelado";
     });
-    var enCamino = PEDIDOS.filter(function (r) { return r.estado === "pedido" || r.estado === "confirmado" || r.estado === "pagado"; });
+    var gastoMes = delMes.reduce(function (a, r) { return a + gastoDe(r); }, 0);
+    var enCamino = PEDIDOS.filter(esEnCamino);
     var enAlmacen = PEDIDOS.filter(function (r) { return r.estado === "recibido"; });
+
     $("statMes").textContent = delMes.length;
+    $("statGasto").textContent = gastoMes ? Math.round(gastoMes).toLocaleString("es-ES") + " €" : "—";
     $("statCamino").textContent = enCamino.length;
     $("statAlmacen").textContent = enAlmacen.length;
-    $("statTotal").textContent = PEDIDOS.length;
   }
 
   function pintar() { pintarCatalogo(); pintarHistorial(); pintarStats(); }
@@ -580,7 +690,26 @@
     });
   });
 
-  // ---------- Filtros ----------
+  // ---------- Filtros del historial ----------
+  var buscaPed = $("qPedidos");
+  if (buscaPed) {
+    buscaPed.addEventListener("input", function () {
+      FILTRO_PED.texto = this.value.trim(); pintarHistorial();
+    });
+    buscaPed.addEventListener("keydown", function (e) {
+      if (e.key === "Escape" && this.value) { this.value = ""; FILTRO_PED.texto = ""; pintarHistorial(); }
+    });
+  }
+  Array.prototype.forEach.call(document.querySelectorAll("#pedChips .chip"), function (c) {
+    c.addEventListener("click", function () {
+      Array.prototype.forEach.call(document.querySelectorAll("#pedChips .chip"), function (x) { x.classList.remove("active"); });
+      c.classList.add("active");
+      FILTRO_PED.estado = c.getAttribute("data-est") || "";
+      pintarHistorial();
+    });
+  });
+
+  // ---------- Filtros del catálogo ----------
   // Buscar mientras se escribe, sin esperar a nada.
   $("qProd").addEventListener("input", function () {
     FILTRO.texto = this.value.trim();

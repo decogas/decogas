@@ -3,7 +3,7 @@
 // Mismo patrón que clientes.astro — comparte sesión con el resto del panel.
 const rawBase = import.meta.env.BASE_URL;
 const base = rawBase.endsWith('/') ? rawBase : rawBase + '/';
-const V = 30; // el estado pasa a desplegable, igual que en Clientes
+const V = 31; // cantidad, buscador de pedidos, gasto del mes, aviso de retraso y repetir
 ---
 <!DOCTYPE html>
 <html lang="es">
@@ -202,7 +202,7 @@ const V = 30; // el estado pasa a desplegable, igual que en Clientes
     background:#fff; border:1px solid var(--line); border-radius:13px;
     padding:14px 16px; margin-bottom:11px;
     transition:box-shadow .25s, border-color .25s;
-    display:grid; grid-template-columns:52px 1fr auto auto; gap:14px; align-items:center;
+    display:grid; grid-template-columns:52px 1fr auto auto auto; gap:14px; align-items:center;
   }
   .ped:hover{ border-color:var(--muted); }
   .ped-mini{
@@ -227,7 +227,7 @@ const V = 30; // el estado pasa a desplegable, igual que en Clientes
   .btn-wa svg{ width:15px; height:15px; fill:currentColor; }
 
   /* Historial de pedidos */
-  .hist{ display:grid; grid-template-columns:1fr auto auto auto; gap:14px; align-items:center;
+  .hist{ display:grid; grid-template-columns:1fr auto auto auto auto; gap:12px; align-items:center;
     background:#fff; border:1px solid var(--line); border-radius:14px; padding:13px 16px; margin-bottom:9px; }
   .hist-fecha{ font-size:12.5px; color:var(--muted); white-space:nowrap; font-variant-numeric:tabular-nums; }
   .hist-del{ background:none; border:none; color:var(--muted); cursor:pointer; font-size:16px; line-height:1; padding:4px 6px; border-radius:6px; }
@@ -299,6 +299,49 @@ const V = 30; // el estado pasa a desplegable, igual que en Clientes
   [data-theme="dark"] .btn-coste{ border-color:#26384B; }
   [data-theme="dark"] .btn-coste:hover{ background:#1B2A3A; color:#E6EEF6; }
 
+  /* --- Selector de cantidad --- */
+  .cant{
+    display:inline-flex; align-items:center; border:1px solid var(--line);
+    border-radius:9px; overflow:hidden; background:#fff;
+  }
+  .cant-btn{
+    border:none; background:transparent; color:var(--navy-2); cursor:pointer;
+    font-size:16px; line-height:1; padding:8px 11px; font-family:'Inter',sans-serif;
+  }
+  .cant-btn:hover{ background:var(--cloud); color:var(--navy); }
+  .cant-num{
+    min-width:26px; text-align:center; font-size:14px; font-weight:700;
+    color:var(--navy); font-variant-numeric:tabular-nums;
+  }
+  .cant-badge{
+    font-size:12px; font-weight:700; color:var(--navy-2);
+    background:var(--cloud); border-radius:6px; padding:2px 6px; margin-left:4px;
+  }
+
+  /* --- Pedido que no llega --- */
+  .hist-retraso{ border-color:#E8B4A8; }
+  .aviso-retraso{
+    font-size:12px; font-weight:700; color:#B4453A; margin-top:4px;
+  }
+  .chip.chip-aviso{ background:#FCE9E7; border-color:#F2C2BC; color:#B3261E; }
+  .chip.chip-aviso.active{ background:#B3261E; border-color:#B3261E; color:#fff; }
+
+  /* --- Repetir pedido --- */
+  .hist-repetir{
+    background:none; border:1px solid var(--line); color:var(--navy-2);
+    border-radius:8px; cursor:pointer; font-size:12.5px; font-weight:600;
+    padding:7px 12px; font-family:'Inter',sans-serif; white-space:nowrap;
+  }
+  .hist-repetir:hover{ border-color:var(--muted); background:var(--cloud); }
+
+  [data-theme="dark"] .cant{ background:#0F1A25; border-color:#26384B; }
+  [data-theme="dark"] .cant-btn:hover{ background:#1B2A3A; color:#E6EEF6; }
+  [data-theme="dark"] .cant-num{ color:#E6EEF6; }
+  [data-theme="dark"] .cant-badge{ background:#1B2A3A; color:#B9CBDC; }
+  [data-theme="dark"] .hist-repetir{ border-color:#26384B; color:#B9CBDC; }
+  [data-theme="dark"] .hist-repetir:hover{ background:#1B2A3A; color:#E6EEF6; }
+  [data-theme="dark"] .hist-retraso{ border-color:#6E3B33; }
+
   /* --- Conmutador de vista y contador --- */
   .barra-vista{ display:flex; align-items:center; gap:14px; flex-wrap:wrap; margin-bottom:10px; }
   .resultados{ font-size:13px; color:var(--muted); font-variant-numeric:tabular-nums; }
@@ -347,9 +390,12 @@ const V = 30; // el estado pasa a desplegable, igual que en Clientes
        enorme, que es lo que se veía en el móvil. */
     .ped{ grid-template-columns:52px 1fr; gap:12px; }
     .ped-costes{ grid-column:1 / -1; text-align:left; }
-    .ped .btn-wa{ grid-column:1 / -1; justify-content:center; }
+    .ped .cant{ grid-column:1; }
+    .ped .btn-wa{ grid-column:2; justify-content:center; }
     .linea-coste{ justify-content:flex-start; }
     .hist{ grid-template-columns:1fr auto; }
+    .hist .lead-estado-wrap{ grid-column:1; }
+    .hist-repetir{ grid-column:2; }
   }
 </style>
 </head>
@@ -403,12 +449,29 @@ const V = 30; // el estado pasa a desplegable, igual que en Clientes
         <div class="stat-card"><div class="num" id="statMes">0</div><div class="lbl">Pedidos este mes</div></div>
         <div class="stat-card" style="animation-delay:.07s;"><div class="num" id="statCamino">0</div><div class="lbl">En camino</div></div>
         <div class="stat-card" style="animation-delay:.14s;"><div class="num" id="statAlmacen">0</div><div class="lbl">En almacén</div></div>
-        <div class="stat-card" style="animation-delay:.21s;"><div class="num" id="statTotal">0</div><div class="lbl">Pedidos totales</div></div>
+        <div class="stat-card" style="animation-delay:.21s;"><div class="num" id="statGasto">—</div><div class="lbl">Gastado este mes</div></div>
       </div>
 
 
       <h2 class="titulo-seccion">Tus pedidos</h2>
-      <p class="sub-seccion">Pulsa el estado de un pedido para avanzarlo.</p>
+      <p class="sub-seccion">Pulsa el estado de un pedido para cambiarlo.</p>
+      <div class="filters-card" id="filtrosPedidos" style="display:none;">
+        <div class="filters-grid">
+          <div>
+            <label for="qPedidos">Buscar en tus pedidos</label>
+            <input type="text" id="qPedidos" placeholder="Máquina, marca o proveedor…" autocomplete="off">
+          </div>
+        </div>
+        <div class="chips" id="pedChips">
+          <button class="chip active" data-est="" type="button">Todos</button>
+          <button class="chip" data-est="pedido" type="button">Pedido</button>
+          <button class="chip" data-est="confirmado" type="button">Confirmado</button>
+          <button class="chip" data-est="pagado" type="button">Pagado</button>
+          <button class="chip" data-est="recibido" type="button">Recibido</button>
+          <button class="chip" data-est="instalado" type="button">Instalado</button>
+          <button class="chip chip-aviso" data-est="retraso" id="chipRetraso" type="button" style="display:none;">Sin llegar</button>
+        </div>
+      </div>
       <div id="historial"></div>
 
       <h2 class="titulo-seccion" style="margin-top:38px;">Hacer un pedido</h2>
