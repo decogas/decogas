@@ -3,7 +3,7 @@
 // Mismo patrón que clientes.astro — comparte sesión con el resto del panel.
 const rawBase = import.meta.env.BASE_URL;
 const base = rawBase.endsWith('/') ? rawBase : rawBase + '/';
-const V = 29; // los pedidos en curso van arriba, el catálogo debajo
+const V = 30; // el estado pasa a desplegable, igual que en Clientes
 ---
 <!DOCTYPE html>
 <html lang="es">
@@ -233,17 +233,15 @@ const V = 29; // los pedidos en curso van arriba, el catálogo debajo
   .hist-del{ background:none; border:none; color:var(--muted); cursor:pointer; font-size:16px; line-height:1; padding:4px 6px; border-radius:6px; }
   .hist-del:hover{ color:var(--err); background:var(--cloud); }
 
-  .est{
-    font-size:11.5px; font-weight:700; letter-spacing:.04em; text-transform:uppercase;
-    padding:6px 12px; border-radius:999px; border:1px solid; cursor:pointer;
-    font-family:'Inter',sans-serif; white-space:nowrap;
-  }
-  .est-pedido{    background:#FBF0DC; color:#B4761A; border-color:#E8CFA0; }
-  .est-confirmado{background:#E2EFF8; color:#1F6FA8; border-color:#B4D6EC; }
-  .est-pagado{    background:#EDE6F8; color:#6B4BA8; border-color:#CFC0EC; }
-  .est-recibido{  background:#E4F4EC; color:#1F8A5B; border-color:#B0DEC7; }
-  .est-instalado{ background:#DFF0F5; color:#1B7A93; border-color:#A9D6E2; }
-  .est-cancelado{ background:#F4E7E7; color:#B4453A; border-color:#E3C2BE; }
+  /* El estado usa la misma base .lead-estado que en Clientes (que ya trae el
+     desplegable, la flechita y el foco); aquí solo se le dan los colores de
+     nuestros estados. */
+  .lead-estado.est-pedido{     background:#FFF3D6; border-color:#F2D48A; color:#8A6100; }
+  .lead-estado.est-confirmado{ background:#E3F2FB; border-color:#A9D7F2; color:#0F5E8C; }
+  .lead-estado.est-pagado{     background:#E8EAF6; border-color:#B9C0E8; color:#2E3A8C; }
+  .lead-estado.est-recibido{   background:#E7F7EE; border-color:#A9DFBB; color:#157A43; }
+  .lead-estado.est-instalado{  background:#DFF0F5; border-color:#A9D6E2; color:#1B5E73; }
+  .lead-estado.est-cancelado{  background:#FCE9E7; border-color:#F2C2BC; color:#B3261E; }
 
   /* --- Coste y margen --- */
   .ped-costes{ text-align:right; }

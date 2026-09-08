@@ -40,7 +40,8 @@
 
   // ---------- CONFIGURACIÓN: estados ----------
   // Para cambiarlos basta con tocar esta lista (y el CHECK de la tabla en la BD).
-  var ESTADOS = ["pedido", "confirmado", "pagado", "recibido", "instalado"];
+  var ESTADOS = ["pedido", "confirmado", "pagado", "recibido", "instalado", "cancelado"];
+  var CARET = '<svg class="lead-estado-caret" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>';
   var ESTADO_LABEL = {
     pedido: "Pedido", confirmado: "Confirmado", pagado: "Pagado",
     recibido: "Recibido", instalado: "Instalado", cancelado: "Cancelado"
@@ -436,30 +437,30 @@
           '<div class="ped-meta">' + esc(r.marca || "") + ' · <b>' + esc(r.proveedor || "") + '</b></div>' +
         '</div>' +
         '<div class="hist-fecha">' + esc(fecha) + '</div>' +
-        '<button class="est est-' + esc(r.estado) + '" data-id="' + esc(r.id) + '" type="button" title="Pulsa para avanzar el estado">' +
-          esc(ESTADO_LABEL[r.estado] || r.estado) + '</button>' +
+        '<span class="lead-estado-wrap"><button class="lead-estado est-' + esc(r.estado) + '" ' +
+          'data-id="' + esc(r.id) + '" type="button" aria-haspopup="listbox" aria-expanded="false">' +
+          esc(ESTADO_LABEL[r.estado] || r.estado) + CARET + '</button></span>' +
         '<button class="hist-del" data-del="' + esc(r.id) + '" type="button" title="Borrar">✕</button>' +
       '</div>';
     }).join("");
 
-    Array.prototype.forEach.call(cont.querySelectorAll(".est"), function (b) {
-      b.addEventListener("click", function () { avanzarEstado(b.getAttribute("data-id")); });
-    });
     Array.prototype.forEach.call(cont.querySelectorAll(".hist-del"), function (b) {
       b.addEventListener("click", function () { borrar(b.getAttribute("data-del")); });
     });
   }
 
-  function avanzarEstado(id) {
+  function cambiarEstado(id, nuevo) {
     var r = PEDIDOS.filter(function (x) { return String(x.id) === String(id); })[0];
-    if (!r) return;
-    var i = ESTADOS.indexOf(r.estado);
-    var siguiente = ESTADOS[(i + 1) % ESTADOS.length];
-    sb.from("pedidos").update({ estado: siguiente }).eq("id", id).then(function (res) {
-      if (res.error) { toast("No se pudo cambiar el estado.", true); return; }
-      r.estado = siguiente;
-      pintarHistorial();
-      pintarStats();
+    if (!r || r.estado === nuevo) return;
+    var anterior = r.estado;
+    r.estado = nuevo;            // se pinta ya, sin esperar a la respuesta
+    pintarHistorial(); pintarStats();
+    sb.from("pedidos").update({ estado: nuevo }).eq("id", id).then(function (res) {
+      if (res.error) {
+        r.estado = anterior;     // si falla, se deja como estaba
+        pintarHistorial(); pintarStats();
+        toast("No se pudo cambiar el estado.", true);
+      }
     });
   }
 
@@ -481,6 +482,71 @@
       }).then(function (ok) { if (ok) seguir(); });
     } else if (confirm("¿Borrar este pedido del historial?")) { seguir(); }
   }
+
+  // ---------- Desplegable de estado ----------
+  // Copiado del de Clientes, incluida la razón de que sea así: un menú ÚNICO
+  // colgado de <body> con position:fixed. Si viviera dentro de cada ficha con
+  // position:absolute quedaría tapado por la ficha siguiente, porque la
+  // animación de entrada de las fichas crea un contexto de apilamiento propio
+  // y el z-index del menú no puede ganarle. Ya les pasó allí; no repetirlo.
+  var menuEl = null, menuTrigger = null;
+
+  function getMenu() {
+    if (!menuEl) {
+      menuEl = document.createElement("div");
+      menuEl.className = "lead-estado-menu";
+      menuEl.setAttribute("role", "listbox");
+      document.body.appendChild(menuEl);
+    }
+    return menuEl;
+  }
+  function cerrarMenu() {
+    if (!menuEl) return;
+    menuEl.classList.remove("open");
+    if (menuTrigger) menuTrigger.setAttribute("aria-expanded", "false");
+    menuTrigger = null;
+  }
+  function abrirMenu(trigger) {
+    var actual = (trigger.className.match(/est-([a-z]+)/) || [])[1] || "";
+    var menu = getMenu();
+    menu.innerHTML = ESTADOS.map(function (e) {
+      return '<button type="button" class="lead-estado-opt' + (e === actual ? " active" : "") +
+        '" data-value="' + e + '" role="option"' + (e === actual ? ' aria-selected="true"' : "") + ">" +
+        ESTADO_LABEL[e] + "</button>";
+    }).join("");
+    // Se mide con el menú ya visible para saber su alto real y decidir si
+    // cabe debajo del botón o hay que abrirlo hacia arriba.
+    menu.classList.add("open");
+    var r = trigger.getBoundingClientRect();
+    var alto = menu.offsetHeight;
+    menu.style.left = Math.max(8, Math.min(r.left, window.innerWidth - menu.offsetWidth - 8)) + "px";
+    menu.style.top = (r.bottom + alto + 8 <= window.innerHeight)
+      ? (r.bottom + 6) + "px"
+      : Math.max(8, r.top - alto - 6) + "px";
+    menu.style.bottom = "auto";
+    trigger.setAttribute("aria-expanded", "true");
+    menuTrigger = trigger;
+  }
+
+  document.addEventListener("click", function (e) {
+    var trigger = e.target.closest(".lead-estado");
+    if (trigger) {
+      var yaAbierto = menuEl && menuEl.classList.contains("open") && menuTrigger === trigger;
+      cerrarMenu();
+      if (!yaAbierto) abrirMenu(trigger);
+      return;
+    }
+    var opt = e.target.closest(".lead-estado-opt");
+    if (opt && menuEl && menuEl.contains(opt)) {
+      var t = menuTrigger;
+      cerrarMenu();
+      if (t) cambiarEstado(t.getAttribute("data-id"), opt.getAttribute("data-value"));
+      return;
+    }
+    if (menuEl && menuEl.classList.contains("open")) cerrarMenu();
+  });
+  document.addEventListener("keydown", function (e) { if (e.key === "Escape") cerrarMenu(); });
+  window.addEventListener("scroll", cerrarMenu, true);
 
   // ---------- Contadores ----------
   function pintarStats() {
