@@ -3,7 +3,7 @@
 // Mismo patrón que clientes.astro — comparte sesión con el resto del panel.
 const rawBase = import.meta.env.BASE_URL;
 const base = rawBase.endsWith('/') ? rawBase : rawBase + '/';
-const V = 28; // fix: marcos anidados, foto en la lista y botón de coste visible
+const V = 29; // los pedidos en curso van arriba, el catálogo debajo
 ---
 <!DOCTYPE html>
 <html lang="es">
@@ -408,6 +408,13 @@ const V = 28; // fix: marcos anidados, foto en la lista y botón de coste visibl
         <div class="stat-card" style="animation-delay:.21s;"><div class="num" id="statTotal">0</div><div class="lbl">Pedidos totales</div></div>
       </div>
 
+
+      <h2 class="titulo-seccion">Tus pedidos</h2>
+      <p class="sub-seccion">Pulsa el estado de un pedido para avanzarlo.</p>
+      <div id="historial"></div>
+
+      <h2 class="titulo-seccion" style="margin-top:38px;">Hacer un pedido</h2>
+      <p class="sub-seccion">Pulsa «Pedir» y se abre WhatsApp con el mensaje escrito. El botón de coste cambia lo que nos cuesta.</p>
       <div class="filters-card">
         <div class="filters-grid">
           <div>
@@ -429,14 +436,7 @@ const V = 28; // fix: marcos anidados, foto en la lista y botón de coste visibl
           <button class="chip" data-cat="termos" type="button">Termos</button>
         </div>
       </div>
-
-      <h2 class="titulo-seccion">Hacer un pedido</h2>
-      <p class="sub-seccion">Pulsa «Pedir» y se abre WhatsApp con el mensaje escrito. El lápiz cambia lo que nos cuesta.</p>
       <div id="catalogo"></div>
-
-      <h2 class="titulo-seccion" style="margin-top:34px;">Pedidos hechos</h2>
-      <p class="sub-seccion">Aquí aparece cada pedido que hagas. Pulsa su estado para avanzarlo.</p>
-      <div id="historial"></div>
     </div>
   </div>
 </div>
