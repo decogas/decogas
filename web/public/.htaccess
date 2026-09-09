@@ -43,12 +43,20 @@
   RewriteRule ^ /%1 [R=301,L]
 
   # 3) /calderas/ con barra final tampoco: una sola direccion por pagina
-  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteCond %{DOCUMENT_ROOT}/$1/index.html !-f
   RewriteCond %{DOCUMENT_ROOT}/$1.html -f
   RewriteRule ^(.+)/$ /$1 [R=301,L]
 
   # 4) y por dentro, /calderas sirve calderas.html
-  RewriteCond %{REQUEST_FILENAME} !-d
+  #
+  #    Aqui hay una trampa: "marcas" es las dos cosas a la vez, una pagina
+  #    (marcas.html) y una carpeta (marcas/bosch.html, marcas/baxi.html...).
+  #    Preguntando solo "es una carpeta?" ganaba la carpeta, el servidor
+  #    mandaba a /marcas/, y como esa carpeta no tiene index.html salia un
+  #    404: el enlace "Marcas" del menu, en todas las paginas.
+  #    La pregunta buena es si la carpeta tiene index.html. Si lo tiene
+  #    (los articulos del blog) manda la carpeta; si no, manda el fichero.
+  RewriteCond %{REQUEST_FILENAME}/index.html !-f
   RewriteCond %{REQUEST_FILENAME}.html -f
   RewriteRule ^(.+)$ $1.html [L]
 </IfModule>
