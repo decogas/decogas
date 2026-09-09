@@ -25,18 +25,18 @@ const resumen = (m) => {
 ---
 <Base title={title} description={description} dataPage="marcas" scripts={scripts}>
   <Fragment slot="head">
-    <link rel="canonical" href={`${SB}marcas.html`} />
+    <link rel="canonical" href={`${SB}marcas`} />
     <meta property="og:type" content="website" />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
-    <meta property="og:url" content={`${SB}marcas.html`} />
+    <meta property="og:url" content={`${SB}marcas`} />
   </Fragment>
 
   <section class="hero" style="min-height:auto; padding:160px 0 60px;">
     <div class="hero-orb orb-1"></div>
     <div class="hero-orb orb-2"></div>
     <div class="wrap page-hero" style="display:block; max-width:820px;">
-      <div class="breadcrumb"><a href={`${SB}index.html`}>Inicio</a> / Marcas</div>
+      <div class="breadcrumb"><a href={`${SB}`}>Inicio</a> / Marcas</div>
       <div class="eyebrow" style="color:var(--flame);">Marcas</div>
       <h1 style="color:#fff; font-size:clamp(32px,4.6vw,48px); margin-bottom:14px;">Los fabricantes que instalamos</h1>
       <p class="lead">Trabajamos con las marcas de siempre, las que tienen repuestos y servicio técnico en Madrid. Elige la tuya y mira su catálogo con precio cerrado.</p>
@@ -47,7 +47,7 @@ const resumen = (m) => {
     <div class="wrap">
       <div class="marcas-grid reveal-stagger">
         {marcas.map((m) => (
-          <a class="marcas-item" href={`${SB}marcas/${m.slug}.html`}>
+          <a class="marcas-item" href={`${SB}marcas/${m.slug}`}>
             <span class="marcas-logo">
               {LOGO[m.slug]
                 ? <img src={`${base}marcas/${LOGO[m.slug]}`} alt={m.brand} loading="lazy" />
@@ -60,7 +60,7 @@ const resumen = (m) => {
           </a>
         ))}
       </div>
-      <p class="ahorro-legal reveal">¿No ves tu marca? Instalamos y reparamos muchas más — <a href={`${SB}index.html#contacto`}>pregúntanos sin compromiso</a>.</p>
+      <p class="ahorro-legal reveal">¿No ves tu marca? Instalamos y reparamos muchas más — <a href={`${SB}#contacto`}>pregúntanos sin compromiso</a>.</p>
     </div>
   </section>
 </Base>

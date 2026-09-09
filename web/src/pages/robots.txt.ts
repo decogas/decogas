@@ -8,8 +8,8 @@ export const GET: APIRoute = ({ site }) => {
   const lines = [
     'User-agent: *',
     'Allow: /',
-    `Disallow: ${base}/admin.html`,
-    `Disallow: ${base}/clientes.html`,
+    `Disallow: ${base}/admin`,
+    `Disallow: ${base}/clientes`,
     '',
     `Sitemap: ${new URL(`${base}/sitemap-index.xml`, site).href}`,
     '',

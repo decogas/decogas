@@ -29,10 +29,10 @@ const scripts = [
 
 // CTA de cierre — determinado por categoría (idéntico al HTML original, verificado 1:1).
 const CTA: Record<string, { title: string; href: string }> = {
-  'caldera':            { title: '¿Necesitas ayuda con tu caldera?',            href: base + 'calderas.html' },
-  'aire-acondicionado': { title: '¿Necesitas ayuda con tu aire acondicionado?', href: base + 'aires.html' },
-  'aerotermia':         { title: '¿Necesitas ayuda con aerotermia?',            href: base + 'index.html#contacto' },
-  'blog':               { title: '¿Necesitas ayuda con tu equipo?',             href: base + 'index.html' },
+  'caldera':            { title: '¿Necesitas ayuda con tu caldera?',            href: base + 'calderas' },
+  'aire-acondicionado': { title: '¿Necesitas ayuda con tu aire acondicionado?', href: base + 'aires' },
+  'aerotermia':         { title: '¿Necesitas ayuda con aerotermia?',            href: base + '#contacto' },
+  'blog':               { title: '¿Necesitas ayuda con tu equipo?',             href: base },
 };
 const cta = CTA[d.category] ?? CTA['blog'];
 
@@ -72,8 +72,8 @@ const breadcrumbLd = JSON.stringify({
   '@context': 'https://schema.org',
   '@type': 'BreadcrumbList',
   itemListElement: [
-    { '@type': 'ListItem', position: 1, name: 'Inicio', item: `${site}${base}index.html` },
-    { '@type': 'ListItem', position: 2, name: 'Guías', item: `${site}${base}guias.html` },
+    { '@type': 'ListItem', position: 1, name: 'Inicio', item: `${site}${base}` },
+    { '@type': 'ListItem', position: 2, name: 'Guías', item: `${site}${base}guias` },
     { '@type': 'ListItem', position: 3, name: d.breadcrumb || d.title, item: canonical },
   ],
 });
@@ -98,7 +98,7 @@ const breadcrumbLd = JSON.stringify({
 
   <section class="article-hero">
     <div class="wrap">
-      <div class="breadcrumb"><a href={`${base}index.html`}>Inicio</a> / <a href={`${base}guias.html`}>Guías</a> / {d.breadcrumb}</div>
+      <div class="breadcrumb"><a href={`${base}`}>Inicio</a> / <a href={`${base}guias`}>Guías</a> / {d.breadcrumb}</div>
       <span class={`guide-tag ${d.tagClass}`} style="display:inline-block; margin:14px 0 12px;">{d.tag}</span>
       <h1>{d.title}</h1>
       <div class="article-meta">{meta}</div>

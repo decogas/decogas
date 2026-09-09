@@ -26,7 +26,7 @@
 
   // ---------- En la ficha: registrar la visita ----------
   if (page === "producto") {
-    var m = window.location.pathname.match(/producto\/([^/]+)\.html$/);
+    var m = window.location.pathname.match(/producto\/([^/]+?)(?:\.html)?$/);
     var titulo = document.querySelector(".prod-title");
     if (m && titulo) {
       var img = document.querySelector(".prod-media img");
@@ -57,8 +57,12 @@
     '<div class="recientes-head"><h4>Vistos recientemente</h4>' +
     '<button class="recientes-clear" type="button">Borrar</button></div>' +
     '<div class="recientes-row">' +
+    // "Vistos recientemente" sale tanto en los listados (aires, calderas...)
+    // como dentro de una ficha. Desde la ficha ya se esta en /producto/, asi
+    // que anadir la carpeta otra vez daba enlaces a /producto/producto/algo.
     vistos.map(function (x) {
-      return '<a class="reciente" href="producto/' + encodeURIComponent(x.slug) + '.html">' +
+      var carpeta = window.location.pathname.indexOf("/producto/") !== -1 ? "" : "producto/";
+      return '<a class="reciente" href="' + carpeta + encodeURIComponent(x.slug) + '">' +
         (x.img && /^https?:\/\//.test(x.img)
           ? '<img src="' + esc(x.img) + '" alt="" loading="lazy">'
           : '<span class="reciente-noimg"></span>') +

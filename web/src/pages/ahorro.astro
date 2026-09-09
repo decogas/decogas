@@ -7,18 +7,18 @@ const scripts = ['utils.js', 'config.js', 'prices.js', 'data-calderas.js', 'data
 ---
 <Base title={title} description={description} dataPage="ahorro" scripts={scripts}>
   <Fragment slot="head">
-    <link rel="canonical" href={`${SB}ahorro.html`} />
+    <link rel="canonical" href={`${SB}ahorro`} />
     <meta property="og:type" content="website" />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
-    <meta property="og:url" content={`${SB}ahorro.html`} />
+    <meta property="og:url" content={`${SB}ahorro`} />
   </Fragment>
 
   <section class="hero" style="min-height:auto; padding:160px 0 70px;">
     <div class="hero-orb orb-1"></div>
     <div class="hero-orb orb-2"></div>
     <div class="wrap page-hero" style="display:block; max-width:760px;">
-      <div class="breadcrumb"><a href={`${SB}index.html`}>Inicio</a> / Comparador de ahorro</div>
+      <div class="breadcrumb"><a href={`${SB}`}>Inicio</a> / Comparador de ahorro</div>
       <div class="eyebrow" style="color:var(--flame);">Comparador de ahorro</div>
       <h1 style="color:#fff; font-size:clamp(34px,5vw,52px); margin-bottom:16px;">¿Cuánto ahorrarías con una caldera de condensación?</h1>
       <p class="lead">Dinos qué caldera tienes y cuánto gastas en gas, y te damos una estimación honesta del ahorro anual. Sin registrarte y sin compromiso.</p>
@@ -56,8 +56,8 @@ const scripts = ['utils.js', 'config.js', 'prices.js', 'data-calderas.js', 'data
           </ul>
           <p class="ahorro-note" id="ahorroNota"></p>
           <div class="ahorro-ctas">
-            <a class="btn btn-flame" href={`${SB}calcula.html`}>Ver qué caldera me corresponde</a>
-            <a class="btn btn-navy" href={`${SB}index.html#contacto`}>Pedir visita técnica gratis</a>
+            <a class="btn btn-flame" href={`${SB}calcula`}>Ver qué caldera me corresponde</a>
+            <a class="btn btn-navy" href={`${SB}#contacto`}>Pedir visita técnica gratis</a>
           </div>
         </div>
       </div>

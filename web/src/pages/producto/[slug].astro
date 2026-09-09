@@ -41,11 +41,11 @@ const { p } = Astro.props;
 const SB = new URL(import.meta.env.BASE_URL.endsWith('/') ? import.meta.env.BASE_URL : import.meta.env.BASE_URL + '/', Astro.site).href;
 
 const CAT = {
-  calderas: { page: 'calderas.html', name: 'Calderas' },
-  aires: { page: 'aires.html', name: 'Aire acondicionado' },
-  termos: { page: 'termos.html', name: 'Termos y calentadores' },
-  aerotermia: { page: 'aerotermia.html', name: 'Aerotermia' },
-}[p.category] || { page: 'index.html', name: 'Catálogo' };
+  calderas: { page: 'calderas', name: 'Calderas' },
+  aires: { page: 'aires', name: 'Aire acondicionado' },
+  termos: { page: 'termos', name: 'Termos y calentadores' },
+  aerotermia: { page: 'aerotermia', name: 'Aerotermia' },
+}[p.category] || { page: '', name: 'Catálogo' };
 
 const price = Number(p.price);
 const fmt = (n) => n.toLocaleString('es-ES');
@@ -53,7 +53,7 @@ const cuota = (meses) => fmt(Math.ceil((price / meses) * 100) / 100);
 const specs = Array.isArray(p.specs) ? p.specs : [];
 const features = Array.isArray(p.features) ? p.features : [];
 const description = String(p.description || '').trim();
-const pageUrl = `${SB}producto/${p.slug}.html`;
+const pageUrl = `${SB}producto/${p.slug}`;
 const metaDesc = (description || `${p.name} con instalación incluida en Madrid por ${fmt(price)} € IVA incluido. Financiación sin intereses.`).slice(0, 158);
 
 const ld = JSON.stringify({
@@ -81,7 +81,7 @@ const breadcrumbLd = JSON.stringify({
   '@context': 'https://schema.org',
   '@type': 'BreadcrumbList',
   itemListElement: [
-    { '@type': 'ListItem', position: 1, name: 'Inicio', item: `${SB}index.html` },
+    { '@type': 'ListItem', position: 1, name: 'Inicio', item: `${SB}` },
     { '@type': 'ListItem', position: 2, name: CAT.name, item: SB + CAT.page },
     { '@type': 'ListItem', position: 3, name: p.name, item: pageUrl },
   ],
@@ -105,7 +105,7 @@ const scripts = ['utils.js', 'config.js', 'prices.js', 'data-calderas.js', 'data
   <section class="hero" style="min-height:auto; padding:150px 0 40px;">
     <div class="hero-orb orb-1"></div>
     <div class="wrap" style="display:block;">
-      <div class="breadcrumb"><a href={`${SB}index.html`}>Inicio</a> / <a href={SB + CAT.page}>{CAT.name}</a> / {p.name}</div>
+      <div class="breadcrumb"><a href={`${SB}`}>Inicio</a> / <a href={SB + CAT.page}>{CAT.name}</a> / {p.name}</div>
     </div>
   </section>
 
@@ -190,7 +190,7 @@ const scripts = ['utils.js', 'config.js', 'prices.js', 'data-calderas.js', 'data
             </tbody>
           </table>
           <p class="prod-fin-note">Te la gestionamos en la visita, sin papeleo por tu parte. Sujeta a aprobación de la financiera.</p>
-          <a class="btn btn-flame" href={`${SB}index.html#contacto`} style="width:100%; margin-top:4px;">Pide tu presupuesto</a>
+          <a class="btn btn-flame" href={`${SB}#contacto`} style="width:100%; margin-top:4px;">Pide tu presupuesto</a>
         </div>
       </div>
 

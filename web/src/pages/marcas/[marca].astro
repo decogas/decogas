@@ -34,24 +34,24 @@ const ld = JSON.stringify({
     '@type': 'ListItem',
     position: i + 1,
     name: p.name,
-    url: `${SB}producto/${p.slug}.html`,
+    url: `${SB}producto/${p.slug}`,
   })),
 });
 ---
 <Base title={title} description={description} dataPage="marca" scripts={scripts}>
   <Fragment slot="head">
-    <link rel="canonical" href={`${SB}marcas/${m.slug}.html`} />
+    <link rel="canonical" href={`${SB}marcas/${m.slug}`} />
     <meta property="og:type" content="website" />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
-    <meta property="og:url" content={`${SB}marcas/${m.slug}.html`} />
+    <meta property="og:url" content={`${SB}marcas/${m.slug}`} />
     <script type="application/ld+json" set:html={ld} is:inline></script>
   </Fragment>
 
   <section class="hero" style="min-height:auto; padding:160px 0 60px;">
     <div class="hero-orb orb-1"></div>
     <div class="wrap page-hero" style="display:block; max-width:820px;">
-      <div class="breadcrumb"><a href={`${SB}index.html`}>Inicio</a> / <a href={`${SB}marcas.html`}>Marcas</a> / {m.brand}</div>
+      <div class="breadcrumb"><a href={`${SB}`}>Inicio</a> / <a href={`${SB}marcas`}>Marcas</a> / {m.brand}</div>
       <div class="eyebrow" style="color:var(--flame);">Instaladores oficiales</div>
       {LOGO[m.slug] && <span class="marca-hero-logo"><img src={`${base}marcas/${LOGO[m.slug]}`} alt={m.brand} /></span>}
       <h1 style="color:#fff; font-size:clamp(32px,4.6vw,48px); margin-bottom:14px;">{m.brand}</h1>
@@ -72,7 +72,7 @@ const ld = JSON.stringify({
           <h2 class="marca-cat reveal">{CAT_NOMBRE[cat] || cat}</h2>
           <div class="marca-grid reveal-stagger">
             {m.productos.filter((p) => p.category === cat).map((p) => (
-              <a class="marca-card" href={`${SB}producto/${p.slug}.html`}>
+              <a class="marca-card" href={`${SB}producto/${p.slug}`}>
                 <div class="marca-visual">
                   {p.img ? <img src={p.img} alt={p.name} loading="lazy" /> : <span class="marca-noimg">Foto próximamente</span>}
                   {p.best && <span class="marca-best">Más vendido</span>}
@@ -92,7 +92,7 @@ const ld = JSON.stringify({
       ))}
 
       <div class="prod-back reveal">
-        <a class="btn btn-navy" href={`${SB}marcas.html`}>← Todas las marcas</a>
+        <a class="btn btn-navy" href={`${SB}marcas`}>← Todas las marcas</a>
       </div>
     </div>
   </section>

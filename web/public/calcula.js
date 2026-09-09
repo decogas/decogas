@@ -110,7 +110,7 @@
 
   // ---------- Render de recomendación ----------
   function catalogLink(cat, slug) {
-    return (cat === "calderas" ? "calderas.html" : "aires.html") + "#p=" + esc(slug);
+    return (cat === "calderas" ? "calderas" : "aires") + "#p=" + esc(slug);
   }
   var LAST = {}; // último equipo recomendado y contexto por categoría (para el presupuesto)
 

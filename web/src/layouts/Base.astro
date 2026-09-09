@@ -6,9 +6,11 @@ const base = rawBase.endsWith('/') ? rawBase : rawBase + '/'; // → '/decogas/'
 const ASSET_V = 55; // presupuesto rápido en la portada
 const STYLES_V = 73; // estilos del presupuesto rápido
 const GOOGLE_ADS_ID = 'AW-18358011669';
-// Página actual (formato 'file': /decogas/calderas.html) para marcar el menú activo
-const currentFile = Astro.url.pathname.split('/').pop() || 'index.html';
-const active = (file: string) => (currentFile === file ? 'page' : undefined);
+// Página actual, para marcar en el menú dónde está el visitante. Se compara
+// sin extensión, que es como se ven ahora las direcciones (/calderas), pero
+// aguanta igual si algún día llega con .html.
+const currentFile = (Astro.url.pathname.split('/').pop() || 'index').replace(/\.html$/, '') || 'index';
+const active = (pagina: string) => (currentFile === pagina ? 'page' : undefined);
 
 export interface Props {
   title: string;
@@ -95,16 +97,16 @@ const localBizLd = JSON.stringify({
 
 <header id="siteHeader">
   <div class="wrap header-inner">
-    <a href={`${base}index.html#top`} class="logo" aria-label="Decogas — Inicio"><img src={`${base}logo-decogas.png`} alt="Decogas — Aire acondicionado y calderas" width="350" height="100"></a>
+    <a href={`${base}#top`} class="logo" aria-label="Decogas — Inicio"><img src={`${base}logo-decogas.png`} alt="Decogas — Aire acondicionado y calderas" width="350" height="100"></a>
     <nav class="main-nav">
-      <a href={`${base}calderas.html`} aria-current={active('calderas.html')}>Calderas</a>
-      <a href={`${base}aires.html`} aria-current={active('aires.html')}>Aire acondicionado</a>
-      <a href={`${base}termos.html`} aria-current={active('termos.html')}>Termos</a>
-      <a href={`${base}aerotermia.html`} aria-current={active('aerotermia.html')}>Aerotermia</a>
-      <a href={`${base}marcas.html`} aria-current={active('marcas.html')}>Marcas</a>
-      <a href={`${base}calcula.html`} aria-current={active('calcula.html')}>Calculadora</a>
-      <a href={`${base}guias.html`} aria-current={active('guias.html')}>Guías</a>
-      <a href={`${base}index.html#contacto`}>Contacto</a>
+      <a href={`${base}calderas`} aria-current={active('calderas')}>Calderas</a>
+      <a href={`${base}aires`} aria-current={active('aires')}>Aire acondicionado</a>
+      <a href={`${base}termos`} aria-current={active('termos')}>Termos</a>
+      <a href={`${base}aerotermia`} aria-current={active('aerotermia')}>Aerotermia</a>
+      <a href={`${base}marcas`} aria-current={active('marcas')}>Marcas</a>
+      <a href={`${base}calcula`} aria-current={active('calcula')}>Calculadora</a>
+      <a href={`${base}guias`} aria-current={active('guias')}>Guías</a>
+      <a href={`${base}#contacto`}>Contacto</a>
     </nav>
     <div class="header-actions">
       <button class="theme-btn" id="themeBtn" aria-label="Cambiar entre modo claro y oscuro">
@@ -114,7 +116,7 @@ const localBizLd = JSON.stringify({
       <button class="search-btn" id="searchBtn" aria-label="Buscar producto">
         <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
       </button>
-      <a href={`${base}index.html#contacto`} class="btn btn-flame">Pide información</a>
+      <a href={`${base}#contacto`} class="btn btn-flame">Pide información</a>
       <button class="nav-toggle" id="navToggle" aria-label="Abrir menú">
         <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/></svg>
       </button>
@@ -138,16 +140,16 @@ const localBizLd = JSON.stringify({
   <button class="close-btn" id="navClose" aria-label="Cerrar menú">
     <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="6" y1="6" x2="18" y2="18"/><line x1="6" y1="18" x2="18" y2="6"/></svg>
   </button>
-  <a href={`${base}calderas.html`} aria-current={active('calderas.html')}>Calderas</a>
-  <a href={`${base}aires.html`} aria-current={active('aires.html')}>Aire acondicionado</a>
-  <a href={`${base}termos.html`} aria-current={active('termos.html')}>Termos y calentadores</a>
-  <a href={`${base}aerotermia.html`} aria-current={active('aerotermia.html')}>Aerotermia</a>
-  <a href={`${base}marcas.html`} aria-current={active('marcas.html')}>Marcas</a>
-  <a href={`${base}calcula.html`} aria-current={active('calcula.html')}>Calculadora</a>
-  <a href={`${base}guias.html`} aria-current={active('guias.html')}>Guías y consejos</a>
-  <a href={`${base}index.html#historia`}>Quiénes somos</a>
-  <a href={`${base}index.html#resenas`}>Reseñas</a>
-  <a href={`${base}index.html#contacto`}>Contacto</a>
+  <a href={`${base}calderas`} aria-current={active('calderas')}>Calderas</a>
+  <a href={`${base}aires`} aria-current={active('aires')}>Aire acondicionado</a>
+  <a href={`${base}termos`} aria-current={active('termos')}>Termos y calentadores</a>
+  <a href={`${base}aerotermia`} aria-current={active('aerotermia')}>Aerotermia</a>
+  <a href={`${base}marcas`} aria-current={active('marcas')}>Marcas</a>
+  <a href={`${base}calcula`} aria-current={active('calcula')}>Calculadora</a>
+  <a href={`${base}guias`} aria-current={active('guias')}>Guías y consejos</a>
+  <a href={`${base}#historia`}>Quiénes somos</a>
+  <a href={`${base}#resenas`}>Reseñas</a>
+  <a href={`${base}#contacto`}>Contacto</a>
 </div>
 
 <slot />
@@ -168,16 +170,16 @@ const localBizLd = JSON.stringify({
       <div>
         <h5>La empresa</h5>
         <ul>
-          <li><a href={`${base}index.html#historia`}>Quiénes somos</a></li>
-          <li><a href={`${base}index.html#resenas`}>Reseñas de Google</a></li>
-          <li><a href={`${base}index.html#zona`}>Zona de servicio</a></li>
-          <li><a href={`${base}index.html#subvenciones`}>Ayudas y subvenciones</a></li>
-          <li><a href={`${base}guias.html`}>Guías y consejos</a></li>
-          <li><a href={`${base}faq.html`}>Preguntas frecuentes</a></li>
-          <li><a href={`${base}ahorro.html`}>Comparador de ahorro</a></li>
-          <li><a href={`${base}legal.html`}>Aviso legal y privacidad</a></li>
-          <li><a href={`${base}calcula.html`}>Calculadora de equipo</a></li>
-          <li><a href={`${base}index.html#contacto`}>Pide información</a></li>
+          <li><a href={`${base}#historia`}>Quiénes somos</a></li>
+          <li><a href={`${base}#resenas`}>Reseñas de Google</a></li>
+          <li><a href={`${base}#zona`}>Zona de servicio</a></li>
+          <li><a href={`${base}#subvenciones`}>Ayudas y subvenciones</a></li>
+          <li><a href={`${base}guias`}>Guías y consejos</a></li>
+          <li><a href={`${base}faq`}>Preguntas frecuentes</a></li>
+          <li><a href={`${base}ahorro`}>Comparador de ahorro</a></li>
+          <li><a href={`${base}legal`}>Aviso legal y privacidad</a></li>
+          <li><a href={`${base}calcula`}>Calculadora de equipo</a></li>
+          <li><a href={`${base}#contacto`}>Pide información</a></li>
         </ul>
       </div>
       <div>
@@ -202,7 +204,7 @@ const localBizLd = JSON.stringify({
 </a>
 
 <div id="dgCookieBanner" class="cookie-banner" role="dialog" aria-live="polite" aria-label="Aviso de cookies">
-  <p>Usamos cookies de publicidad (Google Ads) para medir la eficacia de nuestros anuncios. Puedes aceptarlas o rechazarlas; el resto de la web funciona igual en ambos casos. <a href={`${base}legal.html#cookies`}>Más información</a>.</p>
+  <p>Usamos cookies de publicidad (Google Ads) para medir la eficacia de nuestros anuncios. Puedes aceptarlas o rechazarlas; el resto de la web funciona igual en ambos casos. <a href={`${base}legal#cookies`}>Más información</a>.</p>
   <div class="cookie-banner-actions">
     <button type="button" id="dgCookieReject">Rechazar</button>
     <button type="button" id="dgCookieAccept">Aceptar</button>
