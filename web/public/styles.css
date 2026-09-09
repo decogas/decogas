@@ -1532,3 +1532,90 @@ footer .footer-grid a:hover::after{ right:0; }
   .wa-float::before{ animation:none; }
   footer .footer-grid a::after{ transition:none; }
 }
+
+/* ============================================================
+   PRESUPUESTO RÁPIDO — segunda pestaña de la tarjeta de contacto
+   Convive con el formulario de siempre, no lo sustituye.
+   Usa las variables del sitio, así el modo oscuro sale solo.
+   ============================================================ */
+.form-tabs{
+  display:flex; gap:6px; margin:-8px 0 24px;
+  background:var(--cloud); border-radius:14px; padding:5px;
+}
+.form-tab{
+  flex:1; border:none; background:transparent; cursor:pointer;
+  font-family:inherit; font-size:14px; font-weight:600; color:var(--muted);
+  padding:11px 12px; border-radius:10px; transition:background .2s, color .2s;
+}
+.form-tab:hover{ color:var(--navy); }
+.form-tab.active{ background:#fff; color:var(--navy); box-shadow:0 2px 8px rgba(14,34,56,.09); }
+.form-tab:focus-visible{ outline:2px solid var(--flame); outline-offset:2px; }
+
+.contact-nota{ font-size:14px; color:var(--muted); }
+
+.pr-barra{ height:4px; background:var(--cloud); border-radius:2px; margin-bottom:20px; overflow:hidden; }
+.pr-barra i{ display:block; height:100%; background:var(--flame); transition:width .3s; }
+
+.pr-num{ font-size:12.5px; color:var(--muted); margin:0 0 6px; font-weight:600; }
+.pr-preg{ font-size:21px; line-height:1.25; color:var(--navy); margin:0 0 18px; }
+
+.pr-ops{ display:grid; gap:10px; }
+.pr-op{
+  text-align:left; background:#fff; border:1.5px solid var(--line); border-radius:12px;
+  padding:14px 17px; font-family:inherit; font-size:15.5px; font-weight:600;
+  color:var(--navy); cursor:pointer; transition:border-color .18s, background .18s, transform .18s;
+}
+.pr-op:hover{ border-color:var(--flame); background:var(--cloud); transform:translateY(-1px); }
+.pr-op:focus-visible{ outline:2px solid var(--flame); outline-offset:2px; }
+
+.pr-atras{
+  display:block; background:none; border:none; color:var(--muted);
+  font-family:inherit; font-size:14px; cursor:pointer; padding:0; margin-top:18px;
+}
+.pr-atras:hover{ color:var(--flame-deep); }
+
+.pr-enviar{ width:100%; margin-top:6px; justify-content:center; }
+.pr-error{ color:#B3261E; font-size:13.5px; margin:4px 0 10px; min-height:18px; }
+.pr-legal{ font-size:12.5px; color:var(--muted); margin-top:14px; line-height:1.5; }
+
+.pr-ok{
+  font-size:17px; font-weight:700; color:var(--navy); margin-bottom:16px;
+}
+.pr-texto{ font-size:15.5px; color:var(--navy-soft); line-height:1.6; margin:0 0 14px; }
+.pr-motivos{ margin:0 0 16px; padding-left:20px; font-size:14.5px; color:var(--muted); }
+.pr-motivos li{ margin-bottom:5px; }
+
+.pr-maquina{
+  border:1.5px solid var(--flame); border-radius:16px; padding:20px;
+  background:var(--cloud); margin-bottom:14px;
+}
+.pr-et{
+  font-size:11.5px; font-weight:700; letter-spacing:.09em; text-transform:uppercase;
+  color:var(--flame-deep); margin:0 0 6px;
+}
+.pr-nom{ font-size:20px; line-height:1.2; color:var(--navy); margin:0 0 5px; }
+.pr-det{ font-size:14px; color:var(--muted); margin:0; line-height:1.5; }
+.pr-precio{
+  font-size:32px; font-weight:800; color:var(--navy); margin:14px 0 0; line-height:1;
+}
+.pr-precio span{ font-size:14px; font-weight:600; color:var(--muted); margin-left:6px; }
+.pr-otras{ font-size:14px; color:var(--muted); margin:0 0 16px; }
+
+.pr-incluye{ border-top:1px solid var(--line); padding-top:16px; margin-bottom:14px; }
+.pr-incluye ul{ margin:0; padding-left:20px; font-size:14.5px; color:var(--navy-soft); }
+.pr-incluye li{ margin-bottom:6px; line-height:1.5; }
+.pr-extras{ font-size:13px; color:var(--muted); margin:10px 0 0; line-height:1.5; }
+.pr-aviso{ font-size:13.5px; color:var(--muted); margin:0 0 16px; line-height:1.55; }
+
+@media (max-width:520px){
+  .form-tab{ font-size:13px; padding:10px 8px; }
+  .pr-preg{ font-size:19px; }
+  .pr-precio{ font-size:28px; }
+}
+
+/* Presupuesto rápido en modo oscuro. Las variables ya cambian solas; aquí
+   solo van los sitios donde hubo que poner un blanco fijo. */
+[data-theme="dark"] .form-tab.active{ background:#1B2A3A; color:#DCE7F1; box-shadow:none; }
+[data-theme="dark"] .pr-op{ background:#141F2C; border-color:#25384C; }
+[data-theme="dark"] .pr-op:hover{ background:#1B2A3A; }
+[data-theme="dark"] .pr-maquina{ background:#141F2C; }

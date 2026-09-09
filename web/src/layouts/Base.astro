@@ -3,8 +3,8 @@
 // Se escribe UNA vez y lo comparten todas las páginas raíz de marketing.
 const rawBase = import.meta.env.BASE_URL; // '/decogas' (sin barra final)
 const base = rawBase.endsWith('/') ? rawBase : rawBase + '/'; // → '/decogas/'
-const ASSET_V = 52; // conversión de formulario envía email/teléfono para Conversiones mejoradas
-const STYLES_V = 71; // fix: titulo de articulo invisible (var(--navy) sobre fondo casi igual)
+const ASSET_V = 53; // presupuesto rápido en la portada
+const STYLES_V = 72; // estilos del presupuesto rápido
 const GOOGLE_ADS_ID = 'AW-18358011669';
 // Página actual (formato 'file': /decogas/calderas.html) para marcar el menú activo
 const currentFile = Astro.url.pathname.split('/').pop() || 'index.html';
