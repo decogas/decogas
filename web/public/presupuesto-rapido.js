@@ -3,7 +3,7 @@
 //
 // Convive con el formulario de siempre, no lo sustituye: son dos pestañas
 // dentro de la misma tarjeta. Quien quiere contar su caso escribe; quien
-// solo quiere saber el precio responde cuatro preguntas y lo ve al momento.
+// solo quiere saber el precio responde unas pocas preguntas y lo ve al momento.
 //
 // De dónde sale el precio: NO se inventa nada. Se cruza lo que responde el
 // cliente con la columna "ideal_for" del catálogo, que ya dice para qué
@@ -52,11 +52,15 @@
   // ---------- Catálogo ----------
   // Se lee una sola vez, y solo cuando el cliente abre la pestaña: así no
   // penaliza la carga de la portada a quien no la usa.
+  // Si alguien vuelve a pedir el catálogo mientras se está trayendo, se
+  // apunta en la cola. Antes se descartaba, y el que esperaba se quedaba
+  // colgado para siempre.
   var cargando = false;
+  var enEspera = [];
   function cargarCatalogo(despues) {
     if (CAT.length) return despues();
     if (!LIVE) return despues();
-    if (cargando) return;
+    if (cargando) { enEspera.push(despues); return; }
     cargando = true;
     fetch(cfg.supabaseUrl.replace(/\/+$/, "") +
       "/rest/v1/products?select=name,brand,price,category,ideal_for,efficiency&visible=eq.true&order=price.asc", {
@@ -73,8 +77,14 @@
         });
         cargando = false;
         despues();
+        avisarEspera();
       })
-      .catch(function () { cargando = false; despues(); });
+      .catch(function () { cargando = false; despues(); avisarEspera(); });
+  }
+
+  function avisarEspera() {
+    var cola = enEspera; enEspera = [];
+    cola.forEach(function (f) { f(); });
   }
 
   // "Viviendas de hasta 150 m² con 2 baños." -> 150 y 2
@@ -257,6 +267,18 @@
     err.textContent = "";
     $("prEnviar").disabled = true;
 
+    // Si el catálogo aún no ha llegado (conexión lenta, o el cliente ha ido
+    // muy rápido), se espera. Si no, buscar() no encontraría nada y le
+    // diríamos "ya te llamamos" a alguien a quien sí le encajaba una máquina.
+    if (LIVE && !CAT.length) {
+      $("prEnviar").textContent = "Un momento\u2026";
+      cargarCatalogo(function () { $("prEnviar").textContent = "Ver mi presupuesto"; decidir(nombre, tel, email); });
+      return;
+    }
+    decidir(nombre, tel, email);
+  }
+
+  function decidir(nombre, tel, email) {
     var op = buscar();
     var faltan = motivos(op);
     var auto = op.length > 0 && faltan.length === 0;
@@ -353,7 +375,10 @@
     tabForm.setAttribute("aria-selected", esPres ? "false" : "true");
     panelPres.hidden = !esPres;
     panelForm.hidden = esPres;
-    if (esPres && !CAT.length) cargarCatalogo(function () { if (!pila.length && !R.servicio) reiniciar(); });
+    // Se pide el catálogo, pero NO se repinta nada: la primera pregunta no
+    // depende de él. Repintando aquí se perdía el clic del cliente si lo daba
+    // justo mientras llegaba la respuesta, y parecía que el botón no iba.
+    if (esPres && !CAT.length) cargarCatalogo(function () {});
   }
   if (tabForm && tabPres) {
     tabForm.addEventListener("click", function () { activar("formulario"); });
