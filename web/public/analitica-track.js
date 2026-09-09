@@ -12,7 +12,7 @@
 
   // No medir los paneles internos (por si algún día cargan esto)
   var p = location.pathname;
-  if (/\/(admin|clientes)\.html?$/.test(p)) return;
+  if (/\/(admin|clientes)(?:\.html?)?$/.test(p)) return;
 
   var ENDPOINT = cfg.supabaseUrl.replace(/\/+$/, "") + "/rest/v1/web_events";
 

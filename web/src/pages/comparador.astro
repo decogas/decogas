@@ -4,7 +4,7 @@
 // Página autónoma a pantalla completa (sin la cabecera del sitio).
 const base = import.meta.env.BASE_URL.endsWith('/') ? import.meta.env.BASE_URL : import.meta.env.BASE_URL + '/';
 const site = (Astro.site?.href ?? 'https://queren05.github.io/').replace(/\/$/, '');
-const NUEVA = `${site}${base}index.html`;
+const NUEVA = `${site}${base}`;
 const ANTIGUA = 'https://decogas.com/';
 ---
 <!DOCTYPE html>
@@ -60,7 +60,7 @@ const ANTIGUA = 'https://decogas.com/';
   <div class="cmp-bar">
     <div class="logo"><img src={`${base}logo-decogas.png`} alt="Decogas"> Antes / Después</div>
     <span class="hint">◀ Arrastra la barra para comparar ▶</span>
-    <a class="exit" href={`${base}index.html`}>Ver web nueva →</a>
+    <a class="exit" href={`${base}`}>Ver web nueva →</a>
   </div>
 
   <div class="cmp-wrap" id="cmpWrap">

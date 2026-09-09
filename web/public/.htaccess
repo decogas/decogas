@@ -14,5 +14,44 @@
   Header always set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: https://*.supabase.co https://www.googletagmanager.com https://www.google.com https://www.googleadservices.com https://googleads.g.doubleclick.net https://pagead2.googlesyndication.com; connect-src 'self' https://*.supabase.co https://formsubmit.co https://www.googletagmanager.com https://www.google.com https://www.googleadservices.com https://googleads.g.doubleclick.net https://pagead2.googlesyndication.com; frame-src 'self' https://www.google.com https://decogas.com; object-src 'none'; base-uri 'self'; frame-ancestors 'self'; form-action 'self' mailto:; upgrade-insecure-requests"
 </IfModule>
 
+# ============================================================
+# Direcciones sin .html
+#   decogas.es/calderas   en vez de   decogas.es/calderas.html
+#
+# Son dos cosas distintas y las dos hacen falta:
+#   1. Si alguien pide la direccion vieja (un enlace antiguo, un marcador,
+#      lo que Google tiene indexado), se le manda a la nueva con un 301.
+#      301 = "esto se ha mudado para siempre": Google traslada el
+#      posicionamiento a la direccion nueva en vez de partirlo en dos.
+#   2. Si alguien pide la direccion nueva, por dentro se le sirve el
+#      fichero .html de siempre. El visitante no ve el cambio.
+#
+# La comprobacion se hace sobre THE_REQUEST (lo que ha pedido el navegador)
+# y no sobre la URL ya reescrita: si no, la regla 1 y la regla 3 se
+# retroalimentarian y el navegador entraria en un bucle de redirecciones.
+# ============================================================
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+
+  # 1) index.html no se enseña nunca: la portada es decogas.es/ a secas,
+  #    y un articulo del blog es decogas.es/blog/lo-que-sea/
+  RewriteCond %{THE_REQUEST} "\s/(([^\s?]*/)?)index\.html[\s?]" [NC]
+  RewriteRule ^ /%1 [R=301,L]
+
+  # 2) cualquier otra .html pierde la extension
+  RewriteCond %{THE_REQUEST} "\s/([^\s?]+)\.html[\s?]" [NC]
+  RewriteRule ^ /%1 [R=301,L]
+
+  # 3) /calderas/ con barra final tampoco: una sola direccion por pagina
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteCond %{DOCUMENT_ROOT}/$1.html -f
+  RewriteRule ^(.+)/$ /$1 [R=301,L]
+
+  # 4) y por dentro, /calderas sirve calderas.html
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteCond %{REQUEST_FILENAME}.html -f
+  RewriteRule ^(.+)$ $1.html [L]
+</IfModule>
+
 # Página 404 propia del sitio.
 ErrorDocument 404 /404.html

@@ -10,9 +10,11 @@ const BASE_PATH = ('/' + BASE.replace(/^\/+|\/+$/g, '')).replace(/\/$/, '');
 
 // Normaliza cada URL del sitemap para que sea IDÉNTICA al canonical de su página
 // (si no coinciden, Google diluye las señales entre dos URLs):
-//   · home           -> termina en '/'
-//   · páginas .html  -> aires, calderas, producto/x, marcas/x -> con '.html'
-//   · blog           -> .../blog/<id>/index -> .../blog/<id>/
+//   · home     -> termina en '/'
+//   · páginas  -> aires, calderas, producto/x, marcas/x -> SIN extensión
+//   · blog     -> .../blog/<id>/index -> .../blog/<id>/
+// El .html se quita a proposito: el servidor lo redirige (301) a la direccion
+// sin extension, asi que la unica que debe aparecer aqui es la limpia.
 function serialize(item) {
   const url = new URL(item.url);
   const path = url.pathname.replace(/\/+$/, ''); // sin barra final para comparar
@@ -20,8 +22,8 @@ function serialize(item) {
     url.pathname = (BASE_PATH || '') + '/';          // home con barra
   } else if (path.endsWith('/index')) {
     url.pathname = path.slice(0, -'/index'.length) + '/'; // blog: .../index -> .../
-  } else if (!/\.[a-z0-9]+$/i.test(path)) {
-    url.pathname = path + '.html';                   // páginas raíz/producto/marcas
+  } else {
+    url.pathname = path.replace(/\.html$/i, '');    // páginas raíz/producto/marcas
   }
   item.url = url.toString();
   return item;
