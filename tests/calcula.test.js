@@ -14,9 +14,10 @@ var h = require("./harness");
 var esc = h.extractFn("utils.js", "esc");
 var catalogLink = h.extractFn("calcula.js", "catalogLink", { esc: esc });
 
+// Las direcciones del sitio ya no llevan .html: /calderas, no /calderas.html.
 test("catalogLink apunta al catálogo correcto según la categoría", function () {
-  assert.strictEqual(catalogLink("calderas", "cald-24"), "calderas.html#p=cald-24");
-  assert.strictEqual(catalogLink("aires", "aire-25"), "aires.html#p=aire-25");
+  assert.strictEqual(catalogLink("calderas", "cald-24"), "calderas#p=cald-24");
+  assert.strictEqual(catalogLink("aires", "aire-25"), "aires#p=aire-25");
 });
 
 test("catalogLink escapa el slug (evita romper el href / inyección)", function () {
@@ -135,6 +136,6 @@ test("caldera: recomienda la ficha más ajustada y genera enlace al catálogo", 
   return h.flush().then(function () {
     var html = b.doc.getElementById("cReco").innerHTML;
     assert.ok(html.indexOf("Peque 24") !== -1, "debe recomendar la más ajustada (100 m²)");
-    assert.ok(html.indexOf("calderas.html#p=peque-24") !== -1, "enlace al catálogo con el slug");
+    assert.ok(html.indexOf("calderas#p=peque-24") !== -1, "enlace al catálogo con el slug");
   });
 });

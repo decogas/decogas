@@ -1585,10 +1585,18 @@ footer .footer-grid a:hover::after{ right:0; }
 .pr-motivos{ margin:0 0 16px; padding-left:20px; font-size:14.5px; color:var(--muted); }
 .pr-motivos li{ margin-bottom:5px; }
 
+/* Se enseñan tres maquinas (ajustada / equilibrada / mejor equipada). Solo
+   la primera va con el borde naranja: si las tres gritan igual, ninguna
+   destaca y el cliente no sabe por donde empezar a mirar. */
 .pr-maquina{
-  border:1.5px solid var(--flame); border-radius:16px; padding:20px;
-  background:var(--cloud); margin-bottom:14px;
+  border:1.5px solid var(--line); border-radius:16px; padding:18px 20px;
+  background:var(--cloud); margin-bottom:12px;
 }
+.pr-maquina.destacada{ border-color:var(--flame); border-width:1.5px; }
+.pr-maquina.destacada .pr-precio{ font-size:32px; }
+.pr-maquina:not(.destacada) .pr-et{ color:var(--muted); }
+.pr-maquina:not(.destacada) .pr-nom{ font-size:18px; }
+.pr-maquina:not(.destacada) .pr-precio{ font-size:24px; }
 .pr-et{
   font-size:11.5px; font-weight:700; letter-spacing:.09em; text-transform:uppercase;
   color:var(--flame-deep); margin:0 0 6px;
@@ -1599,7 +1607,7 @@ footer .footer-grid a:hover::after{ right:0; }
   font-size:32px; font-weight:800; color:var(--navy); margin:14px 0 0; line-height:1;
 }
 .pr-precio span{ font-size:14px; font-weight:600; color:var(--muted); margin-left:6px; }
-.pr-otras{ font-size:14px; color:var(--muted); margin:0 0 16px; }
+.pr-otras{ font-size:13.5px; color:var(--muted); margin:2px 0 16px; line-height:1.55; }
 
 .pr-incluye{ border-top:1px solid var(--line); padding-top:16px; margin-bottom:14px; }
 .pr-incluye ul{ margin:0; padding-left:20px; font-size:14.5px; color:var(--navy-soft); }

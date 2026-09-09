@@ -2,7 +2,7 @@
 // Página autónoma (panel privado): head propio con estilos en línea, sin el layout de marketing.
 const rawBase = import.meta.env.BASE_URL;
 const base = rawBase.endsWith('/') ? rawBase : rawBase + '/';
-const V = 8; // fix: la analitica perdia eventos por el tope de 1000 filas de PostgREST
+const V = 9; // nueva tarjeta: presupuestos automaticos guardados
 ---
 <!DOCTYPE html>
 <html lang="es">
@@ -98,6 +98,33 @@ const V = 8; // fix: la analitica perdia eventos por el tope de 1000 filas de Po
 .day-chart{ display:flex; align-items:flex-end; gap:5px; }
   .day-chart .aday{ flex:1; display:flex; flex-direction:column; align-items:center; gap:3px; cursor:pointer; }
   .analitica-lists{ display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:24px; }
+
+  /* Presupuestos automáticos: cada uno se despliega al pincharlo, para que
+     la lista se lea de un vistazo y el detalle esté a un clic. */
+  .pres-vacio{ font-size:13.5px; color:var(--muted); line-height:1.6; padding:6px 0; }
+  .pres-resumen{ font-size:13.5px; color:var(--muted); line-height:1.6; margin:0 0 14px; }
+  .pres-resumen strong{ color:var(--navy); }
+  .pres-lista-items{ display:flex; flex-direction:column; gap:8px; }
+  .pres-item{ border:1.5px solid var(--line); border-radius:12px; overflow:hidden; background:var(--cloud); }
+  .pres-item.sin{ border-left:4px solid var(--gold); }
+  .pres-cab{
+    width:100%; display:grid; grid-template-columns:16px minmax(0,1.2fr) minmax(0,1fr) minmax(0,.9fr) minmax(0,1fr);
+    gap:10px; align-items:center; text-align:left; padding:12px 14px;
+    background:none; border:0; font-size:13.5px; color:var(--navy);
+  }
+  .pres-cab:hover{ background:rgba(0,0,0,.03); }
+  .pres-flecha{ color:var(--muted); font-size:11px; }
+  .pres-quien{ font-weight:700; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .pres-que, .pres-marca, .pres-cuando{ color:var(--muted); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .pres-marca{ font-weight:600; color:var(--navy); }
+  .pres-item.sin .pres-marca{ color:var(--muted); font-weight:600; }
+  .pres-detalle{ padding:0 14px 14px; border-top:1px solid var(--line); }
+  .pres-contacto{ display:flex; flex-wrap:wrap; gap:8px; padding:13px 0; }
+  .pres-cols{ display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:22px; }
+  .pres-tit{ font-size:12.5px; font-weight:700; color:var(--muted); margin:0 0 7px; }
+  .pres-lista{ margin:0; padding-left:17px; font-size:13.5px; line-height:1.65; }
+  .pres-lista li{ margin-bottom:3px; }
+  .pres-nota{ font-size:12.5px; color:var(--muted); margin:8px 0 0; line-height:1.55; }
 @media(max-width:640px){
     .wrap{ padding:0 14px; }
     .section-card{ padding:16px 14px; }
@@ -115,6 +142,9 @@ const V = 8; // fix: la analitica perdia eventos por el tope de 1000 filas de Po
   }
   @media(max-width:600px){
     .analitica-lists{ grid-template-columns:minmax(0,1fr); gap:18px; }
+    .pres-cols{ grid-template-columns:minmax(0,1fr); gap:16px; }
+    .pres-cab{ grid-template-columns:16px minmax(0,1fr); row-gap:3px; }
+    .pres-que, .pres-marca, .pres-cuando{ grid-column:2; }
   }
 </style>
 </head>
@@ -189,6 +219,15 @@ const V = 8; // fix: la analitica perdia eventos por el tope de 1000 filas de Po
         </div>
         <div id="analiticaBox"><p style="color:var(--muted); font-size:14px; padding:6px 0;">Cargando…</p></div>
       </div>
+
+      <div class="section-card" id="presupuestosCard">
+        <div class="section-head">
+          <h2>Presupuestos automáticos <span class="count" id="presupuestosCount"></span></h2>
+          <button class="btn ghost small" id="presupuestosRefresh" type="button">Actualizar</button>
+        </div>
+        <p class="admin-sub" style="margin:0 0 14px;">Quien pide precio en la portada sin esperar a que le llaméis. Pincha en cualquiera para ver su teléfono, su correo, lo que nos ha contado y los precios que llegó a ver.</p>
+        <div id="presupuestosBox"><p class="pres-vacio">Cargando…</p></div>
+      </div>
     </div>
   </div>
 </div>
@@ -199,6 +238,7 @@ const V = 8; // fix: la analitica perdia eventos por el tope de 1000 filas de Po
 <script src={`${base}config.js?v=${V}`} is:inline></script>
 <script src={`${base}analiticas.js?v=${V}`} is:inline></script>
 <script src={`${base}analitica.js?v=${V}`} is:inline></script>
+<script src={`${base}presupuestos.js?v=${V}`} is:inline></script>
 <script>(function(){var b=document.getElementById("themeToggle");if(!b)return;b.addEventListener("click",function(){var d=document.documentElement.getAttribute("data-theme")==="dark";var n=d?"light":"dark";document.documentElement.setAttribute("data-theme",n);try{localStorage.setItem("decogas_theme",n);}catch(e){}});})();</script>
 </body>
 </html>

@@ -63,7 +63,7 @@
     if (cargando) { enEspera.push(despues); return; }
     cargando = true;
     fetch(cfg.supabaseUrl.replace(/\/+$/, "") +
-      "/rest/v1/products?select=name,brand,price,category,ideal_for,efficiency&visible=eq.true&order=price.asc", {
+      "/rest/v1/products?select=name,brand,price,category,ideal_for,efficiency,specs&visible=eq.true&order=price.asc", {
       headers: { apikey: cfg.supabaseAnonKey, Authorization: "Bearer " + cfg.supabaseAnonKey }
     })
       .then(function (r) { return r.ok ? r.json() : []; })
@@ -71,8 +71,8 @@
         CAT = (d || []).map(function (p) {
           return {
             n: p.name, m: p.brand, p: p.price, c: p.category,
-            e: p.efficiency, i: p.ideal_for,
-            m2: leerM2(p.ideal_for), b: leerBanos(p.ideal_for)
+            e: p.efficiency, i: p.ideal_for, s: p.specs || [],
+            m2: leerM2(textoMedidas(p)), b: leerBanos(textoMedidas(p))
           };
         });
         cargando = false;
@@ -88,10 +88,16 @@
   }
 
   // "Viviendas de hasta 150 m² con 2 baños." -> 150 y 2
+  // Se mira tambien en las specs: hay maquinas que llevan el dato ahi
+  // ("Hasta 100 m² y 1 baño") y no en ideal_for, y si solo miraramos
+  // ideal_for esas maquinas no podrian salir nunca en un presupuesto.
   function leerM2(t) { var m = /(\d+)\s*m/.exec(t || ""); return m ? Number(m[1]) : null; }
   function leerBanos(t) {
     var m = /(\d+)\s*(?:-\s*(\d+)\s*)?ba/.exec(t || "");
     return m ? Number(m[2] || m[1]) : null;
+  }
+  function textoMedidas(p) {
+    return [p.ideal_for || ""].concat(p.specs || []).join(" · ");
   }
 
   // ---------- Las preguntas ----------
@@ -212,22 +218,77 @@
   }
 
   // ---------- Emparejar con el catálogo ----------
+  // Devuelve TODAS las maquinas que encajan, ordenadas por precio. Antes se
+  // cortaba en 3 aqui mismo, y como el catalogo viene ordenado de barato a
+  // caro, el cliente solo veia las tres mas baratas: para una vivienda de
+  // 120 m² y 2 baños encajan 33 calderas, de 1250 a 3595 €, y se le
+  // enseñaban tres Ferroli/Ariston de gama de entrada como si no hubiera
+  // mas. La eleccion de cuales enseñar se hace despues, en tresGamas().
+  // Cubrir la vivienda de sobra NO es estar mejor equipado: una caldera de
+  // 220 m² y 3 baños en un piso de 90 m² y 1 baño es la maquina equivocada,
+  // y ademas la mas cara. Por eso, ademas de cubrir, no puede pasarse mas de
+  // la mitad. Si con ese margen no queda nada, se amplia antes que dejar al
+  // cliente sin respuesta.
+  var HOLGURA = 1.5;
+  function ajustadas(lista, necesita) {
+    var justas = lista.filter(function (p) { return p.m2 <= Math.round(necesita * HOLGURA); });
+    return justas.length ? justas : lista;
+  }
+
   function buscar() {
     if (R.servicio === "caldera") {
-      return CAT.filter(function (p) {
+      return ajustadas(CAT.filter(function (p) {
         return p.c === "calderas" && p.m2 && p.b && p.m2 >= R.metros && p.b >= R.banos;
-      }).slice(0, 3);
+      }), R.metros);
     }
     if (R.servicio === "aire" && R.estancias === 1) {
-      return CAT.filter(function (p) {
-        return p.c === "aires" && p.m2 && p.m2 >= R.metrosAire && p.n.indexOf("x1") === -1;
-      }).slice(0, 3);
+      return ajustadas(CAT.filter(function (p) {
+        return p.c === "aires" && p.m2 && p.m2 >= R.metrosAire && !esMultisplit(p.n);
+      }), R.metrosAire);
     }
     if (R.servicio === "aire") {
       var pat = R.estancias === 2 ? "2x1" : "3x1";
-      return CAT.filter(function (p) { return p.c === "aires" && p.n.indexOf(pat) !== -1; }).slice(0, 3);
+      return CAT.filter(function (p) {
+        // En un multisplit el m² de ideal_for es orientativo (habla del
+        // conjunto), asi que aqui manda el numero de estancias.
+        return p.c === "aires" && p.n.indexOf(pat) !== -1;
+      });
     }
     return [];
+  }
+
+  function esMultisplit(nombre) { return /\dx1\b/.test(String(nombre)); }
+
+  // De todas las que encajan se enseñan tres, para que el cliente vea el
+  // abanico real y no solo el suelo de precio: la mas ajustada, una
+  // intermedia y la mejor equipada. Si encajan menos de tres, se enseñan
+  // las que haya.
+  var ETIQUETAS = ["La más ajustada de precio", "El equilibrio entre precio y equipamiento", "La mejor equipada"];
+  function tresGamas(op) {
+    if (op.length <= 3) return op.map(function (x, i) {
+      return { m: x, et: op.length === 1 ? "La que encaja con tu vivienda" : ETIQUETAS[i === op.length - 1 ? 2 : i] };
+    });
+    var medio = op[Math.floor(op.length / 2)];
+    return [
+      { m: op[0], et: ETIQUETAS[0] },
+      { m: medio, et: ETIQUETAS[1] },
+      { m: op[op.length - 1], et: ETIQUETAS[2] }
+    ];
+  }
+
+  // Lo que de verdad distingue a una maquina de otra. La eficiencia NO
+  // sirve para esto: las 48 calderas del catalogo son "A", asi que ponerla
+  // en las tres opciones no le dice nada al cliente. Solo se enseña cuando
+  // las opciones que se estan comparando tienen eficiencias distintas.
+  function rasgos(maq, mostrarEficiencia) {
+    var t = [];
+    if (maq.m) t.push(maq.m);
+    if (mostrarEficiencia && maq.e) t.push("Eficiencia " + maq.e);
+    (maq.s || []).forEach(function (x) {
+      // Las medidas y el "hasta X m²" ya van aparte, no se repiten aqui.
+      if (!/^\s*Medidas/i.test(x) && !/\d+\s*m²/.test(x) && t.length < 4) t.push(x);
+    });
+    return t;
   }
 
   // Motivos por los que NO se puede dar un precio de forma responsable.
@@ -283,8 +344,14 @@
     var faltan = motivos(op);
     var auto = op.length > 0 && faltan.length === 0;
 
+    // Se guarda lo que el cliente ha visto de verdad, no solo la mas barata:
+    // asi, cuando llame, quien coja el telefono sabe exactamente que precios
+    // tiene delante. Lo lee tal cual la pagina de analiticas.
     var texto = resumenRespuestas() + "\n\n" +
-      (auto ? "Presupuesto mostrado: " + op[0].n + " — " + eur(op[0].p)
+      (auto ? "Presupuesto mostrado: " + tresGamas(op).map(function (x) {
+                return x.m.n + " — " + eur(x.m.p);
+              }).join(" | ") +
+              "\nEncajaban " + op.length + " máquinas (" + eur(op[0].p) + " a " + eur(op[op.length - 1].p) + ")"
             : "SIN PRECIO AUTOMÁTICO. Motivos: " + faltan.join("; "));
 
     // Primero se pinta la tarjeta y luego se guarda: si el guardado falla,
@@ -354,18 +421,30 @@
   function mostrarResultado(auto, op, faltan, nombre) {
     var incluye = INCLUYE[R.servicio === "caldera" ? "calderas" : "aires"] || [];
     if (auto) {
-      var el = op[0];
+      var elegidas = tresGamas(op);
+      // La eficiencia solo se enseña si distingue: si las tres son "A", decirlo
+      // tres veces no aporta nada.
+      var efs = {};
+      elegidas.forEach(function (x) { if (x.m.e) efs[x.m.e] = 1; });
+      var verEf = Object.keys(efs).length > 1;
+
       caja.innerHTML =
         '<div class="pr-ok">Listo, ' + esc(nombre.split(" ")[0]) + ". Esto es lo que encaja contigo:</div>" +
-        '<div class="pr-maquina">' +
-          '<p class="pr-et">La opción que mejor encaja</p>' +
-          '<h3 class="pr-nom">' + esc(el.n) + "</h3>" +
-          '<p class="pr-det">' + esc(el.m || "") + (el.e ? " · Eficiencia " + esc(el.e) : "") +
-            (el.i ? "<br>" + esc(el.i) : "") + "</p>" +
-          '<p class="pr-precio">' + eur(el.p) + ' <span>instalación incluida</span></p>' +
-        "</div>" +
-        (op.length > 1 ? '<p class="pr-otras">También te encajarían ' +
-          op.slice(1).map(function (x) { return esc(x.n) + " (" + eur(x.p) + ")"; }).join(" y ") + ".</p>" : "") +
+        elegidas.map(function (x, i) {
+          var maq = x.m;
+          return '<div class="pr-maquina' + (i === 0 ? " destacada" : "") + '">' +
+            '<p class="pr-et">' + esc(x.et) + "</p>" +
+            '<h3 class="pr-nom">' + esc(maq.n) + "</h3>" +
+            '<p class="pr-det">' + rasgos(maq, verEf).map(esc).join(" · ") +
+              (maq.i ? "<br>" + esc(maq.i) : "") + "</p>" +
+            '<p class="pr-precio">' + eur(maq.p) + ' <span>instalación incluida</span></p>' +
+          "</div>";
+        }).join("") +
+        (op.length > elegidas.length
+          ? '<p class="pr-otras">Con tu vivienda encajan ' + op.length +
+            ' máquinas, entre ' + eur(op[0].p) + " y " + eur(op[op.length - 1].p) +
+            ". Estas tres son las que mejor resumen el abanico; el técnico te enseña el resto si quieres.</p>"
+          : "") +
         '<div class="pr-incluye"><p class="pr-et">Qué incluye ese precio</p><ul>' +
           incluye.map(function (x) { return "<li>" + esc(x) + "</li>"; }).join("") + "</ul>" +
           '<p class="pr-extras">' + esc(EXTRAS) + "</p></div>" +
