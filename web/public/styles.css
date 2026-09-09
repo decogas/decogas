@@ -1606,6 +1606,12 @@ footer .footer-grid a:hover::after{ right:0; }
 .pr-incluye li{ margin-bottom:6px; line-height:1.5; }
 .pr-extras{ font-size:13px; color:var(--muted); margin:10px 0 0; line-height:1.5; }
 .pr-aviso{ font-size:13.5px; color:var(--muted); margin:0 0 16px; line-height:1.55; }
+/* Aviso de que no se han podido guardar los datos del cliente. Tiene que
+   verse, porque si no llama el se queda esperando una llamada nuestra. */
+.pr-fallo{ font-size:14px; line-height:1.55; margin:0 0 16px; padding:12px 14px;
+  border-radius:10px; background:#fff4ed; border:1px solid #f6c9ac; color:#8a3b12; }
+.pr-fallo a{ color:inherit; font-weight:700; }
+[data-theme="dark"] .pr-fallo{ background:#3a1d0e; border-color:#6b3a1c; color:#ffd3b8; }
 
 @media (max-width:520px){
   .form-tab{ font-size:13px; padding:10px 8px; }

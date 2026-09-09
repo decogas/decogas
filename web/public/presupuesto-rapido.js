@@ -287,13 +287,14 @@
       (auto ? "Presupuesto mostrado: " + op[0].n + " — " + eur(op[0].p)
             : "SIN PRECIO AUTOMÁTICO. Motivos: " + faltan.join("; "));
 
+    // Primero se pinta la tarjeta y luego se guarda: si el guardado falla,
+    // el aviso tiene que poder colgarse del resultado ya pintado.
+    mostrarResultado(auto, op, faltan, nombre);
+    registrarConversion(email, tel);
     guardarLead({ name: nombre, phone: tel, email: email, message: texto,
       interest: R.servicio === "caldera" ? "Caldera de gas"
               : R.servicio === "aire" ? "Aire acondicionado"
               : R.servicio === "aerotermia" ? "Aerotermia" : "Reparación" });
-
-    registrarConversion(email, tel);
-    mostrarResultado(auto, op, faltan, nombre);
   }
 
   // Misma conversión de Google Ads que el formulario de siempre, con los
@@ -311,8 +312,12 @@
     } catch (e) { /* la analítica nunca corta el flujo del cliente */ }
   }
 
+  // El cliente se va convencido de que le vamos a llamar. Si el guardado
+  // falla y no decimos nada, se queda esperando una llamada que no existe:
+  // por eso, si falla, se le avisa en la misma tarjeta y se guarda una copia
+  // en el navegador (igual que hace el formulario de siempre).
   function guardarLead(lead) {
-    if (!LIVE) return;
+    if (!LIVE) return fallaGuardado();
     fetch(cfg.supabaseUrl.replace(/\/+$/, "") + "/rest/v1/leads", {
       method: "POST",
       headers: {
@@ -322,7 +327,28 @@
         Prefer: "return=minimal"
       },
       body: JSON.stringify(lead)
-    }).catch(function () { /* si falla el guardado, el cliente ya ve su precio igual */ });
+    })
+      .then(function (r) { if (!r.ok) throw new Error("leads " + r.status); })
+      .catch(function () { copiaLocal(lead); fallaGuardado(); });
+  }
+
+  function copiaLocal(lead) {
+    try {
+      var arr = JSON.parse(localStorage.getItem("decogas_leads") || "[]");
+      arr.unshift(Object.assign({ created_at: new Date().toISOString() }, lead));
+      localStorage.setItem("decogas_leads", JSON.stringify(arr));
+    } catch (e) { /* si no hay sitio en el navegador, no se puede hacer mas */ }
+  }
+
+  function fallaGuardado() {
+    var av = caja.querySelector(".pr-fallo");
+    if (av) return;
+    av = document.createElement("p");
+    av.className = "pr-fallo";
+    av.innerHTML = "No hemos podido registrar tus datos. Llámanos al " +
+      '<a href="tel:+34919930168">919 93 01 68</a> y te lo confirmamos al momento.';
+    var boton = caja.querySelector(".btn");
+    if (boton) caja.insertBefore(av, boton); else caja.appendChild(av);
   }
 
   function mostrarResultado(auto, op, faltan, nombre) {
