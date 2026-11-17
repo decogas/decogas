@@ -53,7 +53,7 @@
         '<div class="budget-fin-box"><div class="cuota">' + cuota(price, 24) + " €/mes</div><div class=\"meses\">24 MESES</div></div>" +
         '<div class="budget-fin-box"><div class="cuota">' + cuota(price, 36) + " €/mes</div><div class=\"meses\">36 MESES</div></div>" +
       "</div></div>" +
-      '<p class="budget-foot">Presupuesto orientativo generado en la web de Decogas y sujeto a visita técnica gratuita. INSTALADORES DECOGAS SL · CIF B88192075 · C. de los Almendros 8, Local 6A, 28821 Coslada · 919 93 01 68 · info@decogas.com</p>' +
+      '<p class="budget-foot">Presupuesto orientativo generado en la web de Decogas y sujeto a visita técnica gratuita. INSTALADORES DECOGAS SL · CIF B88192075 · C. de los Almendros 8, Local 6A, 28821 Coslada · 910 29 91 15 · info@decogas.com</p>' +
       '<div class="budget-actions"><a class="btn btn-flame" id="budgetWa2" href="#" target="_blank" rel="noopener">Enviar por WhatsApp</a><button class="btn btn-ghost" id="budgetPrint2" type="button">Descargar PDF</button></div>';
 
     var waText = function () {

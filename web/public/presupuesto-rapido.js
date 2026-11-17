@@ -413,7 +413,7 @@
     av = document.createElement("p");
     av.className = "pr-fallo";
     av.innerHTML = "No hemos podido registrar tus datos. Llámanos al " +
-      '<a href="tel:+34919930168">919 93 01 68</a> y te lo confirmamos al momento.';
+      '<a href="tel:+34910299115">910 29 91 15</a> y te lo confirmamos al momento.';
     var boton = caja.querySelector(".btn");
     if (boton) caja.insertBefore(av, boton); else caja.appendChild(av);
   }
@@ -449,7 +449,7 @@
           incluye.map(function (x) { return "<li>" + esc(x) + "</li>"; }).join("") + "</ul>" +
           '<p class="pr-extras">' + esc(EXTRAS) + "</p></div>" +
         '<p class="pr-aviso">Es un presupuesto orientativo, sujeto a visita técnica. Te llamamos para confirmarlo todo sin compromiso.</p>' +
-        '<a class="btn btn-flame pr-enviar" href="tel:+34919930168">Llamar ahora · 919 93 01 68</a>' +
+        '<a class="btn btn-flame pr-enviar" href="tel:+34910299115">Llamar ahora · 910 29 91 15</a>' +
         '<button type="button" class="pr-atras" id="prOtro">Probar con otros datos</button>';
     } else {
       caja.innerHTML =
@@ -457,7 +457,7 @@
         '<p class="pr-texto">Tu caso conviene mirarlo bien antes de darte un precio, así que te llamamos nosotros y te lo decimos con seguridad. Preferimos eso a darte una cifra que luego cambie.</p>' +
         (faltan.length ? '<ul class="pr-motivos">' + faltan.map(function (m) { return "<li>" + esc(m) + "</li>"; }).join("") + "</ul>" : "") +
         '<p class="pr-aviso">Respondemos el mismo día laborable. Si prefieres no esperar, llámanos.</p>' +
-        '<a class="btn btn-flame pr-enviar" href="tel:+34919930168">Llamar ahora · 919 93 01 68</a>' +
+        '<a class="btn btn-flame pr-enviar" href="tel:+34910299115">Llamar ahora · 910 29 91 15</a>' +
         '<button type="button" class="pr-atras" id="prOtro">Empezar de nuevo</button>';
     }
     var otro = $("prOtro");

@@ -304,7 +304,7 @@
             "\nEmail: " + lead.email + "\nServicio: " + lead.interest + "\n\nMensaje:\n" + lead.message);
           window.location.href = "mailto:info@decogas.com?subject=" + subject + "&body=" + body;
           // Fallo total: NO mostramos la pantalla de éxito; avisamos al visitante.
-          window.alert("No hemos podido enviar tu solicitud automáticamente. Hemos abierto tu gestor de correo para que nos escribas a info@decogas.com; si no se abre, llámanos al 919 93 01 68.");
+          window.alert("No hemos podido enviar tu solicitud automáticamente. Hemos abierto tu gestor de correo para que nos escribas a info@decogas.com; si no se abre, llámanos al 910 29 91 15.");
         }
       });
     });

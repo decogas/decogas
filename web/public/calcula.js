@@ -126,7 +126,7 @@
         '<div class="reco-why">' + esc(why) + "</div>" +
         (noFit
           ? '<div class="reco-actions">' +
-              '<a class="btn btn-flame" style="padding:11px 20px; font-size:13.5px;" href="tel:+34919930168">Llamar y pedir estudio gratuito</a>' +
+              '<a class="btn btn-flame" style="padding:11px 20px; font-size:13.5px;" href="tel:+34910299115">Llamar y pedir estudio gratuito</a>' +
               '<a class="btn btn-ghost" style="padding:11px 20px; font-size:13.5px;" href="https://wa.me/34651368631" target="_blank" rel="noopener">WhatsApp</a>' +
             "</div>"
           : '<div class="reco-actions">' +
@@ -226,7 +226,7 @@
         "</div>" +
       "</div>" +
       '<p class="budget-foot">Presupuesto orientativo generado con la calculadora de decogas.es y sujeto a visita t\u00E9cnica gratuita. ' +
-        "INSTALADORES DECOGAS SL \u00B7 CIF B88192075 \u00B7 C. de los Almendros 8, Local 6A, 28821 Coslada \u00B7 919 93 01 68 \u00B7 info@decogas.com</p>" +
+        "INSTALADORES DECOGAS SL \u00B7 CIF B88192075 \u00B7 C. de los Almendros 8, Local 6A, 28821 Coslada \u00B7 910 29 91 15 \u00B7 info@decogas.com</p>" +
       '<div class="budget-actions">' +
         '<a class="btn btn-flame" id="budgetWa" href="#" target="_blank" rel="noopener">Enviar por WhatsApp</a>' +
         '<button class="btn btn-ghost" id="budgetPrint" type="button">Descargar PDF</button>' +

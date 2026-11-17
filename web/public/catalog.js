@@ -201,7 +201,7 @@
   var buildHTML = function (filter) {
     if (!PRODUCTS.length) {
       return '<div class="no-results">Estamos preparando el catálogo de esta sección. ' +
-        'Mientras tanto, <a href="tel:+34919930168" style="color:var(--flame-deep); font-weight:600;">llámanos al 919 93 01 68</a> ' +
+        'Mientras tanto, <a href="tel:+34910299115" style="color:var(--flame-deep); font-weight:600;">llámanos al 910 29 91 15</a> ' +
         'o <a href="./#contacto" style="color:var(--flame-deep); font-weight:600;">pide información</a> y te asesoramos con el equipo que necesitas.</div>';
     }
     var POOL = PRODUCTS.filter(matchesQuery).filter(matchesType).filter(matchesPower);
